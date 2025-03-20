@@ -5,3 +5,5 @@
 !CMakeLists.txt
 !CMakePresets.json
 !.gitignore
+!vcpkg-configuration.json
+!vcpkg.json
