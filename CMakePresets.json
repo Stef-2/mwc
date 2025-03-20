@@ -9,6 +9,8 @@
             "binaryDir": "${sourceDir}/build/${presetName}",
             "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
             "cacheVariables": {
+                "VCPKG_HOST_TRIPLET": "x64-mingw-dynamic",
+                "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic",
                 "CMAKE_C_COMPILER": "gcc",
                 "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_CXX_STANDARD": "26",
