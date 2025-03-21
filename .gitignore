@@ -7,3 +7,4 @@
 !.gitignore
 !vcpkg-configuration.json
 !vcpkg.json
+*/std.cc
