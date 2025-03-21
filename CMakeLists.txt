@@ -30,9 +30,17 @@ add_executable(${PROJECT_NAME})
 # engine module sources
 target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES FILES
     ${MODULE_DIR}/motor/core/string/string.cppm
+    ${MODULE_DIR}/motor/core/diagnostics/assert.cppm
+    ${MODULE_DIR}/motor/core/diagnostics/debug.cppm
+    ${MODULE_DIR}/motor/core/output/output_stream/output_stream.cppm
 )
 # engine translation units
 target_sources(${PROJECT_NAME} PRIVATE
     ${SOURCE_DIR}/motor/motor.cpp
 )
+
+# engine definitions
+set(ENGINE_DEBUG "MTR_DEBUG=1")
+set(CONFIGURATION "CONFIGURATION=1")
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${ENGINE_DEBUG})
 target_link_libraries(${PROJECT_NAME} PUBLIC std stdc++exp)

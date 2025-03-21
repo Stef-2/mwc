@@ -8,4 +8,6 @@ int main()
     std::println("ait");
     
     std::println("{0}", wtf);
+
+    std::println("{0}", std::stacktrace::current());
 }
