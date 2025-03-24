@@ -2,6 +2,7 @@
 
 !/data
 !/source
+source/std/*
 !CMakeLists.txt
 !CMakePresets.json
 !.gitignore
