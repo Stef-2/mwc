@@ -2927,6 +2927,8 @@ export namespace std
   using std::is_empty_v;
   using std::is_enum;
   using std::is_enum_v;
+  using std::is_scoped_enum;
+  using std::is_scoped_enum_v;
   using std::is_final;
   using std::is_final_v;
   using std::is_floating_point;

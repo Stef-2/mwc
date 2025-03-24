@@ -15,7 +15,8 @@
                 "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_CXX_STANDARD": "26",
                 "CMAKE_MAKE_PROGRAM": "ninja",
-                "CMAKE_CXX_FLAGS": "-std=c++26 -fmodules"
+                "CMAKE_CXX_FLAGS": "-std=c++26 -fmodules",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true
             }
         },
         {
