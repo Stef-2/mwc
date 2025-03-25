@@ -47,6 +47,7 @@ target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MOD
 add_executable(${PROJECT_NAME})
 # engine module sources
 target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES FILES
+    ${MODULE_DIR}/motor/core/definition/definition.cppm
     ${MODULE_DIR}/motor/core/utility/enum_bitwise_operators.cppm
     ${MODULE_DIR}/motor/core/utility/bit_shift.cppm
     ${MODULE_DIR}/motor/core/string/string.cppm
