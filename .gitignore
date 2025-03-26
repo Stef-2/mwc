@@ -8,3 +8,4 @@ source/std/*
 !.gitignore
 !vcpkg-configuration.json
 !vcpkg.json
+!clang-format.txt

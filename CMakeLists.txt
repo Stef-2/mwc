@@ -8,10 +8,11 @@ set(MTR_DEBUG 1)
 set(MTR_LOG 1)
 
 # project directory paths
-set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/source)
+set(ROOT_DIR ${PROJECT_SOURCE_DIR})
+set(SOURCE_DIR ${ROOT_DIR}/source)
 set(SOURCE_STD_DIR ${SOURCE_DIR}/std)
 set(MODULE_DIR ${SOURCE_DIR})
-set(LOG_DIR ${PROJECT_SOURCE_DIR}/log)
+set(LOG_DIR ${ROOT_DIR}/log)
 
 # if logging is enabled, attempt to find the logging directory, if not present, create one
 if(${MTR_LOG})
@@ -49,8 +50,7 @@ add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES FILES
     ${MODULE_DIR}/motor/core/definition/definition.cppm
     ${MODULE_DIR}/motor/core/utility/enum_bitwise_operators.cppm
-    ${MODULE_DIR}/motor/core/utility/bit_shift.cppm
-    ${MODULE_DIR}/motor/core/string/string.cppm
+    ${MODULE_DIR}/motor/core/utility/bit.cppm
     ${MODULE_DIR}/motor/core/concept/concept.cppm
     ${MODULE_DIR}/motor/core/output/output_stream.cppm
     ${MODULE_DIR}/motor/core/diagnostic/log/sink.cppm
@@ -63,5 +63,12 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${SOURCE_DIR}/motor/motor.cpp
 )
 # engine compile definitions
-target_compile_definitions(${PROJECT_NAME} PRIVATE MTR_DEBUG=${MTR_DEBUG} MTR_LOG=${MTR_LOG})
-target_link_libraries(${PROJECT_NAME} PUBLIC std stdc++exp)
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    MTR_DEBUG=${MTR_DEBUG}
+    MTR_LOG=${MTR_LOG}
+    $<IF:${MTR_LOG},MTR_LOG_DIR="${LOG_DIR}", MTR_LOG_DIR="">
+)
+target_link_libraries(${PROJECT_NAME} PUBLIC
+    std
+    stdc++exp
+)

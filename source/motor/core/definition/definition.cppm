@@ -7,28 +7,30 @@ import std;
 export namespace mtr
 {
     // integral types
-    using s8 = std::int8_t;
-    using u8 = std::uint8_t;
-    using s16 = std::int16_t;
-    using u16 = std::uint16_t;
-    using s32 = std::int32_t;
-    using u32 = std::uint32_t;
-    using s64 = std::int64_t;
-    using u64 = std::uint64_t;
+    using sint8_t = std::int8_t;
+    using uint8_t = std::uint8_t;
+    using sint16_t = std::int16_t;
+    using uint16_t = std::uint16_t;
+    using sint32_t = std::int32_t;
+    using uint32_t = std::uint32_t;
+    using sint64_t = std::int64_t;
+    using uint64_t = std::uint64_t;
+    using sintptr_t = std::intptr_t;
+    using uintptr_t = std::uintptr_t;
+    using size_t = std::size_t;
 
     // floating point types
-    using f16 = std::float16_t;
-    using bf16 = std::bfloat16_t;
-    using f32 = std::float32_t;
-    using f64 = std::float64_t;
-    using f128 = std::float128_t;
+    using float16_t = std::float16_t;
+    using bfloat16_t = std::bfloat16_t;
+    using float32_t = std::float32_t;
+    using float64_t = std::float64_t;
+    using float128_t = std::float128_t;
 
     // character / string types
-    using ch = char;
-    using str = std::basic_string<ch>;
-    using str_view = std::basic_string_view<ch>;
+    using char_t = char;
+    using string_t = std::basic_string<char_t>;
+    using string_view_t = std::basic_string_view<char_t>;
 
     // path types
-    using path = std::filesystem::path;
-    constexpr auto aaaaaa = sizeof(path);
+    using filepath_t = std::filesystem::path;
 }

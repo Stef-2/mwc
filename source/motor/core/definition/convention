@@ -1,0 +1,33 @@
+project wide code convention:
+
+    lower case characters
+
+    types:
+        struct types:
+            suffix: "_st"
+            aggregate types
+        class types:
+            suffix:"_ct"
+            non-aggregate types
+        enumerator types:
+            suffix: "_et"
+            scoped enumerators
+        union types:
+            suffix: "_ut"
+        alias types:
+            suffix: "_t"
+
+    values:
+        const by default
+        automatic type deduction
+        members:
+            prefix: "m_"
+        globals:
+            prefix: "g_"
+        function arguments:
+            prefix: "a_"
+        
+    functions:
+        automatic type deduction
+
+            

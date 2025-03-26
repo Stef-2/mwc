@@ -2,7 +2,8 @@ module;
 
 export module mtr_sink;
 
-import mtr_bit_shift;
+import mtr_bit;
+import mtr_enum_bitwise_operators;
 
 import std;
 
@@ -10,21 +11,23 @@ export namespace mtr
 {
     namespace log
     {
-        class sink
+        class sink_ct
         {
         public:
-            enum class type : std::uint8_t
+            enum class type_et
             {
-                e_console = bit(1),
-                e_string = bit(2),
-                e_file = bit(3)
+                e_console = utility::bit<1>(),
+                e_string = utility::bit<2>(),
+                e_file = utility::bit<3>()
             };
 
-
-            struct configuration
+            struct configuration_st
             {
-                //std::bitset<sizeof(type)> m_type;
+                type_et m_type;
+                std::ostream &m_stream;
             };
+
+            sink_ct(const configuration_st &a_configuration) : m_configuration(a_configuration) {}
         };
     }
 }

@@ -2,20 +2,20 @@ module;
 
 export module mtr_log;
 
+import mtr_definition;
+
 import std;
 
 export namespace mtr
 {
     namespace log
     {
-        
-
-        enum class severity : std::uint8_t
+        enum class severity_et : uint8_t
         {
-            e_information = 1 << 0,
-            e_warning = 1 << 1,
-            e_error = 1 << 2,
-            e_critical = 1 << 3
+            e_information,
+            e_warning,
+            e_error,
+            e_critical
         };
     }
 }
