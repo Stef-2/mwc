@@ -4,12 +4,14 @@ export module mtr_output_stream;
 
 import std;
 
-export namespace mtr {
-namespace output {
-auto output_stream() -> const std::ostream& { return std::cout; }
+export namespace mtr
+{
+  namespace output
+  {
+    auto output_stream() -> const std::ostream& { return std::cout; }
 
-auto error_stream() -> const std::ostream& { return std::cerr; }
+    auto error_stream() -> const std::ostream& { return std::cerr; }
 
-auto log_stream() -> const std::ostream& { return std::clog; }
-}
+    auto log_stream() -> const std::ostream& { return std::clog; }
+  }
 }

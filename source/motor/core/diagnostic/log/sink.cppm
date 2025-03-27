@@ -9,25 +9,23 @@ import std;
 
 export namespace mtr
 {
-    namespace log
+  namespace log
+  {
+    class sink_ct
     {
-        class sink_ct
-        {
-        public:
-            enum class type_et
-            {
-                e_console = utility::bit<1>(),
-                e_string = utility::bit<2>(),
-                e_file = utility::bit<3>()
-            };
+      public:
+      enum class type_et
+      {
+        e_console = utility::bit<1>(),
+        e_string = utility::bit<2>(),
+        e_file = utility::bit<3>()
+      };
 
-            struct configuration_st
-            {
-                type_et m_type;
-                std::ostream &m_stream;
-            };
-
-            sink_ct(const configuration_st &a_configuration) : m_configuration(a_configuration) {}
-        };
-    }
+      struct configuration_st
+      {
+        type_et m_type;
+        std::ostream& m_stream;
+      };
+    };
+  }
 }

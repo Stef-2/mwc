@@ -8,14 +8,14 @@ import std;
 
 export namespace mtr
 {
-    namespace log
+  namespace log
+  {
+    enum class severity_et : uint8_t
     {
-        enum class severity_et : uint8_t
-        {
-            e_information,
-            e_warning,
-            e_error,
-            e_critical
-        };
-    }
+      e_information,
+      e_warning,
+      e_error,
+      e_critical
+    };
+  }
 }

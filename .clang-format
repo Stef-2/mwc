@@ -1,0 +1,89 @@
+---
+AccessModifierOffset: 0
+UseTab: Never
+Standard: Latest
+SpacesInLineCommentPrefix:
+  Minimum: 1
+  Maximum: 1
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeParensOptions:
+  AfterRequiresInClause: true
+  AfterRequiresInExpression: true
+  AfterControlStatements: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeCaseColon: true
+SpaceBeforeAssignmentOperators: true
+SpaceAfterTemplateKeyword: true
+SpaceAfterLogicalNot: true
+SeparateDefinitionBlocks: Always
+RequiresExpressionIndentation: Keyword
+RequiresClausePosition: OwnLine
+RemoveSemicolon: true
+RemoveParentheses: MultipleParentheses
+RemoveBracesLLVM: true
+ReferenceAlignment: Pointer
+PointerAlignment: Left
+PackConstructorInitializers: CurrentLine
+PPIndentWidth: 2
+NamespaceIndentation: All
+MaxEmptyLinesToKeep: 1
+Language: Cpp
+LambdaBodyIndentation: Signature
+IntegerLiteralSeparator:
+  Binary: 4
+  BinaryMinDigits: 8
+  Decimal: 3
+  DecimalMinDigits: 6
+IndentRequiresClause: true
+IndentWidth: 2
+IndentPPDirectives: BeforeHash
+IndentCaseLabels: true
+IndentCaseBlocks: true
+IndentAccessModifiers: false
+FixNamespaceComments: false
+ExperimentalAutoDetectBinPacking: true
+EmptyLineBeforeAccessModifier: Always
+BreakTemplateDeclarations: Yes
+BreakFunctionDefinitionParameters: false
+BreakBeforeConceptDeclarations: Always
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  AfterExternBlock: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: true
+  BeforeWhile: true
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+BitFieldColonSpacing: Both
+BinPackParameters: true
+BinPackArguments: true
+AllowShortLoopsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortCompoundRequirementOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortCaseExpressionOnASingleLine: true
+AllowShortBlocksOnASingleLine: Never
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllArgumentsOnNextLine: false
+AlignOperands: AlignAfterOperator
+AlignConsecutiveTableGenDefinitionColons:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: {}
+AlignConsecutiveDeclarations: {}
+BracedInitializerIndentWidth: 0
+ContinuationIndentWidth: 0
+ConstructorInitializerIndentWidth: 0

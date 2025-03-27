@@ -2,7 +2,7 @@ module;
 
 export module mtr_assert;
 
-import mtr_definition;
+//import mtr_definition;
 import mtr_debug;
 import mtr_concept;
 import mtr_log;
