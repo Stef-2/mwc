@@ -85,5 +85,7 @@ AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: {}
 AlignConsecutiveDeclarations: {}
 BracedInitializerIndentWidth: 0
-ContinuationIndentWidth: 0
+ContinuationIndentWidth: 2
 ConstructorInitializerIndentWidth: 0
+
+

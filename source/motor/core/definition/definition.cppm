@@ -33,4 +33,15 @@ export namespace mtr
 
   // path types
   using filepath_t = std::filesystem::path;
+
+  // stream types
+  using istream_t = std::istream;
+  using ostream_t = std::ostream;
+  using iostream_t = std::iostream;
+
+  // container types
+  template <typename t, size_t n>
+  using array_t = std::array<t, n>;
+  template <typename t, typename a = std::allocator<t>>
+  using vector_t = std::vector<t, a>;
 }

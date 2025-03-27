@@ -2,16 +2,18 @@ module;
 
 export module mtr_output_stream;
 
+import mtr_definition;
+
 import std;
 
 export namespace mtr
 {
   namespace output
   {
-    auto output_stream() -> const std::ostream& { return std::cout; }
+    consteval auto output_stream() -> ostream_t& { return std::cout; }
 
-    auto error_stream() -> const std::ostream& { return std::cerr; }
+    consteval auto error_stream() -> ostream_t& { return std::cerr; }
 
-    auto log_stream() -> const std::ostream& { return std::clog; }
+    consteval auto log_stream() -> ostream_t& { return std::clog; }
   }
 }

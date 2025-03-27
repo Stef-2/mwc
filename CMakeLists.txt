@@ -4,6 +4,7 @@ include(CMakePrintHelpers)
 project(motor LANGUAGES CXX)
 
 # project configuration
+set(CXX_MODULE_FILE_EXTENSION ".cppm")
 set(MTR_DEBUG 1)
 set(MTR_LOG 1)
 
@@ -47,17 +48,8 @@ target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MOD
 # engine executable
 add_executable(${PROJECT_NAME})
 # engine module sources
-target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES FILES
-    ${MODULE_DIR}/motor/core/definition/definition.cppm
-    ${MODULE_DIR}/motor/core/utility/enum_bitwise_operators.cppm
-    ${MODULE_DIR}/motor/core/utility/bit.cppm
-    ${MODULE_DIR}/motor/core/concept/concept.cppm
-    ${MODULE_DIR}/motor/core/output/output_stream.cppm
-    ${MODULE_DIR}/motor/core/diagnostic/log/sink.cppm
-    ${MODULE_DIR}/motor/core/diagnostic/log/log.cppm
-    ${MODULE_DIR}/motor/core/diagnostic/debug.cppm
-    ${MODULE_DIR}/motor/core/diagnostic/assert.cppm
-)
+file(GLOB_RECURSE MODULE_SOURCES CONFIGURE_DEPENDS ${MODULE_DIR}/*${CXX_MODULE_FILE_EXTENSION})
+target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES FILES ${MODULE_SOURCES})
 # engine translation units
 target_sources(${PROJECT_NAME} PRIVATE
     ${SOURCE_DIR}/motor/motor.cpp
