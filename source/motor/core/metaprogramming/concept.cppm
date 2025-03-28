@@ -16,9 +16,9 @@ export namespace mtr
       std::is_same_v<type, bool> or std::is_convertible_v<type, bool>;
 
     template <typename type, typename... types>
-    concept is_any = std::disjunction_v<std::is_same<type, types>...>;
+    concept any_of = std::disjunction_v<std::is_same<type, types>...>;
 
     template <typename type, typename... types>
-    concept are_same = std::conjunction_v<std::is_same<type, types>...>;
+    concept all_of = std::conjunction_v<std::is_same<type, types>...>;
   }
 }

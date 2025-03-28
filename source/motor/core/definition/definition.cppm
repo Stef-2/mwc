@@ -38,6 +38,7 @@ export namespace mtr
   using istream_t = std::istream;
   using ostream_t = std::ostream;
   using iostream_t = std::iostream;
+  using file_t = std::FILE;
 
   // container types
   template <typename t, size_t n>
