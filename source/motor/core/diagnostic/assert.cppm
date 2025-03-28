@@ -12,14 +12,16 @@ import std;
 export namespace mtr
 {
   constexpr auto assert(const concepts::boolean auto a_condition,
-                        const string_view_t a_message = {""}) -> void
+                        const string_view_t a_message = {}) -> void
   {
     if constexpr (not debugging())
       return;
 
     if (not a_condition)
     {
-      std::print("{}\n", a_message);
+      if (not a_message.empty())
+        std::print("{}\n", a_message);
+
       std::abort();
     }
   }

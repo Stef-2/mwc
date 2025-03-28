@@ -16,6 +16,7 @@ export namespace mtr
 {
   namespace log
   {
+    // sink types
     enum class sink_et : uint8_t
     {
       e_console,
@@ -23,21 +24,37 @@ export namespace mtr
       e_file
     };
 
-    template <sink_et t = sink_et::e_console,
+    template <sink_et sink_type = sink_et::e_console>
+    auto consteval sink_output_map()
+    {
+      if constexpr (sink_type == sink_et::e_console)
+        return std::remove_reference<decltype(output::log_stream())> {};
+      if constexpr (sink_type == sink_et::e_string)
+        return string_t {};
+      if constexpr (sink_type == sink_et::e_file)
+        return file_t {};
+
+      static_assert(false, "unreachable");
+    }
+
+    template <sink_et sink_type = sink_et::e_console,
               size_t stream_count = std::dynamic_extent>
     class sink_ct
     {
       public:
-      /*struct configuration_st
+      /*template <sink_et cfg_sink_type = sink_type,
+                size_t cfg_stream_count = stream_count>*/
+      struct configuration_st
       {
-        sink_et m_type;
-        extent_t<observer_ptr_t<ostream_t>, stream_count> m_streams;
+        extent_t<observer_ptr_t<decltype(sink_output_map<sink_type>())>,
+                 stream_count>
+          m_streams;
       };
 
-      static constexpr auto g_default_cfg =
+      /*static constexpr auto g_default_cfg =
         configuration_st {.m_type = sink_et::e_console,
-                          .m_streams = extent_t<observer_ptr_t<ostream_t>, 1> {
-                          &output::log_stream()}};
+                          .m_streams = extent_t<observer_ptr_t<ostream_t>, 1>
+      { &output::log_stream()}};
 
       constexpr sink_ct(const configuration_st& a_cfg = g_default_cfg)
       : m_configuration(a_cfg)

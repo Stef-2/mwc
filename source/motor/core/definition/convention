@@ -20,10 +20,10 @@ project wide code convention:
     values:
         const by default
         automatic type deduction
-        members:
+        member:
             prefix: "m_"
-        globals:
-            prefix: "g_"
+        static member:
+            prefix: "s_"
         function arguments:
             prefix: "a_"
         
