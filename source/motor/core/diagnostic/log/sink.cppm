@@ -12,83 +12,52 @@ import mtr_type_map;
 
 import std;
 
-export namespace mtr
+namespace mtr
 {
   namespace log
   {
     // sink types
-    enum class sink_et : uint8_t
+    export enum class sink_et : uint8_t
     {
       e_console,
       e_string,
       e_file
     };
 
+    template <typename T>
+    concept sink_output_t = concepts::any_off<T, ostream_t, string_t, file_t>;
+
+    // map sink types to their respective output stream types
     template <sink_et sink_type = sink_et::e_console>
-    auto consteval sink_output_map()
+    auto constexpr sink_output_map()
     {
       if constexpr (sink_type == sink_et::e_console)
-        return std::remove_reference<decltype(output::log_stream())> {};
+        return observer_ptr_t<std::remove_reference_t<decltype(output::log_stream())>> {};
       if constexpr (sink_type == sink_et::e_string)
-        return string_t {};
+        return observer_ptr_t<string_t> {};
       if constexpr (sink_type == sink_et::e_file)
-        return file_t {};
-
-      static_assert(false, "unreachable");
+        return observer_ptr_t<file_t> {};
     }
 
-    template <sink_et sink_type = sink_et::e_console,
-              size_t stream_count = std::dynamic_extent>
+    export template <sink_et sink_type = sink_et::e_console,
+                     size_t stream_count = 1>
     class sink_ct
     {
       public:
-      /*template <sink_et cfg_sink_type = sink_type,
-                size_t cfg_stream_count = stream_count>*/
-      struct configuration_st
-      {
-        extent_t<observer_ptr_t<decltype(sink_output_map<sink_type>())>,
-                 stream_count>
-          m_streams;
-      };
+      using sink_output_t = decltype(sink_output_map<sink_type>());
 
-      /*static constexpr auto g_default_cfg =
-        configuration_st {.m_type = sink_et::e_console,
-                          .m_streams = extent_t<observer_ptr_t<ostream_t>, 1>
-      { &output::log_stream()}};
-
-      constexpr sink_ct(const configuration_st& a_cfg = g_default_cfg)
-      : m_configuration(a_cfg)
+      constexpr sink_ct(const extent_t<sink_output_t, stream_count>& a_streams /*= {&output::log_stream()}*/)
+      : m_streams {std::move(a_streams)}
       {}
 
       private:
-      configuration_st m_configuration;**/
+      extent_t<sink_output_t, stream_count> m_streams;
     };
-  }
-}
 
-namespace mtr
-{
-  namespace log
-  {
-    using console_sink_type_map_t = type_map_st<sink_et, ostream_t>;
-
-    template <size_t stream_count>
-    struct console_sink_st
+    auto unit_test()
     {
-      extent_t<observer_ptr_t<ostream_t>, stream_count> m_streams;
-    };
-
-    template <size_t string_count>
-    struct string_sink_st
-
-    {
-      extent_t<observer_ptr_t<string_t>, string_count> m_streams;
-    };
-
-    template <size_t file_count>
-    struct file_sink_st
-    {
-      extent_t<observer_ptr_t<file_t>, file_count> m_streams;
-    };
+      string_t s;
+      auto sink = sink_ct {{&s}};
+    }
   }
 }
