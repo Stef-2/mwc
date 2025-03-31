@@ -1,12 +1,12 @@
 module;
 
-export module mtr_type_map;
+export module mwc_type_map;
 
-import mtr_concept;
+import mwc_concept;
 
 import std;
 
-export namespace mtr
+export namespace mwc
 {
   // map [key_type] to [value_type]
   template <typename key_type, typename value_type>

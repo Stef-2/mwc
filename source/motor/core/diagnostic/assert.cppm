@@ -1,28 +1,30 @@
 module;
 
-export module mtr_assert;
+export module mwc_assert;
 
-import mtr_definition;
-import mtr_debug;
-import mtr_concept;
-import mtr_log;
+import mwc_definition;
+import mwc_debug;
+import mwc_concept;
 
 import std;
 
-export namespace mtr
+export namespace mwc
 {
-  constexpr auto assert(const concepts::boolean auto a_condition,
-                        const string_view_t a_message = {}) -> void
+  namespace diagnostic
   {
-    if constexpr (not debugging())
-      return;
-
-    if (not a_condition)
+    constexpr auto assert(const concepts::boolean_c auto a_condition,
+                          const string_view_t a_message = {}) -> void
     {
-      if (not a_message.empty())
-        std::print("{}\n", a_message);
+      if constexpr (not debugging())
+        return;
 
-      std::abort();
+      if (not a_condition)
+      {
+        if (not a_message.empty())
+          std::print("{}\n", a_message);
+
+        std::abort();
+      }
     }
   }
 }

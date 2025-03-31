@@ -1,9 +1,12 @@
 module;
 
-export module mtr_debug;
+export module mwc_debug;
 
-export namespace mtr
+export namespace mwc
 {
-  // debugging mode
-  consteval auto debugging() -> const bool { return {MTR_DEBUG}; }
+  namespace diagnostic
+  {
+    // debugging mode
+    consteval auto debugging() -> const bool { return {MWC_DEBUG}; }
+  }
 }

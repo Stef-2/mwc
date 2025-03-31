@@ -1,16 +1,37 @@
-import mtr_definition;
-import mtr_log;
-import mtr_sink;
+#include <csignal>
+#include <stdio.h>
+
+import mwc_definition;
+import mwc_log;
+import mwc_sink;
 
 import std;
 
+extern "C" void handle_signal(int signal)
+{
+  printf("SIGNAL!!!\n");
+  //std::_Exit(1);
+}
+
 int main()
 {
-  mtr::string_t wtf = {"asd"};
+  // this is the main entry point for the application
+  mwc::string_t wtf = {"asd"};
   std::println("ait");
+  std::signal(SIGFPE, handle_signal);
+  std::println("{0}", MWC_LOG_DIR);
+  // mwc::log::wtf();
+  //mwc::log::sink_ct<mwc::log::sink_et::e_console, 1> wtf_sink;
+  char* omg = nullptr;
+  std::string s = "sinksss";
+  std::FILE* f = std::fopen("sink.txt", "w");
+  mwc::diagnostic::sink_ct sink {&s};
+  sink.write_to_drains(" wwworking ?\n");
 
-  std::println("{0}", MTR_LOG_DIR);
-  // mtr::log::wtf();
-  mtr::log::sink_ct<mtr::log::sink_et::e_console, 1> wtf_sink;
-  const bool aaa = MTR_DEBUG;
+  //int i = 3 / 0;
+  //std::cout << i;
+  const bool aaa = MWC_DEBUG;
+  std::cout << omg;
+  omg[0] = 'a';
+  std::cout << s;
 }

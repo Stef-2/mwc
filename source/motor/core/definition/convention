@@ -9,13 +9,16 @@ project wide code convention:
         class types:
             suffix:"_ct"
             non-aggregate types
-        enumerator types:
+        enumerator_c types:
             suffix: "_et"
-            scoped enumerators
+            scoped enumerator_cs
         union types:
             suffix: "_ut"
         alias types:
             suffix: "_t"
+
+    concepts:
+        sufix: "_c"
 
     values:
         const by default

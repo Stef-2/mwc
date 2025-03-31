@@ -1,12 +1,12 @@
 module;
 
-export module mtr_bit;
+export module mwc_bit;
 
-import mtr_definition;
+import mwc_definition;
 
 import std;
 
-export namespace mtr
+export namespace mwc
 {
   namespace utility
   {

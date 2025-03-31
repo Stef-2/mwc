@@ -1,10 +1,10 @@
 module;
 
-export module mtr_definition;
+export module mwc_definition;
 
 import std;
 
-export namespace mtr
+export namespace mwc
 {
   // integral types
   using sint8_t = std::int8_t;
@@ -45,4 +45,8 @@ export namespace mtr
   using array_t = std::array<t, n>;
   template <typename t, typename a = std::allocator<t>>
   using vector_t = std::vector<t, a>;
+  template <typename t>
+  using initializer_list_t = std::initializer_list<t>;
+  template <typename t>
+  using span_t = std::span<t>;
 }

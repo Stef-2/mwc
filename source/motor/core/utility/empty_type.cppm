@@ -1,8 +1,8 @@
 module;
 
-export module mtr_empty_type;
+export module mwc_empty_type;
 
-export namespace mtr
+export namespace mwc
 {
   struct empty_type_st
   {};

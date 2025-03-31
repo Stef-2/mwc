@@ -1,22 +1,24 @@
 cmake_minimum_required(VERSION 4.0.0 FATAL_ERROR)
 include(CMakePrintHelpers)
 
-project(motor LANGUAGES CXX)
+project(mwc LANGUAGES CXX)
 
 # project configuration
+set(CXX_SOURCE_FILE_EXTENSION ".cpp")
 set(CXX_MODULE_FILE_EXTENSION ".cppm")
-set(MTR_DEBUG 1)
-set(MTR_LOG 1)
+set(MWC_DEBUG 1)
+set(MWC_LOG 1)
 
 # project directory paths
 set(ROOT_DIR ${PROJECT_SOURCE_DIR})
 set(SOURCE_DIR ${ROOT_DIR}/source)
+set(SOURCE_PROJECT_DIR ${SOURCE_DIR}/${PROJECT_NAME})
 set(SOURCE_STD_DIR ${SOURCE_DIR}/std)
 set(MODULE_DIR ${SOURCE_DIR})
 set(LOG_DIR ${ROOT_DIR}/log)
 
 # if logging is enabled, attempt to find the logging directory, if not present, create one
-if(${MTR_LOG})
+if(${MWC_LOG})
     message(CHECK_START "logging is enabled, attempting to find the log directory...")
     if(EXISTS ${LOG_DIR})
         message(CHECK_PASS "logging directory found: " ${LOG_DIR})
@@ -51,14 +53,15 @@ add_executable(${PROJECT_NAME})
 file(GLOB_RECURSE MODULE_SOURCES CONFIGURE_DEPENDS ${MODULE_DIR}/*${CXX_MODULE_FILE_EXTENSION})
 target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES FILES ${MODULE_SOURCES})
 # engine translation units
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${SOURCE_DIR}/*${CXX_SOURCE_FILE_EXTENSION})
 target_sources(${PROJECT_NAME} PRIVATE
-    ${SOURCE_DIR}/motor/motor.cpp
+    ${SOURCES}
 )
 # engine compile definitions
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    MTR_DEBUG=${MTR_DEBUG}
-    MTR_LOG=${MTR_LOG}
-    $<IF:${MTR_LOG},MTR_LOG_DIR="${LOG_DIR}", MTR_LOG_DIR="">
+    MWC_DEBUG=${MWC_DEBUG}
+    MWC_LOG=${MWC_LOG}
+    $<IF:${MWC_LOG},MWC_LOG_DIR="${LOG_DIR}", MWC_LOG_DIR="">
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC
     std

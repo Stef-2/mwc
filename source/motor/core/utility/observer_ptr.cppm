@@ -1,8 +1,8 @@
 module;
 
-export module mtr_observer_ptr;
+export module mwc_observer_ptr;
 
-export namespace mtr
+export namespace mwc
 {
   template <typename t>
   using observer_ptr_t = t*;

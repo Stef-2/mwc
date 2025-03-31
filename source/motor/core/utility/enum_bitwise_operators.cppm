@@ -1,54 +1,54 @@
 module;
 
-export module mtr_enum_bitwise_operators;
+export module mwc_enum_bitwise_operators;
 
-import mtr_concept;
+import mwc_concept;
 
 import std;
 
-export namespace mtr
+export namespace mwc
 {
-  constexpr auto operator not(const concepts::enumerator auto x)
+  constexpr auto operator not(const concepts::enumerator_c auto x)
   {
-    return static_cast<const concepts::enumerator auto>(
-    not std::to_underlying(x));
+    return static_cast<const concepts::enumerator_c auto>(
+      not std::to_underlying(x));
   }
 
-  constexpr auto operator bitor(const concepts::enumerator auto x,
-                                const concepts::enumerator auto y)
+  constexpr auto operator bitor(const concepts::enumerator_c auto x,
+                                const concepts::enumerator_c auto y)
   {
-    return static_cast<const concepts::enumerator auto>(
-    std::to_underlying(x) bitor std::to_underlying(y));
+    return static_cast<const concepts::enumerator_c auto>(
+      std::to_underlying(x) bitor std::to_underlying(y));
   }
 
-  constexpr auto operator bitand(const concepts::enumerator auto x,
-                                 const concepts::enumerator auto y)
+  constexpr auto operator bitand(const concepts::enumerator_c auto x,
+                                 const concepts::enumerator_c auto y)
   {
-    return static_cast<const concepts::enumerator auto>(
-    std::to_underlying(x) bitand std::to_underlying(y));
+    return static_cast<const concepts::enumerator_c auto>(
+      std::to_underlying(x) bitand std::to_underlying(y));
   }
 
-  constexpr auto operator xor(const concepts::enumerator auto x,
-                              const concepts::enumerator auto y)
+  constexpr auto operator xor(const concepts::enumerator_c auto x,
+                              const concepts::enumerator_c auto y)
   {
-    return static_cast<const concepts::enumerator auto>(
-    std::to_underlying(x) xor std::to_underlying(y));
+    return static_cast<const concepts::enumerator_c auto>(
+      std::to_underlying(x) xor std::to_underlying(y));
   }
 
-  constexpr auto operator|=(concepts::enumerator auto& x,
-                            const concepts::enumerator auto y)
+  constexpr auto operator|=(concepts::enumerator_c auto& x,
+                            const concepts::enumerator_c auto y)
   {
     return x bitor y;
   }
 
-  constexpr auto operator&=(concepts::enumerator auto& x,
-                            const concepts::enumerator auto y)
+  constexpr auto operator&=(concepts::enumerator_c auto& x,
+                            const concepts::enumerator_c auto y)
   {
     return x bitand y;
   }
 
-  constexpr auto operator^=(concepts::enumerator auto& x,
-                            const concepts::enumerator auto y)
+  constexpr auto operator^=(concepts::enumerator_c auto& x,
+                            const concepts::enumerator_c auto y)
   {
     return x xor y;
   }

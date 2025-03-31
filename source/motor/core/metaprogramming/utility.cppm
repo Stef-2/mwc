@@ -1,8 +1,8 @@
 module;
 
-export module mtr_metaprogramming_utility;
+export module mwc_metaprogramming_utility;
 
-export namespace mtr
+export namespace mwc
 {
 
 }

@@ -1,6 +1,5 @@
 {
     "version": 8,
-
     "configurePresets": [
         {
             "name": "base",
@@ -15,7 +14,7 @@
                 "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_CXX_STANDARD": "26",
                 "CMAKE_MAKE_PROGRAM": "ninja",
-                "CMAKE_CXX_FLAGS": "-std=c++26 -fmodules",
+                "CMAKE_CXX_FLAGS": "-std=c++26 -fmodules -fno-exceptions",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": true
             }
         },
@@ -23,26 +22,25 @@
             "name": "debug",
             "inherits": "base",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE":"Debug"
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
             "name": "release",
             "inherits": "base",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE":"Release"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {
             "name": "release_with_debug_information",
             "inherits": "base",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE":"RelWithDebInfo"
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
         }
     ],
-
-    "buildPresets":[
+    "buildPresets": [
         {
             "name": "debug",
             "configurePreset": "debug"

@@ -1,12 +1,12 @@
 module;
 
-export module mtr_output_stream;
+export module mwc_output_stream;
 
-import mtr_definition;
+import mwc_definition;
 
 import std;
 
-export namespace mtr
+export namespace mwc
 {
   namespace output
   {
