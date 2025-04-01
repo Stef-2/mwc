@@ -43,6 +43,10 @@ export namespace mwc
       // if [drain_count] is [s_dynamic_extent], the storage is [vector_t<drain_t>]
       using drain_storage_t = extent_t<drain_t, drain_count>;
 
+      // default constructor is only available if [drain_storage_t] is [vector_t<drain_t>]
+      sink_ct()
+        requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>)
+      = default;
       sink_ct(const auto& a_drains);
 
       // disable copy constructor and assignment operator
@@ -50,9 +54,9 @@ export namespace mwc
       sink_ct& operator=(const sink_ct&) = delete;
 
       auto add_drain(const drain_t a_drain) -> void
-        requires(drain_count == s_dynamic_extent);
+        requires std::is_same_v<drain_storage_t, vector_t<drain_t>>;
       auto remove_drain(const drain_t a_drain) -> void
-        requires(drain_count == s_dynamic_extent);
+        requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>);
       auto write_to_drains(const string_view_t a_string) -> void;
 
       private:
@@ -80,9 +84,8 @@ export namespace mwc
 
     template <drain_c drain_t, size_t drain_count>
     auto sink_ct<drain_t, drain_count>::add_drain(const drain_t a_drain) -> void
-      requires(drain_count == s_dynamic_extent)
+      requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>)
     {
-
       assert(a_drain);
       m_drains.emplace_back(a_drain);
     }
@@ -90,7 +93,7 @@ export namespace mwc
     template <drain_c drain_t, size_t drain_count>
     auto sink_ct<drain_t, drain_count>::remove_drain(const drain_t a_drain)
       -> void
-      requires(drain_count == s_dynamic_extent)
+      requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>)
     {
       assert(a_drain);
       std::erase(m_drains, a_drain);
@@ -101,6 +104,9 @@ export namespace mwc
     sink_ct<drain_t, drain_count>::write_to_drains(const string_view_t a_string)
       -> void
     {
+      // note: consider adding a a special constexpr check for [stream_count == 1]
+      // in case the compiler doesn't optimize away the for_each loop
+
       if constexpr (std::is_same_v<drain_t, ostream_ptr_t>)
         for (const auto drain : m_drains)
           std::print(*drain, "{0}", a_string);

@@ -7,18 +7,12 @@ import mwc_sink;
 
 import std;
 
-extern "C" void handle_signal(int signal)
-{
-  printf("SIGNAL!!!\n");
-  //std::_Exit(1);
-}
-
 int main()
 {
   // this is the main entry point for the application
   mwc::string_t wtf = {"asd"};
   std::println("ait");
-  std::signal(SIGFPE, handle_signal);
+
   std::println("{0}", MWC_LOG_DIR);
   // mwc::log::wtf();
   //mwc::log::sink_ct<mwc::log::sink_et::e_console, 1> wtf_sink;
@@ -31,7 +25,5 @@ int main()
   //int i = 3 / 0;
   //std::cout << i;
   const bool aaa = MWC_DEBUG;
-  std::cout << omg;
-  omg[0] = 'a';
   std::cout << s;
 }

@@ -47,6 +47,15 @@ endif()
 add_library(std)
 target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
 
+# vulkan library
+#[[
+add_library(vulkan)
+find_package(VulkanHeaders CONFIG REQUIRED)
+get_target_property(VULKAN_INCLUDE_DIR Vulkan::Headers INTERFACE_INCLUDE_DIRECTORIES)
+target_compile_definitions(vulkan PRIVATE VULKAN_HPP_NO_EXCEPTIONS)
+target_include_directories(vulkan PRIVATE ${VULKAN_INCLUDE_DIR})
+target_sources(vulkan PUBLIC FILE_SET CXX_MODULES FILES ${VULKAN_INCLUDE_DIR}/vulkan/vulkan.cppm)]]
+
 # engine executable
 add_executable(${PROJECT_NAME})
 # engine module sources
@@ -66,4 +75,5 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PUBLIC
     std
     stdc++exp
+    #vulkan
 )
