@@ -49,4 +49,6 @@ export namespace mwc
   using initializer_list_t = std::initializer_list<t>;
   template <typename t>
   using span_t = std::span<t>;
+  template <typename... types>
+  using tuple_t = std::tuple<types...>;
 }
