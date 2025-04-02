@@ -42,6 +42,7 @@ export namespace mwc
       // if [drain_count] is not [s_dynamic_extent], the storage is [array_t<drain_t, drain_count>]
       // if [drain_count] is [s_dynamic_extent], the storage is [vector_t<drain_t>]
       using drain_storage_t = extent_t<drain_t, drain_count>;
+      using underlying_drain_t = drain_t;
 
       // default constructor is only available if [drain_storage_t] is [vector_t<drain_t>]
       sink_ct()

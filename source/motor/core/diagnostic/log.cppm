@@ -16,37 +16,36 @@ export namespace mwc
   namespace diagnostic
   {
 
-    //template <template <drain_c c, size_t n> typename... sinks>
-    //using wtf = sinks;
-
-    /*template <template <drain_c, size_t> typename... sinks, drain_c drain,
-              size_t drain_count>*/
-    //template <template <drain_c, size_t> typename... sinks>
-    template <sink_ct<drain_c, size_t>... sinks>
+    template <typename... ts>
     class log_ct
     {
       public:
+      static constexpr auto ostream =
+        concepts::any_of_c<ts..., sink_ct<ostream_t*, s_dynamic_extent>>;
+
       //template <sinks...>
       //using drain_t = D;
 
       /*log_ct(
         const auto&... a_sinks)
       {}*/
-
-      std::tuple<decltype(sinks)...> m_sinks;
+      //log_ct(const auto&... a_sinks) /*: m_sinks {a_sinks...} */ {}
+      //log_ct() {}
+      log_ct(const auto&... a_sinks) : m_sinks {std::make_tuple(a_sinks...)} {}
 
       private:
+      std::tuple<ts...> m_sinks;
     };
 
     void test()
     {
-
-      //sink_ct<ostream_t*, 1> sink {&std::cout};
+      string_t s;
+      sink_ct<ostream_t*, s_dynamic_extent> sink1 {&std::cout};
+      sink_ct<string_t*, s_dynamic_extent> sink2 {&s};
       //log_ct<decltype(sink)> /*<ostream_t*, 1>*/ log {sink};
       /*log_ct<sink_ct<ostream_t*, std::dynamic_extent>> log {
         sink_ct<ostream_t*, std::dynamic_extent> {&std::cout}};*/
-      log_ct<sink_ct<ostream_t*, 1>> log {
-        /*sink_ct<ostream_t*, 1> {&std::cout}*/};
+      log_ct<sink_ct<ostream_t*, s_dynamic_extent>> log {sink1};
       //log.m_sinks.write_to_drains(" wwworking ?\n");
       //std::get<0>(log).write_to_drains(" wwworking ?\n");
     }
