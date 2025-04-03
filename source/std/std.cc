@@ -51,151 +51,203 @@ export namespace std
     using std::ranges::in_out_result;
     using std::ranges::min_max_result;
   }
+
   using std::all_of;
+
   namespace ranges
   {
     using std::ranges::all_of;
   }
+
   using std::any_of;
+
   namespace ranges
   {
     using std::ranges::any_of;
   }
+
   using std::none_of;
+
   namespace ranges
   {
     using std::ranges::none_of;
   }
+
   using std::for_each;
+
   namespace ranges
   {
     using std::ranges::for_each;
     using std::ranges::for_each_result;
   }
+
   using std::for_each_n;
+
   namespace ranges
   {
     using std::ranges::for_each_n;
     using std::ranges::for_each_n_result;
   }
+
   using std::find;
   using std::find_if;
   using std::find_if_not;
+
   namespace ranges
   {
     using std::ranges::find;
     using std::ranges::find_if;
     using std::ranges::find_if_not;
   }
+
   using std::find_end;
+
   namespace ranges
   {
     using std::ranges::find_end;
   }
+
   using std::find_first_of;
+
   namespace ranges
   {
     using std::ranges::find_first_of;
   }
+
   using std::adjacent_find;
+
   namespace ranges
   {
     using std::ranges::adjacent_find;
   }
+
   using std::count;
   using std::count_if;
+
   namespace ranges
   {
     using std::ranges::count;
     using std::ranges::count_if;
   }
+
   using std::mismatch;
+
   namespace ranges
   {
     using std::ranges::mismatch;
     using std::ranges::mismatch_result;
   }
+
   using std::equal;
+
   namespace ranges
   {
     using std::ranges::equal;
   }
+
   using std::is_permutation;
+
   namespace ranges
   {
     using std::ranges::is_permutation;
   }
+
   using std::search;
+
   namespace ranges
   {
     using std::ranges::search;
   }
+
   using std::search_n;
+
   namespace ranges
   {
     using std::ranges::search_n;
   }
+
   namespace ranges
-  {}
+  {
+  }
+
   using std::copy;
+
   namespace ranges
   {
     using std::ranges::copy;
     using std::ranges::copy_result;
   }
+
   using std::copy_n;
+
   namespace ranges
   {
     using std::ranges::copy_n;
     using std::ranges::copy_n_result;
   }
+
   using std::copy_if;
+
   namespace ranges
   {
     using std::ranges::copy_if;
     using std::ranges::copy_if_result;
   }
+
   using std::copy_backward;
+
   namespace ranges
   {
     using std::ranges::copy_backward;
     using std::ranges::copy_backward_result;
   }
+
   using std::move;
+
   namespace ranges
   {
     using std::ranges::move;
     using std::ranges::move_result;
   }
+
   using std::move_backward;
+
   namespace ranges
   {
     using std::ranges::move_backward;
     using std::ranges::move_backward_result;
   }
+
   using std::swap_ranges;
+
   namespace ranges
   {
     using std::ranges::swap_ranges;
     using std::ranges::swap_ranges_result;
   }
+
   using std::iter_swap;
   using std::transform;
+
   namespace ranges
   {
     using std::ranges::binary_transform_result;
     using std::ranges::transform;
     using std::ranges::unary_transform_result;
   }
+
   using std::replace;
   using std::replace_if;
+
   namespace ranges
   {
     using std::ranges::replace;
     using std::ranges::replace_if;
   }
+
   using std::replace_copy;
   using std::replace_copy_if;
+
   namespace ranges
   {
     using std::ranges::replace_copy;
@@ -203,29 +255,37 @@ export namespace std
     using std::ranges::replace_copy_if_result;
     using std::ranges::replace_copy_result;
   }
+
   using std::fill;
   using std::fill_n;
+
   namespace ranges
   {
     using std::ranges::fill;
     using std::ranges::fill_n;
   }
+
   using std::generate;
   using std::generate_n;
+
   namespace ranges
   {
     using std::ranges::generate;
     using std::ranges::generate_n;
   }
+
   using std::remove;
   using std::remove_if;
+
   namespace ranges
   {
     using std::ranges::remove;
     using std::ranges::remove_if;
   }
+
   using std::remove_copy;
   using std::remove_copy_if;
+
   namespace ranges
   {
     using std::ranges::remove_copy;
@@ -233,259 +293,358 @@ export namespace std
     using std::ranges::remove_copy_if_result;
     using std::ranges::remove_copy_result;
   }
+
   using std::unique;
+
   namespace ranges
   {
     using std::ranges::unique;
   }
+
   using std::unique_copy;
+
   namespace ranges
   {
     using std::ranges::unique_copy;
     using std::ranges::unique_copy_result;
   }
+
   using std::reverse;
+
   namespace ranges
   {
     using std::ranges::reverse;
   }
+
   using std::reverse_copy;
+
   namespace ranges
   {
     using std::ranges::reverse_copy;
     using std::ranges::reverse_copy_result;
   }
+
   using std::rotate;
+
   namespace ranges
   {
     using std::ranges::rotate;
   }
+
   using std::rotate_copy;
+
   namespace ranges
   {
     using std::ranges::rotate_copy;
     using std::ranges::rotate_copy_result;
   }
+
   using std::sample;
+
   namespace ranges
   {
     using std::ranges::sample;
   }
+
   using std::shuffle;
+
   namespace ranges
   {
     using std::ranges::shuffle;
   }
+
   using std::shift_left;
+
   namespace ranges
-  {}
+  {
+  }
+
   using std::shift_right;
+
   namespace ranges
-  {}
+  {
+  }
+
   using std::sort;
+
   namespace ranges
   {
     using std::ranges::sort;
   }
+
   using std::stable_sort;
+
   namespace ranges
   {
     using std::ranges::stable_sort;
   }
+
   using std::partial_sort;
+
   namespace ranges
   {
     using std::ranges::partial_sort;
   }
+
   using std::partial_sort_copy;
+
   namespace ranges
   {
     using std::ranges::partial_sort_copy;
     using std::ranges::partial_sort_copy_result;
   }
+
   using std::is_sorted;
   using std::is_sorted_until;
+
   namespace ranges
   {
     using std::ranges::is_sorted;
     using std::ranges::is_sorted_until;
   }
+
   using std::nth_element;
+
   namespace ranges
   {
     using std::ranges::nth_element;
   }
+
   using std::lower_bound;
+
   namespace ranges
   {
     using std::ranges::lower_bound;
   }
+
   using std::upper_bound;
+
   namespace ranges
   {
     using std::ranges::upper_bound;
   }
+
   using std::equal_range;
+
   namespace ranges
   {
     using std::ranges::equal_range;
   }
+
   using std::binary_search;
+
   namespace ranges
   {
     using std::ranges::binary_search;
   }
+
   using std::is_partitioned;
+
   namespace ranges
   {
     using std::ranges::is_partitioned;
   }
+
   using std::partition;
+
   namespace ranges
   {
     using std::ranges::partition;
   }
+
   using std::stable_partition;
+
   namespace ranges
   {
     using std::ranges::stable_partition;
   }
+
   using std::partition_copy;
+
   namespace ranges
   {
     using std::ranges::partition_copy;
     using std::ranges::partition_copy_result;
   }
+
   using std::partition_point;
+
   namespace ranges
   {
     using std::ranges::partition_point;
   }
+
   using std::merge;
+
   namespace ranges
   {
     using std::ranges::merge;
     using std::ranges::merge_result;
   }
+
   using std::inplace_merge;
+
   namespace ranges
   {
     using std::ranges::inplace_merge;
   }
+
   using std::includes;
+
   namespace ranges
   {
     using std::ranges::includes;
   }
+
   using std::set_union;
+
   namespace ranges
   {
     using std::ranges::set_union;
     using std::ranges::set_union_result;
   }
+
   using std::set_intersection;
+
   namespace ranges
   {
     using std::ranges::set_intersection;
     using std::ranges::set_intersection_result;
   }
+
   using std::set_difference;
+
   namespace ranges
   {
     using std::ranges::set_difference;
     using std::ranges::set_difference_result;
   }
+
   using std::set_symmetric_difference;
+
   namespace ranges
   {
     using std::ranges::set_symmetric_difference;
     using std::ranges::set_symmetric_difference_result;
   }
+
   using std::push_heap;
+
   namespace ranges
   {
     using std::ranges::push_heap;
   }
+
   using std::pop_heap;
+
   namespace ranges
   {
     using std::ranges::pop_heap;
   }
+
   using std::make_heap;
+
   namespace ranges
   {
     using std::ranges::make_heap;
   }
+
   using std::sort_heap;
+
   namespace ranges
   {
     using std::ranges::sort_heap;
   }
+
   using std::is_heap;
+
   namespace ranges
   {
     using std::ranges::is_heap;
   }
+
   using std::is_heap_until;
+
   namespace ranges
   {
     using std::ranges::is_heap_until;
   }
+
   using std::min;
+
   namespace ranges
   {
     using std::ranges::min;
   }
+
   using std::max;
+
   namespace ranges
   {
     using std::ranges::max;
   }
+
   using std::minmax;
+
   namespace ranges
   {
     using std::ranges::minmax;
     using std::ranges::minmax_result;
   }
+
   using std::min_element;
+
   namespace ranges
   {
     using std::ranges::min_element;
   }
+
   using std::max_element;
+
   namespace ranges
   {
     using std::ranges::max_element;
   }
+
   using std::minmax_element;
+
   namespace ranges
   {
     using std::ranges::minmax_element;
     using std::ranges::minmax_element_result;
   }
+
   using std::clamp;
+
   namespace ranges
   {
     using std::ranges::clamp;
   }
+
   using std::lexicographical_compare;
+
   namespace ranges
   {
     using std::ranges::lexicographical_compare;
   }
+
   using std::lexicographical_compare_three_way;
   using std::next_permutation;
+
   namespace ranges
   {
     using std::ranges::next_permutation;
     using std::ranges::next_permutation_result;
   }
+
   using std::prev_permutation;
+
   namespace ranges
   {
     using std::ranges::prev_permutation;
     using std::ranges::prev_permutation_result;
   }
+
   namespace ranges
   {
 #if __cpp_lib_ranges_contains
@@ -702,7 +861,9 @@ export namespace std
     using std::chrono::duration;
     using std::chrono::time_point;
   }
+
   using std::common_type;
+
   namespace chrono
   {
     using std::chrono::duration_values;
@@ -770,9 +931,24 @@ export namespace std
     using std::chrono::year_month_weekday_last;
     using std::chrono::years;
   }
+
   using std::formatter;
+
   namespace chrono
   {
+    using chrono::clock_cast;
+    using chrono::clock_time_conversion;
+    using chrono::from_stream;
+    using chrono::gps_clock;
+    using chrono::gps_seconds;
+    using chrono::gps_time;
+    using chrono::parse;
+    using chrono::tai_clock;
+    using chrono::tai_seconds;
+    using chrono::tai_time;
+    using chrono::utc_clock;
+    using chrono::utc_seconds;
+    using chrono::utc_time;
     using std::chrono::April;
     using std::chrono::August;
     using std::chrono::December;
@@ -793,47 +969,35 @@ export namespace std
     using std::chrono::Thursday;
     using std::chrono::Tuesday;
     using std::chrono::Wednesday;
-    using chrono::utc_clock;
-    using chrono::utc_time;
-    using chrono::utc_seconds;
-    using chrono::tai_clock;
-    using chrono::tai_time;
-    using chrono::tai_seconds;
-    using chrono::gps_clock;
-    using chrono::gps_time;
-    using chrono::gps_seconds;
-    using chrono::clock_cast;
-    using chrono::parse;
-    using chrono::from_stream;
-    using chrono::clock_time_conversion;
-#if __cpp_lib_chrono >= 201907L
-    using chrono::tzdb;
-    using chrono::tzdb_list;
+  #if __cpp_lib_chrono >= 201'907L
+    using chrono::ambiguous_local_time;
+    using chrono::choose;
+    using chrono::current_zone;
+    using chrono::get_leap_second_info;
     using chrono::get_tzdb;
     using chrono::get_tzdb_list;
-    using chrono::locate_zone;
-    using chrono::current_zone;
-    using chrono::reload_tzdb;
-    using chrono::remote_version;
-    using chrono::nonexistent_local_time;
-    using chrono::ambiguous_local_time;
-    using chrono::sys_info;
-    using chrono::local_info;
-    using chrono::choose;
-    using chrono::time_zone;
-    using chrono::zoned_traits;
-    using chrono::zoned_time;
-    using chrono::zoned_seconds;
     using chrono::leap_second;
     using chrono::leap_second_info;
-    using chrono::get_leap_second_info;
-    using chrono::time_zone_link;
+    using chrono::local_info;
     using chrono::local_time_format;
-#endif
+    using chrono::locate_zone;
+    using chrono::nonexistent_local_time;
+    using chrono::reload_tzdb;
+    using chrono::remote_version;
+    using chrono::sys_info;
+    using chrono::time_zone;
+    using chrono::time_zone_link;
+    using chrono::tzdb;
+    using chrono::tzdb_list;
+    using chrono::zoned_seconds;
+    using chrono::zoned_time;
+    using chrono::zoned_traits;
+  #endif
     using chrono::is_clock;
     using chrono::is_clock_v;
   }
 }
+
 export namespace std::inline literals::inline chrono_literals
 {
   using std::literals::chrono_literals::operator""h;
@@ -845,7 +1009,9 @@ export namespace std::inline literals::inline chrono_literals
   using std::literals::chrono_literals::operator""d;
   using std::literals::chrono_literals::operator""y;
 }
-export namespace std::chrono {
+
+export namespace std::chrono
+{
   using namespace literals::chrono_literals;
 }
 #endif // __cpp_lib_chrono
@@ -865,26 +1031,26 @@ export namespace std
 {
   using std::common_comparison_category;
   using std::common_comparison_category_t;
+  using std::compare_partial_order_fallback;
+  using std::compare_strong_order_fallback;
   using std::compare_three_way;
   using std::compare_three_way_result;
   using std::compare_three_way_result_t;
+  using std::compare_weak_order_fallback;
   using std::is_eq;
   using std::is_gt;
   using std::is_gteq;
   using std::is_lt;
   using std::is_lteq;
   using std::is_neq;
+  using std::partial_order;
   using std::partial_ordering;
+  using std::strong_order;
   using std::strong_ordering;
   using std::three_way_comparable;
   using std::three_way_comparable_with;
-  using std::weak_ordering;
-  using std::compare_partial_order_fallback;
-  using std::compare_strong_order_fallback;
-  using std::compare_weak_order_fallback;
-  using std::partial_order;
-  using std::strong_order;
   using std::weak_order;
+  using std::weak_ordering;
 }
 #endif // __cpp_lib_three_way_comparison
 
@@ -924,7 +1090,15 @@ export namespace std
   using std::sqrt;
   using std::tan;
   using std::tanh;
+#if __cpp_lib_tuple_like >= 202'311L
+  using std::get;
+  using std::tuple_element;
+  using std::tuple_element_t;
+  using std::tuple_size;
+  using std::tuple_size_v;
+#endif
 }
+
 export namespace std::inline literals::inline complex_literals
 {
   using std::operator""il;
@@ -946,10 +1120,12 @@ export namespace std
   using std::same_as;
   using std::signed_integral;
   using std::unsigned_integral;
+
   namespace ranges
   {
     using std::ranges::swap;
   }
+
   using std::constructible_from;
   using std::copy_constructible;
   using std::copyable;
@@ -1019,6 +1195,7 @@ export namespace std
   using std::erase;
   using std::erase_if;
   using std::swap;
+
   namespace pmr
   {
     using std::pmr::deque;
@@ -1051,133 +1228,136 @@ export namespace std
 {
   using std::is_execution_policy;
   using std::is_execution_policy_v;
+
   namespace execution
   {
-    using std::execution::sequenced_policy;
-    using std::execution::parallel_policy;
-    using std::execution::parallel_unsequenced_policy;
-    using std::execution::unsequenced_policy;
-    using std::execution::seq;
     using std::execution::par;
     using std::execution::par_unseq;
+    using std::execution::parallel_policy;
+    using std::execution::parallel_unsequenced_policy;
+    using std::execution::seq;
+    using std::execution::sequenced_policy;
     using std::execution::unseq;
+    using std::execution::unsequenced_policy;
   }
-#if __cpp_lib_senders
-  using std::forwarding_query_t;
-  using std::get_allocator_t;
-  using std::get_stop_token_t;
+  #if __cpp_lib_senders
   using std::forwarding_query;
+  using std::forwarding_query_t;
   using std::get_allocator;
+  using std::get_allocator_t;
   using std::get_stop_token;
+  using std::get_stop_token_t;
   using std::stop_token_of_t;
+
   namespace execution
   {
-    using std::execution::get_domain_t;
-    using std::execution::get_scheduler_t;
-    using std::execution::get_delegation_scheduler_t;
-    using std::execution::get_forward_progress_guarantee_t;
-    using std::execution::get_completion_scheduler_t;
-    using std::execution::get_domain;
-    using std::execution::get_scheduler;
-    using std::execution::get_delegation_scheduler;
-    using std::execution::forward_progress_guarantee;
-    using std::execution::get_forward_progress_guarantee;
-    using std::execution::get_completion_scheduler;
-    using std::execution::empty_env;
-    using std::execution::get_env_t;
-    using std::execution::get_env;
-    using std::execution::env_of_t;
-    using std::execution::default_domain;
-    using std::execution::scheduler_t;
-    using std::execution::scheduler;
-    using std::execution::receiver_t;
-    using std::execution::receiver;
-    using std::execution::receiver_of;
-    using std::execution::set_value_t;
-    using std::execution::set_error_t;
-    using std::execution::set_stopped_t;
-    using std::execution::set_value;
-    using std::execution::set_error;
-    using std::execution::set_stopped;
-    using std::execution::operation_state_t;
-    using std::execution::operation_state;
-    using std::execution::start_t;
-    using std::execution::start;
-    using std::execution::sender_t;
-    using std::execution::sender;
-    using std::execution::sender_in;
-    using std::execution::sender_to;
-    using std::execution::get_completion_signatures_t;
-    using std::execution::get_completion_signatures;
-    using std::execution::completion_signatures_of_t;
-    using std::execution::value_types_of_t;
-    using std::execution::error_types_of_t;
-    using std::execution::sends_stopped;
-    using std::execution::tag_of_t;
-    using std::execution::transform_sender;
-    using std::execution::transform_env;
     using std::execution::apply_sender;
-    using std::execution::connect_t;
+    using std::execution::bulk;
+    using std::execution::bulk_t;
+    using std::execution::completion_signatures;
+    using std::execution::completion_signatures_of_t;
     using std::execution::connect;
     using std::execution::connect_result_t;
-    using std::execution::just_t;
-    using std::execution::just_error_t;
-    using std::execution::just_stopped_t;
-    using std::execution::schedule_t;
+    using std::execution::connect_t;
+    using std::execution::continues_on;
+    using std::execution::continues_on_t;
+    using std::execution::default_domain;
+    using std::execution::empty_env;
+    using std::execution::env_of_t;
+    using std::execution::error_types_of_t;
+    using std::execution::forward_progress_guarantee;
+    using std::execution::get_completion_scheduler;
+    using std::execution::get_completion_scheduler_t;
+    using std::execution::get_completion_signatures;
+    using std::execution::get_completion_signatures_t;
+    using std::execution::get_delegation_scheduler;
+    using std::execution::get_delegation_scheduler_t;
+    using std::execution::get_domain;
+    using std::execution::get_domain_t;
+    using std::execution::get_env;
+    using std::execution::get_env_t;
+    using std::execution::get_forward_progress_guarantee;
+    using std::execution::get_forward_progress_guarantee_t;
+    using std::execution::get_scheduler;
+    using std::execution::get_scheduler_t;
+    using std::execution::into_variant;
+    using std::execution::into_variant_t;
     using std::execution::just;
     using std::execution::just_error;
+    using std::execution::just_error_t;
     using std::execution::just_stopped;
-    using std::execution::schedule;
-    using std::execution::read_env;
-    using std::execution::schedule_result_t;
-    using std::execution::sender_adaptor_closure;
-    using std::execution::starts_on_t;
-    using std::execution::continues_on_t;
-    using std::execution::on_t;
-    using std::execution::schedule_from_t;
-    using std::execution::then_t;
-    using std::execution::upon_error_t;
-    using std::execution::upon_stopped_t;
-    using std::execution::let_value_t;
-    using std::execution::let_error_t;
-    using std::execution::let_stopped_t;
-    using std::execution::bulk_t;
-    using std::execution::split_t;
-    using std::execution::when_all_t;
-    using std::execution::when_all_with_variant_t;
-    using std::execution::into_variant_t;
-    using std::execution::stopped_as_optional_t;
-    using std::execution::stopped_as_error_t;
-    using std::execution::starts_on;
-    using std::execution::continues_on;
-    using std::execution::on;
-    using std::execution::schedule_from;
-    using std::execution::then;
-    using std::execution::upon_error;
-    using std::execution::upon_stopped;
-    using std::execution::let_value;
+    using std::execution::just_stopped_t;
+    using std::execution::just_t;
     using std::execution::let_error;
+    using std::execution::let_error_t;
     using std::execution::let_stopped;
-    using std::execution::bulk;
+    using std::execution::let_stopped_t;
+    using std::execution::let_value;
+    using std::execution::let_value_t;
+    using std::execution::on;
+    using std::execution::on_t;
+    using std::execution::operation_state;
+    using std::execution::operation_state_t;
+    using std::execution::read_env;
+    using std::execution::receiver;
+    using std::execution::receiver_of;
+    using std::execution::receiver_t;
+    using std::execution::run_loop;
+    using std::execution::schedule;
+    using std::execution::schedule_from;
+    using std::execution::schedule_from_t;
+    using std::execution::schedule_result_t;
+    using std::execution::schedule_t;
+    using std::execution::scheduler;
+    using std::execution::scheduler_t;
+    using std::execution::sender;
+    using std::execution::sender_adaptor_closure;
+    using std::execution::sender_in;
+    using std::execution::sender_t;
+    using std::execution::sender_to;
+    using std::execution::sends_stopped;
+    using std::execution::set_error;
+    using std::execution::set_error_t;
+    using std::execution::set_stopped;
+    using std::execution::set_stopped_t;
+    using std::execution::set_value;
+    using std::execution::set_value_t;
     using std::execution::split;
-    using std::execution::when_all;
-    using std::execution::when_all_with_variant;
-    using std::execution::into_variant;
-    using std::execution::stopped_as_optional;
+    using std::execution::split_t;
+    using std::execution::start;
+    using std::execution::start_t;
+    using std::execution::starts_on;
+    using std::execution::starts_on_t;
     using std::execution::stopped_as_error;
-    using std::execution::completion_signatures;
+    using std::execution::stopped_as_error_t;
+    using std::execution::stopped_as_optional;
+    using std::execution::stopped_as_optional_t;
+    using std::execution::tag_of_t;
+    using std::execution::then;
+    using std::execution::then_t;
     using std::execution::transform_completion_signatures;
     using std::execution::transform_completion_signatures_of;
-    using std::execution::run_loop;
+    using std::execution::transform_env;
+    using std::execution::transform_sender;
+    using std::execution::upon_error;
+    using std::execution::upon_error_t;
+    using std::execution::upon_stopped;
+    using std::execution::upon_stopped_t;
+    using std::execution::value_types_of_t;
+    using std::execution::when_all;
+    using std::execution::when_all_t;
+    using std::execution::when_all_with_variant;
+    using std::execution::when_all_with_variant_t;
   }
+
   namespace this_thread
   {
-    using std::this_thread::sync_wait_t;
-    using std::this_thread::sync_wait_with_variant_t;
     using std::this_thread::sync_wait;
+    using std::this_thread::sync_wait_t;
     using std::this_thread::sync_wait_with_variant;
+    using std::this_thread::sync_wait_with_variant_t;
   }
-#endif // __cpp_lib_senders
+  #endif // __cpp_lib_senders
 }
 #endif // __cpp_lib_execution
 
@@ -1185,11 +1365,11 @@ export namespace std
 #if __cpp_lib_expected
 export namespace std
 {
-  using std::unexpected;
   using std::bad_expected_access;
-  using std::unexpect_t;
-  using std::unexpect;
   using std::expected;
+  using std::unexpect;
+  using std::unexpect_t;
+  using std::unexpected;
 }
 #endif
 
@@ -1281,8 +1461,8 @@ export namespace std
 #if __cpp_lib_flat_set
 export namespace std
 {
-  using std::flat_set;
   using std::flat_multiset;
+  using std::flat_set;
   using std::sorted_equivalent;
   using std::sorted_equivalent_t;
   using std::sorted_unique;
@@ -1309,13 +1489,13 @@ export namespace std
   using std::format_to_n_result;
   using std::formatted_size;
 // FIXME __cpp_lib_format_ranges
-#if __cplusplus > 202002L
+#if __cplusplus > 202'002L
   using std::formattable;
 #endif
   using std::formatter;
   using std::make_format_args;
   using std::make_wformat_args;
-#if __cpp_lib_format >= 202311L // >= C++26
+#if __cpp_lib_format >= 202'311L // >= C++26
   using std::runtime_format;
 #endif
   using std::vformat;
@@ -1336,6 +1516,7 @@ export namespace std
   using std::erase;
   using std::erase_if;
   using std::swap;
+
   namespace pmr
   {
     using std::pmr::forward_list;
@@ -1404,6 +1585,7 @@ export namespace std
   using std::plus;
   using std::ref;
   using std::reference_wrapper;
+
   namespace placeholders
   {
     using std::placeholders::_1;
@@ -1417,6 +1599,7 @@ export namespace std
     using std::placeholders::_8;
     using std::placeholders::_9;
   }
+
   using std::bad_function_call;
   using std::function;
   using std::mem_fn;
@@ -1426,6 +1609,7 @@ export namespace std
   using std::boyer_moore_searcher;
   using std::default_searcher;
   using std::hash;
+
   namespace ranges
   {
     using std::ranges::equal_to;
@@ -1468,6 +1652,7 @@ export namespace std
 export namespace std
 {
   using std::generator;
+
   namespace pmr
   {
     using pmr::generator;
@@ -1550,20 +1735,20 @@ export namespace std
 // <iosfwd>
 export namespace std
 {
-  using std::streampos;
-  using std::u16streampos;
-  using std::u32streampos;
-  using std::u8streampos;
-  using std::wstreampos;
   using std::basic_osyncstream;
   using std::basic_syncbuf;
+  using std::fpos;
   using std::istreambuf_iterator;
   using std::ostreambuf_iterator;
   using std::osyncstream;
+  using std::streampos;
   using std::syncbuf;
+  using std::u16streampos;
+  using std::u32streampos;
+  using std::u8streampos;
   using std::wosyncstream;
+  using std::wstreampos;
   using std::wsyncbuf;
-  using std::fpos;
 }
 
 // <iostream>
@@ -1601,6 +1786,7 @@ export namespace std
   using std::iter_reference_t;
   using std::iter_value_t;
   using std::iterator_traits;
+
   // _Cpo is an implementation detail we can't avoid exposing; if we do the
   // using in ranges directly, it conflicts with any friend functions of the
   // same name, which is why the customization points are in an inline
@@ -1610,6 +1796,7 @@ export namespace std
     using _Cpo::iter_move;
     using _Cpo::iter_swap;
   }
+
   using std::advance;
   using std::bidirectional_iterator;
   using std::bidirectional_iterator_tag;
@@ -1653,6 +1840,7 @@ export namespace std
   using std::sized_sentinel_for;
   using std::sortable;
   using std::weakly_incrementable;
+
   namespace ranges
   {
     using std::ranges::advance;
@@ -1660,6 +1848,7 @@ export namespace std
     using std::ranges::next;
     using std::ranges::prev;
   }
+
   using std::reverse_iterator;
   using std::operator==;
   using std::operator!=;
@@ -1704,14 +1893,15 @@ export namespace std
   using std::unreachable_sentinel;
   using std::unreachable_sentinel_t;
 #if __glibcxx_ranges_as_const // >= C++23
-  using std::iter_const_reference_t;
   using std::basic_const_iterator;
   using std::const_iterator;
   using std::const_sentinel;
+  using std::iter_const_reference_t;
   using std::make_const_iterator;
   using std::make_const_sentinel;
 #endif
 }
+
 // FIXME these should be friends of __normal_iterator to avoid exporting
 // __gnu_cxx.
 export namespace __gnu_cxx
@@ -1747,6 +1937,7 @@ export namespace std
   using std::erase;
   using std::erase_if;
   using std::swap;
+
   namespace pmr
   {
     using std::pmr::list;
@@ -1811,6 +2002,7 @@ export namespace std
   using std::erase_if;
   using std::multimap;
   using std::swap;
+
   namespace pmr
   {
     using std::pmr::map;
@@ -1840,20 +2032,25 @@ export namespace std
   using std::addressof;
   using std::uninitialized_default_construct;
   using std::uninitialized_default_construct_n;
+
   namespace ranges
   {
     using std::ranges::uninitialized_default_construct;
     using std::ranges::uninitialized_default_construct_n;
   }
+
   using std::uninitialized_value_construct;
   using std::uninitialized_value_construct_n;
+
   namespace ranges
   {
     using std::ranges::uninitialized_value_construct;
     using std::ranges::uninitialized_value_construct_n;
   }
+
   using std::uninitialized_copy;
   using std::uninitialized_copy_n;
+
   namespace ranges
   {
     using std::ranges::uninitialized_copy;
@@ -1861,8 +2058,10 @@ export namespace std
     using std::ranges::uninitialized_copy_n_result;
     using std::ranges::uninitialized_copy_result;
   }
+
   using std::uninitialized_move;
   using std::uninitialized_move_n;
+
   namespace ranges
   {
     using std::ranges::uninitialized_move;
@@ -1870,27 +2069,34 @@ export namespace std
     using std::ranges::uninitialized_move_n_result;
     using std::ranges::uninitialized_move_result;
   }
+
   using std::uninitialized_fill;
   using std::uninitialized_fill_n;
+
   namespace ranges
   {
     using std::ranges::uninitialized_fill;
     using std::ranges::uninitialized_fill_n;
   }
+
   using std::construct_at;
+
   namespace ranges
   {
     using std::ranges::construct_at;
   }
+
   using std::destroy;
   using std::destroy_at;
   using std::destroy_n;
+
   namespace ranges
   {
     using std::ranges::destroy;
     using std::ranges::destroy_at;
     using std::ranges::destroy_n;
   }
+
   using std::default_delete;
   using std::make_unique;
   using std::make_unique_for_overwrite;
@@ -1903,16 +2109,6 @@ export namespace std
   using std::operator<<;
   using std::allocate_shared;
   using std::allocate_shared_for_overwrite;
-  using std::bad_weak_ptr;
-  using std::const_pointer_cast;
-  using std::dynamic_pointer_cast;
-  using std::make_shared;
-  using std::make_shared_for_overwrite;
-  using std::reinterpret_pointer_cast;
-  using std::shared_ptr;
-  using std::static_pointer_cast;
-  using std::swap;
-  using std::get_deleter;
   using std::atomic_compare_exchange_strong;
   using std::atomic_compare_exchange_strong_explicit;
   using std::atomic_compare_exchange_weak;
@@ -1924,13 +2120,23 @@ export namespace std
   using std::atomic_load_explicit;
   using std::atomic_store;
   using std::atomic_store_explicit;
+  using std::bad_weak_ptr;
+  using std::const_pointer_cast;
+  using std::dynamic_pointer_cast;
   using std::enable_shared_from_this;
+  using std::get_deleter;
   using std::hash;
+  using std::make_shared;
+  using std::make_shared_for_overwrite;
   using std::owner_less;
+  using std::reinterpret_pointer_cast;
+  using std::shared_ptr;
+  using std::static_pointer_cast;
+  using std::swap;
   using std::weak_ptr;
 #if __cpp_lib_out_ptr
-  using std::out_ptr;
   using std::inout_ptr;
+  using std::out_ptr;
 #endif
 }
 
@@ -1982,16 +2188,16 @@ export namespace std
   using std::destroying_delete;
   using std::destroying_delete_t;
   using std::get_new_handler;
-  using std::hardware_destructive_interference_size;
   using std::hardware_constructive_interference_size;
+  using std::hardware_destructive_interference_size;
   using std::launder;
   using std::new_handler;
   using std::nothrow;
   using std::nothrow_t;
   using std::set_new_handler;
 }
-export
-{
+
+export {
   using ::operator new;
   using ::operator delete;
   using ::operator new[];
@@ -2035,26 +2241,29 @@ export namespace std
   using std::accumulate;
   using std::adjacent_difference;
   using std::exclusive_scan;
+  using std::gcd;
   using std::inclusive_scan;
   using std::inner_product;
   using std::iota;
+  using std::lcm;
+  using std::midpoint;
   using std::partial_sum;
   using std::reduce;
   using std::transform_exclusive_scan;
   using std::transform_inclusive_scan;
   using std::transform_reduce;
-  using std::gcd;
-  using std::lcm;
-  using std::midpoint;
 #if __cpp_lib_ranges_iota
-  namespace ranges { using ranges::iota; }
+  namespace ranges
+  {
+    using ranges::iota;
+  }
 #endif
 #if __cpp_lib_saturation_arithmetic
   using std::add_sat;
-  using std::sub_sat;
-  using std::mul_sat;
   using std::div_sat;
+  using std::mul_sat;
   using std::saturate_cast;
+  using std::sub_sat;
 #endif
 }
 
@@ -2088,8 +2297,8 @@ export namespace std
   using std::wostream;
   using std::operator<<;
   using std::emit_on_flush;
-  using std::noemit_on_flush;
   using std::flush_emit;
+  using std::noemit_on_flush;
 }
 
 // <print>
@@ -2172,25 +2381,21 @@ export namespace std
   namespace ranges
   {
     using std::ranges::begin;
+    using std::ranges::bidirectional_range;
+    using std::ranges::borrowed_range;
     using std::ranges::cbegin;
     using std::ranges::cdata;
     using std::ranges::cend;
+    using std::ranges::common_range;
+    using std::ranges::contiguous_range;
     using std::ranges::crbegin;
     using std::ranges::crend;
     using std::ranges::data;
-    using std::ranges::empty;
-    using std::ranges::end;
-    using std::ranges::rbegin;
-    using std::ranges::rend;
-    using std::ranges::size;
-    using std::ranges::ssize;
-    using std::ranges::bidirectional_range;
-    using std::ranges::borrowed_range;
-    using std::ranges::common_range;
-    using std::ranges::contiguous_range;
     using std::ranges::disable_sized_range;
+    using std::ranges::empty;
     using std::ranges::enable_borrowed_range;
     using std::ranges::enable_view;
+    using std::ranges::end;
     using std::ranges::forward_range;
     using std::ranges::get;
     using std::ranges::input_range;
@@ -2204,8 +2409,12 @@ export namespace std
     using std::ranges::range_rvalue_reference_t;
     using std::ranges::range_size_t;
     using std::ranges::range_value_t;
+    using std::ranges::rbegin;
+    using std::ranges::rend;
     using std::ranges::sentinel_t;
+    using std::ranges::size;
     using std::ranges::sized_range;
+    using std::ranges::ssize;
     using std::ranges::subrange;
     using std::ranges::subrange_kind;
     using std::ranges::view;
@@ -2213,184 +2422,286 @@ export namespace std
     using std::ranges::view_interface;
     using std::ranges::viewable_range;
   }
+
   using std::ranges::get;
+
   namespace ranges
   {
     using std::ranges::borrowed_iterator_t;
     using std::ranges::borrowed_subrange_t;
     using std::ranges::dangling;
     using std::ranges::empty_view;
+
     namespace views
     {
       using std::ranges::views::empty;
     }
+
     using std::ranges::single_view;
+
     namespace views
     {
       using std::ranges::views::single;
     }
+
     using std::ranges::iota_view;
+
     namespace views
     {
       using std::ranges::views::iota;
     }
+
     using std::ranges::basic_istream_view;
     using std::ranges::istream_view;
     using std::ranges::wistream_view;
+
     namespace views
     {
       using std::ranges::views::istream;
     }
+
     namespace views
     {
       using std::ranges::views::all;
       using std::ranges::views::all_t;
     }
+
     using std::ranges::filter_view;
     using std::ranges::owning_view;
     using std::ranges::ref_view;
+
     namespace views
     {
       using std::ranges::views::filter;
     }
+
     using std::ranges::transform_view;
+
     namespace views
     {
       using std::ranges::views::transform;
     }
+
     using std::ranges::take_view;
+
     namespace views
     {
       using std::ranges::views::take;
     }
+
     using std::ranges::take_while_view;
+
     namespace views
     {
       using std::ranges::views::take_while;
     }
+
     using std::ranges::drop_view;
+
     namespace views
     {
       using std::ranges::views::drop;
     }
+
     using std::ranges::drop_while_view;
+
     namespace views
     {
       using std::ranges::views::drop_while;
     }
+
     using std::ranges::join_view;
+
     namespace views
     {
       using std::ranges::views::join;
     }
+
     using std::ranges::lazy_split_view;
     using std::ranges::split_view;
+
     namespace views
     {
       using std::ranges::views::lazy_split;
       using std::ranges::views::split;
     }
+
     namespace views
     {
       using std::ranges::views::counted;
     }
+
     using std::ranges::common_view;
+
     namespace views
     {
       using std::ranges::views::common;
     }
+
     using std::ranges::reverse_view;
+
     namespace views
     {
       using std::ranges::views::reverse;
     }
+
     using std::ranges::elements_view;
     using std::ranges::keys_view;
     using std::ranges::values_view;
+
     namespace views
     {
       using std::ranges::views::elements;
       using std::ranges::views::keys;
       using std::ranges::views::values;
     }
-#if __cpp_lib_ranges >= 202202L
+#if __cpp_lib_ranges >= 202'202L
     using ranges::range_adaptor_closure;
 #endif
   }
   namespace views = ranges::views;
   using std::tuple_element;
   using std::tuple_size;
+
   namespace ranges
   {
 #if __glibcxx_ranges_as_const // >= C++23
-    using ranges::constant_range;
+    using ranges::as_const_view;
     using ranges::const_iterator_t;
     using ranges::const_sentinel_t;
+    using ranges::constant_range;
     using ranges::range_const_reference_t;
-    using ranges::as_const_view;
-    namespace views { using views::as_const; }
+
+    namespace views
+    {
+      using views::as_const;
+    }
 #endif
-#ifdef __glibcxx_generator  // C++ >= 23 && __glibcxx_coroutine
+#ifdef __glibcxx_generator // C++ >= 23 && __glibcxx_coroutine
     using ranges::elements_of;
 #endif
 #ifdef __cpp_lib_ranges_as_rvalue // C++ >= 23
     using ranges::as_rvalue_view;
-    namespace views { using views::as_rvalue; }
+
+    namespace views
+    {
+      using views::as_rvalue;
+    }
 #endif
 #ifdef __cpp_lib_ranges_chunk // C++ >= 23
     using ranges::chunk_view;
-    namespace views { using views::chunk; }
+
+    namespace views
+    {
+      using views::chunk;
+    }
 #endif
 #ifdef __cpp_lib_ranges_slide // C++ >= 23
     using ranges::slide_view;
-    namespace views { using views::slide; }
+
+    namespace views
+    {
+      using views::slide;
+    }
 #endif
 #ifdef __cpp_lib_ranges_zip // C++ >= 23
-    using ranges::zip_view;
-    using ranges::zip_transform_view;
-    using ranges::adjacent_view;
     using ranges::adjacent_transform_view;
-    namespace views {
-      using views::zip;
-      using views::zip_transform;
+    using ranges::adjacent_view;
+    using ranges::zip_transform_view;
+    using ranges::zip_view;
+
+    namespace views
+    {
       using views::adjacent;
       using views::adjacent_transform;
       using views::pairwise;
       using views::pairwise_transform;
+      using views::zip;
+      using views::zip_transform;
     }
 #endif
 #ifdef __cpp_lib_ranges_chunk_by // C++ >= 23
     using ranges::chunk_by_view;
-    namespace views { using views::chunk_by; }
+
+    namespace views
+    {
+      using views::chunk_by;
+    }
 #endif
 #ifdef __cpp_lib_ranges_join_with // C++ >= 23
     using ranges::join_with_view;
-    namespace views { using views::join_with; }
+
+    namespace views
+    {
+      using views::join_with;
+    }
 #endif
 #ifdef __cpp_lib_ranges_repeat // C++ >= 23
     using ranges::repeat_view;
-    namespace views { using views::repeat; }
+
+    namespace views
+    {
+      using views::repeat;
+    }
 #endif
 #ifdef __cpp_lib_ranges_stride // C++ >= 23
     using ranges::stride_view;
-    namespace views { using views::stride; }
+
+    namespace views
+    {
+      using views::stride;
+    }
 #endif
 #ifdef __cpp_lib_ranges_cartesian_product // C++ >= 23
     using ranges::cartesian_product_view;
-    namespace views { using views::cartesian_product; }
+
+    namespace views
+    {
+      using views::cartesian_product;
+    }
 #endif
 #ifdef __cpp_lib_ranges_enumerate // C++ >= 23
     using ranges::enumerate_view;
-    namespace views { using views::enumerate; }
+
+    namespace views
+    {
+      using views::enumerate;
+    }
 #endif
-#if __cpp_lib_ranges_to_container // C++ >= 23
-    using ranges::to;
-#endif // __cpp_lib_ranges_to_container
 #if __cpp_lib_ranges_concat // C++ >= C++26
     using ranges::concat_view;
-    namespace views { using views::concat; }
+
+    namespace views
+    {
+      using views::concat;
+    }
+#endif
+#if __cpp_lib_ranges_cache_latest // C++ >= C++26
+    using ranges::cache_latest_view;
+
+    namespace views
+    {
+      using views::cache_latest;
+    }
+#endif
+#if __glibcxx_ranges_to_input // C++ >= 26
+    using ranges::to_input_view;
+
+    namespace views
+    {
+      using views::to_input;
+    }
 #endif
   }
+#if __glibcxx_ranges_to_container // C++ >= 23
+  namespace ranges
+  {
+    using ranges::to;
+  }
+
+  using std::from_range;
+  using std::from_range_t;
+#endif
 }
 
 // <ratio>
@@ -2449,6 +2760,7 @@ export namespace std
     using std::regex_constants::operator|=;
     using std::regex_constants::operator~;
   }
+
   using std::basic_regex;
   using std::csub_match;
   using std::regex;
@@ -2481,6 +2793,7 @@ export namespace std
   using std::wsmatch;
   using std::wsregex_iterator;
   using std::wsregex_token_iterator;
+
   namespace pmr
   {
     using std::pmr::cmatch;
@@ -2514,6 +2827,7 @@ export namespace std
   using std::erase_if;
   using std::multiset;
   using std::swap;
+
   namespace pmr
   {
     using std::pmr::multiset;
@@ -2541,11 +2855,13 @@ export namespace std
 {
   using std::dynamic_extent;
   using std::span;
+
   namespace ranges
   {
     using std::ranges::enable_borrowed_range;
     using std::ranges::enable_view;
   }
+
   using std::as_bytes;
   using std::as_writable_bytes;
 }
@@ -2554,17 +2870,17 @@ export namespace std
 // <spanstream>
 export namespace std
 {
-  using std::basic_spanbuf;
-  using std::spanbuf;
-  using std::wspanbuf;
   using std::basic_ispanstream;
-  using std::ispanstream;
-  using std::wispanstream;
   using std::basic_ospanstream;
-  using std::ospanstream;
-  using std::wospanstream;
+  using std::basic_spanbuf;
   using std::basic_spanstream;
+  using std::ispanstream;
+  using std::ospanstream;
+  using std::spanbuf;
   using std::spanstream;
+  using std::wispanstream;
+  using std::wospanstream;
+  using std::wspanbuf;
   using std::wspanstream;
 }
 #endif
@@ -2606,17 +2922,19 @@ export namespace std
 #if __cpp_lib_stacktrace
 export namespace std
 {
-  using std::stacktrace_entry;
   using std::basic_stacktrace;
   using std::stacktrace;
+  using std::stacktrace_entry;
   using std::swap;
   using std::to_string;
   using std::operator<<;
   using std::formatter;
+
   namespace pmr
   {
     using std::pmr::stacktrace;
   }
+
   using std::hash;
 }
 #endif
@@ -2659,18 +2977,18 @@ export namespace std
 #if __cpp_lib_jthread
 export namespace std
 {
-  using std::stop_token;
-  using std::stop_source;
-  using std::nostopstate_t;
   using std::nostopstate;
+  using std::nostopstate_t;
   using std::stop_callback;
-#if __cpp_lib_senders
-  using std::never_stop_token;
-  using std::inplace_stop_token;
-  using std::inplace_stop_source;
+  using std::stop_source;
+  using std::stop_token;
+  #if __cpp_lib_senders
   using std::inplace_stop_callback;
+  using std::inplace_stop_source;
+  using std::inplace_stop_token;
+  using std::never_stop_token;
   using std::stop_callback_for;
-#endif
+  #endif
 }
 #endif
 
@@ -2711,6 +3029,7 @@ export namespace std
   using std::u32string;
   using std::u8string;
   using std::wstring;
+
   namespace pmr
   {
     using std::pmr::basic_string;
@@ -2720,8 +3039,10 @@ export namespace std
     using std::pmr::u8string;
     using std::pmr::wstring;
   }
+
   using std::hash;
 }
+
 export namespace std::inline literals::inline string_literals
 {
   using std::operator""s;
@@ -2731,11 +3052,13 @@ export namespace std::inline literals::inline string_literals
 export namespace std
 {
   using std::basic_string_view;
+
   namespace ranges
   {
     using std::ranges::enable_borrowed_range;
     using std::ranges::enable_view;
   }
+
   using std::operator==;
   using std::operator<=>;
   using std::operator<<;
@@ -2746,6 +3069,7 @@ export namespace std
   using std::u8string_view;
   using std::wstring_view;
 }
+
 export namespace std::inline literals::inline string_view_literals
 {
   using string_view_literals::operator""sv;
@@ -2763,10 +3087,10 @@ export namespace std
 // <syncstream>
 export namespace std
 {
-  using std::basic_syncbuf;
-  using std::swap;
   using std::basic_osyncstream;
+  using std::basic_syncbuf;
   using std::osyncstream;
+  using std::swap;
   using std::syncbuf;
   using std::wosyncstream;
   using std::wsyncbuf;
@@ -2805,9 +3129,10 @@ export namespace std
 // <thread>
 export namespace std
 {
+  using std::jthread;
   using std::swap;
   using std::thread;
-  using std::jthread;
+
   namespace this_thread
   {
     using std::this_thread::get_id;
@@ -2815,6 +3140,7 @@ export namespace std
     using std::this_thread::sleep_until;
     using std::this_thread::yield;
   }
+
   using std::operator==;
   using std::operator<=>;
   using std::operator<<;
@@ -2927,8 +3253,6 @@ export namespace std
   using std::is_empty_v;
   using std::is_enum;
   using std::is_enum_v;
-  using std::is_scoped_enum;
-  using std::is_scoped_enum_v;
   using std::is_final;
   using std::is_final_v;
   using std::is_floating_point;
@@ -2999,6 +3323,8 @@ export namespace std
   using std::is_same_v;
   using std::is_scalar;
   using std::is_scalar_v;
+  using std::is_scoped_enum;
+  using std::is_scoped_enum_v;
   using std::is_signed;
   using std::is_signed_v;
   using std::is_standard_layout;
@@ -3076,10 +3402,10 @@ export namespace std
   using std::unwrap_reference_t;
   using std::void_t;
 #if __cpp_lib_reference_from_temporary
-  using std::reference_converts_from_temporary;
-  using std::reference_converts_from_temporary_v;
   using std::reference_constructs_from_temporary;
   using std::reference_constructs_from_temporary_v;
+  using std::reference_converts_from_temporary;
+  using std::reference_converts_from_temporary_v;
 #endif
 #if __cpp_lib_is_layout_compatible
   using std::is_corresponding_member;
@@ -3115,6 +3441,7 @@ export namespace std
   using std::operator==;
   using std::erase_if;
   using std::swap;
+
   namespace pmr
   {
     using std::pmr::unordered_map;
@@ -3130,6 +3457,7 @@ export namespace std
   using std::operator==;
   using std::erase_if;
   using std::swap;
+
   namespace pmr
   {
     using std::pmr::unordered_multiset;
@@ -3182,6 +3510,7 @@ export namespace std
   using std::tuple_size;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
   namespace rel_ops
   {
     using std::rel_ops::operator!=;
@@ -3189,6 +3518,7 @@ export namespace std
     using std::rel_ops::operator<=;
     using std::rel_ops::operator>=;
   }
+
 #pragma GCC diagnostic pop
 #if __cpp_lib_unreachable
   using std::unreachable;
@@ -3279,19 +3609,22 @@ export namespace std
   using std::erase;
   using std::erase_if;
   using std::swap;
+
   namespace pmr
   {
     using std::pmr::vector;
   }
+
   using std::hash;
 }
+
 // C standard library exports for -*- C++ -*- std and std.compat modules
 // This file is appended to std.cc.in or std-compat.cc.in.
 
 #ifdef STD_COMPAT
-#define C_LIB_NAMESPACE
+  #define C_LIB_NAMESPACE
 #else
-#define C_LIB_NAMESPACE namespace std
+  #define C_LIB_NAMESPACE namespace std
 #endif
 
 // C standard library headers [tab:headers.cpp.c]
@@ -3355,10 +3688,10 @@ export C_LIB_NAMESPACE
   using std::imaxdiv_t;
   using std::strtoimax;
   using std::strtoumax;
-#if defined(_GLIBCXX_USE_WCHAR_T) && _GLIBCXX_USE_C99_INTTYPES_WCHAR_T
+  #if defined(_GLIBCXX_USE_WCHAR_T) && _GLIBCXX_USE_C99_INTTYPES_WCHAR_T
   using std::wcstoimax;
   using std::wcstoumax;
-#endif
+  #endif
 #endif
 }
 
@@ -3567,7 +3900,7 @@ export C_LIB_NAMESPACE
   using std::truncf;
   using std::truncl;
 
-#if __cpp_lib_math_special_functions && !defined(STD_COMPAT)
+#if __cpp_lib_math_special_functions && ! defined(STD_COMPAT)
   using std::assoc_laguerre;
   using std::assoc_laguerref;
   using std::assoc_laguerrel;
@@ -3613,12 +3946,12 @@ export C_LIB_NAMESPACE
   using std::hermite;
   using std::hermitef;
   using std::hermitel;
-  using std::legendre;
-  using std::legendref;
-  using std::legendrel;
   using std::laguerre;
   using std::laguerref;
   using std::laguerrel;
+  using std::legendre;
+  using std::legendref;
+  using std::legendrel;
   using std::riemann_zeta;
   using std::riemann_zetaf;
   using std::riemann_zetal;
@@ -3686,10 +4019,10 @@ export C_LIB_NAMESPACE
 // 17.4 <cstdint>
 export C_LIB_NAMESPACE
 {
-  using std::int8_t;
   using std::int16_t;
   using std::int32_t;
   using std::int64_t;
+  using std::int8_t;
   using std::int_fast16_t;
   using std::int_fast32_t;
   using std::int_fast64_t;
@@ -3700,10 +4033,10 @@ export C_LIB_NAMESPACE
   using std::int_least8_t;
   using std::intmax_t;
   using std::intptr_t;
-  using std::uint8_t;
   using std::uint16_t;
   using std::uint32_t;
   using std::uint64_t;
+  using std::uint8_t;
   using std::uint_fast16_t;
   using std::uint_fast32_t;
   using std::uint_fast64_t;
@@ -3872,9 +4205,9 @@ export C_LIB_NAMESPACE
   using std::strftime;
   using std::time;
   using std::time_t;
-  using std::timespec;
   using std::tm;
 #ifdef _GLIBCXX_HAVE_TIMESPEC_GET
+  using std::timespec;
   using std::timespec_get;
 #endif
 }
@@ -3883,14 +4216,14 @@ export C_LIB_NAMESPACE
 export C_LIB_NAMESPACE
 {
 #if _GLIBCXX_USE_UCHAR_C8RTOMB_MBRTOC8_CXX20
-  using std::mbrtoc8;
   using std::c8rtomb;
+  using std::mbrtoc8;
 #endif
 #if _GLIBCXX_USE_C11_UCHAR_CXX11
-  using std::mbrtoc16;
   using std::c16rtomb;
-  using std::mbrtoc32;
   using std::c32rtomb;
+  using std::mbrtoc16;
+  using std::mbrtoc32;
 #endif
 }
 
@@ -3921,19 +4254,19 @@ export C_LIB_NAMESPACE
   using std::tm;
   using std::ungetwc;
   using std::vfwprintf;
-# if _GLIBCXX_HAVE_VFWSCANF
+  #if _GLIBCXX_HAVE_VFWSCANF
   using std::vfwscanf;
-#endif
-#ifndef _GLIBCXX_HAVE_BROKEN_VSWPRINTF
+  #endif
+  #ifndef _GLIBCXX_HAVE_BROKEN_VSWPRINTF
   using std::vswprintf;
-#endif
-# if _GLIBCXX_HAVE_VSWSCANF
+  #endif
+  #if _GLIBCXX_HAVE_VSWSCANF
   using std::vswscanf;
-#endif
+  #endif
   using std::vwprintf;
-# if _GLIBCXX_HAVE_VWSCANF
+  #if _GLIBCXX_HAVE_VWSCANF
   using std::vwscanf;
-#endif
+  #endif
   using std::wcrtomb;
   using std::wcscat;
   using std::wcschr;
@@ -3952,19 +4285,19 @@ export C_LIB_NAMESPACE
   using std::wcsspn;
   using std::wcsstr;
   using std::wcstod;
-#if _GLIBCXX_HAVE_WCSTOF
+  #if _GLIBCXX_HAVE_WCSTOF
   using std::wcstof;
-#endif
+  #endif
   using std::wcstok;
   using std::wcstol;
-#if _GLIBCXX_USE_C99_WCHAR
+  #if _GLIBCXX_USE_C99_WCHAR
   using std::wcstold;
   using std::wcstoll;
-#endif
+  #endif
   using std::wcstoul;
-#if _GLIBCXX_USE_C99_WCHAR
+  #if _GLIBCXX_USE_C99_WCHAR
   using std::wcstoull;
-#endif
+  #endif
   using std::wcsxfrm;
   using std::wctob;
   using std::wint_t;
@@ -3984,9 +4317,9 @@ export C_LIB_NAMESPACE
 {
   using std::iswalnum;
   using std::iswalpha;
-#if _GLIBCXX_HAVE_ISWBLANK
+  #if _GLIBCXX_HAVE_ISWBLANK
   using std::iswblank;
-#endif
+  #endif
   using std::iswcntrl;
   using std::iswctype;
   using std::iswdigit;
