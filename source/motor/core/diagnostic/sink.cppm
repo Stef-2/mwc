@@ -33,79 +33,56 @@ export namespace mwc
       concept drain_c =
         concepts::any_of_c<t, ostream_ptr_t, string_ptr_t, file_ptr_t>;
 
-      template <drain_c tp_drain>
-      struct static_configuration_st
-      {
-        using drain_t = tp_drain;
-
-        drain_t m_drain = nullptr;
-        size_t m_drain_count = s_dynamic_extent;
-      };
-
-      // type which abstracts writing character strings to output targets (drains)
+      // type which abstracts writing character strings to an output target (drain)
       // possible drains are output streams (console / terminal), string objects in memory or files
-      // sink_ct has no ownership of any drains passed to it
-      template <auto tp_cfg>
+      // sink_ct has no ownership of any drain passed to it
+      template <drain_c tp_drain>
       class sink_ct
       {
         public:
-        using cfg_t = decltype(tp_cfg);
-        using drain_t = cfg_t::drain_t;
+        using drain_t = tp_drain;
 
         // underlying drain storage depends on the [m_drain_count] template parameter
         // if [m_drain_count] is not [s_dynamic_extent], the storage is [array_t<drain_t, m_drain_count>]
         // if [m_drain_count] is [s_dynamic_extent], the storage is [vector_t<drain_t>]
-        using drain_storage_t = extent_t<drain_t, tp_cfg.m_drain_count>;
+        //using drain_storage_t = extent_t<drain_t, tp_cfg.m_drain_count>;
 
         // default constructor is only available if [drain_storage_t] is [vector_t<drain_t>]
-        sink_ct()
+        /*sink_ct()
           requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>)
-        = default;
+        = default;*/
 
-        sink_ct(const auto& a_drains)
-        {
-          for (const auto drain : m_drains)
-            assert(drain);
-        }
+        sink_ct(const drain_t a_drain) : m_drain {a_drain} { assert(m_drain); }
 
         // disable copy constructor and assignment operator
         sink_ct(const sink_ct&) = delete;
         sink_ct& operator=(const sink_ct&) = delete;
 
-        auto add_drain(const drain_t a_drain) -> void
-          requires std::is_same_v<drain_storage_t, vector_t<drain_t>>
+        auto drain(const drain_t a_drain) -> void
         {
           assert(a_drain);
-          m_drains.emplace_back(a_drain);
+          m_drain = a_drain;
         }
 
-        auto remove_drain(const drain_t a_drain) -> void
-          requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>)
-        {
-          assert(a_drain);
-          std::erase(m_drains, a_drain);
-        }
+        auto drain() const -> void { return m_drain; }
 
-        auto write_to_drains(const string_view_t a_string) -> void
+        auto write_to_drain(const string_view_t a_string) -> void
         {
           // note: consider adding a a special constexpr check for [stream_count == 1]
           // in case the compiler doesn't optimize away the for_each loop
 
           if constexpr (std::is_same_v<drain_t, ostream_ptr_t>)
-            for (const auto drain : m_drains)
-              std::print(*drain, "{0}", a_string);
+            std::print(*m_drain, "{0}", a_string);
 
           if constexpr (std::is_same_v<drain_t, file_ptr_t>)
-            for (const auto drain : m_drains)
-              std::print(drain, "{0}", a_string);
+            std::print(m_drain, "{0}", a_string);
 
           if constexpr (std::is_same_v<drain_t, string_ptr_t>)
-            for (const auto drain : m_drains)
-              drain->append(a_string);
+            m_drain->append(a_string);
         }
 
         private:
-        drain_storage_t m_drains;
+        drain_t m_drain;
       };
 
       // explicit deduction guides
@@ -202,8 +179,8 @@ export namespace mwc
         test<y> t;
         test tt {y};
 
-        constexpr static_configuration_st<ostream_t*> cfg {&std::cout, 1};
-        sink_ct<cfg> sink {&std::cout};
+        //constexpr static_configuration_st<ostream_t*> cfg {&std::cout, 1};
+        sink_ct<ostream_ptr_t> sink {&std::cout};
       }
     }
   }
