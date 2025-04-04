@@ -120,5 +120,43 @@ export namespace mwc
         for (const auto drain : m_drains)
           drain->append(a_string);
     }
+
+    struct static_t
+    {
+      consteval static_t() {}
+
+      static_t(const static_t&) = delete("FUCK YOU");
+
+      static_t& operator=(const static_t&) = delete("FUCK YOU");
+    };
+
+    struct cfg : static_t
+    {
+      int x;
+
+      consteval auto y() const -> bool { return true; }
+    };
+
+    template <auto c = cfg {}>
+    class test
+    {
+      public:
+      test()
+        requires(not std::is_same_v<decltype(c), int>)
+      {}
+
+      constexpr test(const cfg& a_cfg) {}
+
+      int m_x;
+      std::conditional_t<c.y() == true, int, double> m_y;
+    };
+
+    void wtf()
+    {
+      static_t zzz;
+      constexpr cfg y {.x = 3};
+      test<y> t;
+      test tt {y};
+    }
   }
 }
