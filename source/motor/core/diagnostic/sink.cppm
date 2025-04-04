@@ -17,146 +17,194 @@ export namespace mwc
 {
   namespace diagnostic
   {
-    // possible types for sink drains
-    // [ostream_t] is a standard output stream type
-    // [string_t] is a standard string type
-    // [file_t] is a standard file type
-    using ostream_ptr_t = observer_ptr_t<ostream_t>;
-    using string_ptr_t = observer_ptr_t<string_t>;
-    using file_ptr_t = observer_ptr_t<file_t>;
-
-    // concept modeling pointers to types which can be used as sink drains
-    // possible types are: [ostream_ptr_t], [string_ptr_t], [file_ptr_t]
-    template <typename t>
-    concept drain_c =
-      concepts::any_of_c<t, ostream_ptr_t, string_ptr_t, file_ptr_t>;
-
-    // type which abstracts writing character strings to output targets (drains)
-    // possible drains are output streams (console / terminal), string objects in memory or files
-    // sink_ct has no ownership of any drains passed to it
-    template <drain_c drain_t, size_t drain_count>
-    class sink_ct
+    namespace sink
     {
-      public:
-      // underlying drain storage depends on the [drain_count] template parameter
-      // if [drain_count] is not [s_dynamic_extent], the storage is [array_t<drain_t, drain_count>]
-      // if [drain_count] is [s_dynamic_extent], the storage is [vector_t<drain_t>]
-      using drain_storage_t = extent_t<drain_t, drain_count>;
-      using underlying_drain_t = drain_t;
+      // possible sink drains:
+      // [ostream_t] -> standard output stream type
+      // [string_t] -> standard string type
+      // [file_t] -> standard file type
+      using ostream_ptr_t = observer_ptr_t<ostream_t>;
+      using string_ptr_t = observer_ptr_t<string_t>;
+      using file_ptr_t = observer_ptr_t<file_t>;
 
-      // default constructor is only available if [drain_storage_t] is [vector_t<drain_t>]
-      sink_ct()
+      // concept modeling pointers to types which can be used as sink drains
+      // possible types are: [ostream_ptr_t], [string_ptr_t], [file_ptr_t]
+      template <typename t>
+      concept drain_c =
+        concepts::any_of_c<t, ostream_ptr_t, string_ptr_t, file_ptr_t>;
+
+      template <drain_c tp_drain>
+      struct static_configuration_st
+      {
+        using drain_t = tp_drain;
+
+        drain_t m_drain = nullptr;
+        size_t m_drain_count = s_dynamic_extent;
+      };
+
+      // type which abstracts writing character strings to output targets (drains)
+      // possible drains are output streams (console / terminal), string objects in memory or files
+      // sink_ct has no ownership of any drains passed to it
+      template <auto tp_cfg>
+      class sink_ct
+      {
+        public:
+        using cfg_t = decltype(tp_cfg);
+        using drain_t = cfg_t::drain_t;
+
+        // underlying drain storage depends on the [m_drain_count] template parameter
+        // if [m_drain_count] is not [s_dynamic_extent], the storage is [array_t<drain_t, m_drain_count>]
+        // if [m_drain_count] is [s_dynamic_extent], the storage is [vector_t<drain_t>]
+        using drain_storage_t = extent_t<drain_t, tp_cfg.m_drain_count>;
+
+        // default constructor is only available if [drain_storage_t] is [vector_t<drain_t>]
+        sink_ct()
+          requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>)
+        = default;
+
+        sink_ct(const auto& a_drains)
+        {
+          for (const auto drain : m_drains)
+            assert(drain);
+        }
+
+        // disable copy constructor and assignment operator
+        sink_ct(const sink_ct&) = delete;
+        sink_ct& operator=(const sink_ct&) = delete;
+
+        auto add_drain(const drain_t a_drain) -> void
+          requires std::is_same_v<drain_storage_t, vector_t<drain_t>>
+        {
+          assert(a_drain);
+          m_drains.emplace_back(a_drain);
+        }
+
+        auto remove_drain(const drain_t a_drain) -> void
+          requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>)
+        {
+          assert(a_drain);
+          std::erase(m_drains, a_drain);
+        }
+
+        auto write_to_drains(const string_view_t a_string) -> void
+        {
+          // note: consider adding a a special constexpr check for [stream_count == 1]
+          // in case the compiler doesn't optimize away the for_each loop
+
+          if constexpr (std::is_same_v<drain_t, ostream_ptr_t>)
+            for (const auto drain : m_drains)
+              std::print(*drain, "{0}", a_string);
+
+          if constexpr (std::is_same_v<drain_t, file_ptr_t>)
+            for (const auto drain : m_drains)
+              std::print(drain, "{0}", a_string);
+
+          if constexpr (std::is_same_v<drain_t, string_ptr_t>)
+            for (const auto drain : m_drains)
+              drain->append(a_string);
+        }
+
+        private:
+        drain_storage_t m_drains;
+      };
+
+      // explicit deduction guides
+      /*template <drain_c d>
+      sink_ct(vector_t<d> a_value) -> sink_ct<d, s_dynamic_extent>;
+      template <drain_c d, size_t n>
+      sink_ct(array_t<d, n> a_value) -> sink_ct<d, n>;
+      template <drain_c d>
+      sink_ct(d a_value) -> sink_ct<d, 1>;*/
+
+      // ================================
+      // implementation
+      // ================================
+      /*template <auto>
+      sink_ct<static_configuration_st>::sink_ct(const auto& a_drains)
+      : m_drains {a_drains}
+      {
+        for (const auto drain : m_drains)
+          assert(drain);
+      }*/
+      /*
+      template <static_configuration_st>
+      auto sink_ct<static_configuration_st>::add_drain(const drain_t a_drain)
+        -> void
         requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>)
-      = default;
-      sink_ct(const auto& a_drains);
+      {
+        assert(a_drain);
+        m_drains.emplace_back(a_drain);
+      }*/
+      /*
+      template <drain_c drain_t, size_t drain_count>
+      auto sink_ct<drain_t, drain_count>::remove_drain(const drain_t a_drain)
+        -> void
+        requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>)
+      {
+        assert(a_drain);
+        std::erase(m_drains, a_drain);
+      }*/
+      /*
+      template <drain_c drain_t, size_t drain_count>
+      auto sink_ct<drain_t, drain_count>::write_to_drains(
+        const string_view_t a_string) -> void
+      {
+        // note: consider adding a a special constexpr check for [stream_count == 1]
+        // in case the compiler doesn't optimize away the for_each loop
 
-      // disable copy constructor and assignment operator
-      sink_ct(const sink_ct&) = delete;
-      sink_ct& operator=(const sink_ct&) = delete;
+        if constexpr (std::is_same_v<drain_t, ostream_ptr_t>)
+          for (const auto drain : m_drains)
+            std::print(*drain, "{0}", a_string);
 
-      auto add_drain(const drain_t a_drain) -> void
-        requires std::is_same_v<drain_storage_t, vector_t<drain_t>>;
-      auto remove_drain(const drain_t a_drain) -> void
-        requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>);
-      auto write_to_drains(const string_view_t a_string) -> void;
+        if constexpr (std::is_same_v<drain_t, file_ptr_t>)
+          for (const auto drain : m_drains)
+            std::print(drain, "{0}", a_string);
 
-      private:
-      drain_storage_t m_drains;
-    };
+        if constexpr (std::is_same_v<drain_t, string_ptr_t>)
+          for (const auto drain : m_drains)
+            drain->append(a_string);
+      }
+*/
+      struct static_t
+      {
+        consteval static_t() {}
 
-    // explicit deduction guides
-    template <drain_c d>
-    sink_ct(vector_t<d> a_value) -> sink_ct<d, s_dynamic_extent>;
-    template <drain_c d, size_t n>
-    sink_ct(array_t<d, n> a_value) -> sink_ct<d, n>;
-    template <drain_c d>
-    sink_ct(d a_value) -> sink_ct<d, 1>;
+        static_t(const static_t&) = delete("FUCK YOU");
 
-    // ================================
-    // implementation
-    // ================================
-    template <drain_c drain_t, size_t drain_count>
-    sink_ct<drain_t, drain_count>::sink_ct(const auto& a_drains)
-    : m_drains {a_drains}
-    {
-      for (const auto drain : m_drains)
-        assert(drain);
-    }
+        static_t& operator=(const static_t&) = delete("FUCK YOU");
+      };
 
-    template <drain_c drain_t, size_t drain_count>
-    auto sink_ct<drain_t, drain_count>::add_drain(const drain_t a_drain) -> void
-      requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>)
-    {
-      assert(a_drain);
-      m_drains.emplace_back(a_drain);
-    }
+      struct cfg
+      {
+        int x;
 
-    template <drain_c drain_t, size_t drain_count>
-    auto sink_ct<drain_t, drain_count>::remove_drain(const drain_t a_drain)
-      -> void
-      requires(std::is_same_v<drain_storage_t, vector_t<drain_t>>)
-    {
-      assert(a_drain);
-      std::erase(m_drains, a_drain);
-    }
+        consteval auto y() const -> bool { return true; }
+      };
 
-    template <drain_c drain_t, size_t drain_count>
-    auto
-    sink_ct<drain_t, drain_count>::write_to_drains(const string_view_t a_string)
-      -> void
-    {
-      // note: consider adding a a special constexpr check for [stream_count == 1]
-      // in case the compiler doesn't optimize away the for_each loop
+      template <auto c = cfg {}>
+      class test
+      {
+        public:
+        test()
+          requires(not std::is_same_v<decltype(c), int>)
+        {}
 
-      if constexpr (std::is_same_v<drain_t, ostream_ptr_t>)
-        for (const auto drain : m_drains)
-          std::print(*drain, "{0}", a_string);
+        constexpr test(const cfg& a_cfg) {}
 
-      if constexpr (std::is_same_v<drain_t, file_ptr_t>)
-        for (const auto drain : m_drains)
-          std::print(drain, "{0}", a_string);
+        int m_x;
+        std::conditional_t<c.y() == true, int, double> m_y;
+      };
 
-      if constexpr (std::is_same_v<drain_t, string_ptr_t>)
-        for (const auto drain : m_drains)
-          drain->append(a_string);
-    }
+      void wtf()
+      {
+        static_t zzz;
+        constexpr cfg y {.x = 3};
+        test<y> t;
+        test tt {y};
 
-    struct static_t
-    {
-      consteval static_t() {}
-
-      static_t(const static_t&) = delete("FUCK YOU");
-
-      static_t& operator=(const static_t&) = delete("FUCK YOU");
-    };
-
-    struct cfg : static_t
-    {
-      int x;
-
-      consteval auto y() const -> bool { return true; }
-    };
-
-    template <auto c = cfg {}>
-    class test
-    {
-      public:
-      test()
-        requires(not std::is_same_v<decltype(c), int>)
-      {}
-
-      constexpr test(const cfg& a_cfg) {}
-
-      int m_x;
-      std::conditional_t<c.y() == true, int, double> m_y;
-    };
-
-    void wtf()
-    {
-      static_t zzz;
-      constexpr cfg y {.x = 3};
-      test<y> t;
-      test tt {y};
+        constexpr static_configuration_st<ostream_t*> cfg {&std::cout, 1};
+        sink_ct<cfg> sink {&std::cout};
+      }
     }
   }
 }
