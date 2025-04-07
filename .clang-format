@@ -82,8 +82,10 @@ AlignConsecutiveTableGenDefinitionColons:
   AcrossEmptyLines: false
   AcrossComments: false
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: {}
-AlignConsecutiveDeclarations: {}
+AlignConsecutiveAssignments:
+  Enabled: false
+AlignConsecutiveDeclarations:
+  Enabled: false
 BracedInitializerIndentWidth: 0
 ContinuationIndentWidth: 2
 ConstructorInitializerIndentWidth: 0

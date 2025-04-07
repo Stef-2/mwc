@@ -14,31 +14,13 @@ export namespace mwc
   template <template <class...> class U, class... Vs>
   constexpr inline bool instance_of_v<U<Vs...>, U> = std::true_type {};
 
-  // ================================
-  /*template <class T, class P>
-  inline constexpr bool is_like_v = std::is_same_v<T, P>;
+  template <size_t tp_min, size_t tp_max, typename... t>
+  consteval auto within_bounds()
+  {
+    constexpr auto check = sizeof...(t) >= tp_min and sizeof...(t) <= tp_max;
 
-  struct _
-  {};
-
-  template <class T>
-  inline constexpr bool is_like_v<T, _> = true;
-
-  template <template <class...> class T, class... Ts, class... Us>
-    requires(sizeof...(Ts) == sizeof...(Us))
-  inline constexpr bool is_like_v<T<Ts...>, T<Us...>> =
-    (is_like_v<Ts, Us> && ...);
-
-  template <class T, size_t M, class U, size_t N>
-  inline constexpr bool is_like_v<std::array<T, M>, std::array<U, N>> =
-    is_like_v<T, U>;
-
-  template <class... Ps>
-  struct in
-  {};
-
-  template <class T, class... Ps>
-  inline constexpr bool is_like_v<T, in<Ps...>> = (is_like_v<T, Ps> || ...);*/
+    return check;
+  }
 
   template <size_t i, size_t n, typename functor>
   consteval auto static_for_loop(const functor& a_functor)
