@@ -8,7 +8,7 @@ import mwc_extent;
 import mwc_event_severity;
 import mwc_metaprogramming_utility;
 import mwc_concept;
-import mwc_sink;
+import mwc_observer_ptr;
 import mwc_assert;
 
 import std;
@@ -19,12 +19,26 @@ export namespace mwc
   {
     namespace log
     {
-      template <drain_c tp_drain>
+      // possible sink types:
+      // [ostream_t] -> standard output stream type
+      // [string_t] -> standard string type
+      // [file_t] -> standard file type
+      using ostream_ptr_t = observer_ptr_t<ostream_t>;
+      using string_ptr_t = observer_ptr_t<string_t>;
+      using file_ptr_t = observer_ptr_t<file_t>;
+
+      // concept modeling pointers to types which can be used as log sinks
+      // possible types are: [ostream_ptr_t], [string_ptr_t], [file_ptr_t]
+      template <typename t>
+      concept sink_c =
+        concepts::any_of_c<t, ostream_ptr_t, string_ptr_t, file_ptr_t>;
+
+      template <sink_c tp_sink>
       struct static_configuration_st
       {
-        using sink_t = tp_drain;
+        using sink_t = tp_sink;
 
-        size_t m_drain_count = s_dynamic_extent;
+        size_t m_sink_count = s_dynamic_extent;
       };
 
       template <static_configuration_st... tp_configs>
@@ -34,12 +48,12 @@ export namespace mwc
         public:
         using sink_storage_t =
           tuple_t<extent_t<typename decltype(tp_configs)::sink_t,
-                           tp_configs.m_drain_count>...>;
+                           tp_configs.m_sink_count>...>;
 
         constexpr log_ct() {}
 
-        //template <drain_c tp_drain>
-        constexpr auto add_sink(const drain_c auto a_sink) -> void
+        //template <sink_c tp_sink>
+        constexpr auto add_sink(const sink_c auto a_sink) -> void
         {
           using sink_t = std::remove_const_t<decltype(a_sink)>;
           assert(a_sink);
@@ -48,8 +62,8 @@ export namespace mwc
 
           auto& sink_storage = std::get<sink_index>(m_sinks);
 
-          constexpr auto dynamic_extent =
-            instance_of_v<decltype(sink_storage), vector_t>;
+          /*constexpr auto dynamic_extent =
+            instance_of_v<decltype(sink_storage), vector_t>;*/
 
           for (auto& sink : sink_storage)
             if (not sink)
@@ -60,20 +74,24 @@ export namespace mwc
 
         auto write_to_sinks(const string_view_t m_string) -> void
         {
-          *(std::get<0>(m_sinks)[0]) << m_string;
+          //event_severity_et severity = event_severity_et::info;
+
+          for (auto& sink : std::get<0>(m_sinks))
+            *sink << m_string;
+          //*(std::get<0>(m_sinks)[0]) << m_string;
         }
 
         sink_storage_t m_sinks;
 
         //private:
-        template <drain_c tp_sink>
-        consteval auto find_matching_extent_index() -> const size_t
+        template <sink_c tp_sink>
+        consteval auto find_matching_extent_index() const -> size_t
         {
           constexpr auto tuple_size = std::tuple_size_v<sink_storage_t>;
 
           [&]<size_t... tp>(std::index_sequence<tp...>)
           {
-            auto find = [&]<size_t i>(auto&& t)
+            auto find = [&]<size_t i>(auto&& /*t*/)
             {
               if constexpr (i > 0)
               {
@@ -84,6 +102,8 @@ export namespace mwc
 
                   return i;
               }
+              if constexpr (i == tuple_size)
+                static_assert(false, "no matching sink found");
             };
 
             (find.template operator()<tp>(std::get<tp>(m_sinks)), ...);
@@ -101,17 +121,18 @@ export namespace mwc
       void testtt()
       {
         string_t s;
-        file_t x, y, z;
-        array_t a {&x, &y, &z};
+        //file_t x, y, z;
+        //array_t a {&x, &y, &z};
 
         constexpr auto asd = static_configuration_st<ostream_t*> {1};
-        auto sa {&std::cout};
+        //auto sa {&std::cout};
         //log_ct<asd> log {array_t<sink_ct<ostream_t*>, 1> {&std::cout}};
         log_ct<asd> log;
         //std::get<0>(log.m_sinks)[0] = &std::cout;
         log.add_sink(&std::cout);
         static_assert(std::is_same_v<decltype(log)::sink_storage_t,
                                      tuple_t<array_t<ostream_t*, 1>>>);
+        log.write_to_sinks("Hello World!");
       }
 
       template <typename tp, size_t tp_n>
