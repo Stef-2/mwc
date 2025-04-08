@@ -36,7 +36,6 @@ int main()
   //printt("fuck !!!");
   printt("{0} {1}", "fuck !!!", 123);
   auto um = std::unordered_map<mwc::diagnostic::event_severity_et, void*> {};
-  std::system("cls||clear");
 
   //log.error("fuck!");
 }

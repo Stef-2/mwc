@@ -36,12 +36,20 @@ export namespace mwc
       template <sink_c tp_sink>
       struct static_configuration_st
       {
-        using sink_t = tp_sink;
+        struct sink_st
+        {
+          tp_sink m_sink;
+          event_severity_et m_severity;
+        };
+
+        using sink_t = sink_st;
 
         size_t m_sink_count = s_dynamic_extent;
       };
 
-      template <static_configuration_st... tp_configs>
+      template <event_severity_et tp_default_severity =
+                  event_severity_et::e_information,
+                static_configuration_st... tp_configs>
         requires(within_bounds<1, 3, decltype(tp_configs)...>())
       class log_ct
       {
@@ -50,34 +58,44 @@ export namespace mwc
           tuple_t<extent_t<typename decltype(tp_configs)::sink_t,
                            tp_configs.m_sink_count>...>;
 
-        constexpr log_ct() {}
+        static constexpr auto s_default_severity = tp_default_severity;
+
+        constexpr log_ct() : m_sinks {} {}
 
         //template <sink_c tp_sink>
-        constexpr auto add_sink(const sink_c auto a_sink) -> void
+        constexpr auto add_sink(
+          const sink_c auto a_sink,
+          const event_severity_et a_severity = s_default_severity) -> void
         {
           using sink_t = std::remove_const_t<decltype(a_sink)>;
           assert(a_sink);
 
           constexpr auto sink_index = find_matching_extent_index<sink_t>();
-
           auto& sink_storage = std::get<sink_index>(m_sinks);
 
-          /*constexpr auto dynamic_extent =
-            instance_of_v<decltype(sink_storage), vector_t>;*/
+          constexpr auto dynamic_extent =
+            instance_of_v<decltype(sink_storage), vector_t>;
 
-          for (auto& sink : sink_storage)
-            if (not sink)
-              sink = a_sink;
+          if constexpr (not dynamic_extent)
+          {
+            for (auto& sink : sink_storage)
+              if (not sink.m_sink)
+                sink = {a_sink, a_severity};
+          }
+          else
+            m_sinks.emplace_back(a_sink, a_severity);
         }
 
         constexpr auto remove_sink();
 
-        auto write_to_sinks(const string_view_t m_string) -> void
+        auto write_to_sinks(
+          const string_view_t m_string,
+          const event_severity_et a_severity = s_default_severity) -> void
         {
           //event_severity_et severity = event_severity_et::info;
 
           for (auto& sink : std::get<0>(m_sinks))
-            *sink << m_string;
+            *sink.m_sink << m_string;
           //*(std::get<0>(m_sinks)[0]) << m_string;
         }
 
@@ -95,11 +113,10 @@ export namespace mwc
             {
               if constexpr (i > 0)
               {
-                using extent_value_type_t =
+                using extent_value_t =
                   decltype(std::get<i>(m_sinks))::value_type;
 
-                if constexpr (std::is_same_v<tp_sink, extent_value_type_t>)
-
+                if constexpr (std::is_same_v<tp_sink, extent_value_t>)
                   return i;
               }
               if constexpr (i == tuple_size)
@@ -124,14 +141,17 @@ export namespace mwc
         //file_t x, y, z;
         //array_t a {&x, &y, &z};
 
-        constexpr auto asd = static_configuration_st<ostream_t*> {1};
+        constexpr auto asd =
+          static_configuration_st<ostream_t*> {s_dynamic_extent};
         //auto sa {&std::cout};
         //log_ct<asd> log {array_t<sink_ct<ostream_t*>, 1> {&std::cout}};
-        log_ct<asd> log;
+        log_ct<event_severity_et::e_information, asd> log;
         //std::get<0>(log.m_sinks)[0] = &std::cout;
         log.add_sink(&std::cout);
-        static_assert(std::is_same_v<decltype(log)::sink_storage_t,
-                                     tuple_t<array_t<ostream_t*, 1>>>);
+        /*static_assert(
+          std::is_same_v<
+            decltype(log)::sink_storage_t,
+            tuple_t<array_t<static_configuration_st<ostream_t*>::sink_t, 1>>>);*/
         log.write_to_sinks("Hello World!");
       }
 
