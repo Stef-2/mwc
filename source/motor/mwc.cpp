@@ -27,9 +27,11 @@ int main()
 {
   constexpr auto asd =
     mwc::diagnostic::log::static_configuration_st<mwc::ostream_t*> {1};
-  mwc::diagnostic::log::log_ct<asd> log;
+  mwc::diagnostic::log::
+    log_ct<mwc::diagnostic::event_severity_et::e_information, asd>
+      log;
 
-  log.add_sink(&std::cout);
+    log.add_sink(&std::cout);
   log.write_to_sinks("Hello World!");
 
   //if (std::rand())

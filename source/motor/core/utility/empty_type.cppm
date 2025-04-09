@@ -4,6 +4,6 @@ export module mwc_empty_type;
 
 export namespace mwc
 {
-  struct empty_type_st
+  struct empty_st
   {};
 }
