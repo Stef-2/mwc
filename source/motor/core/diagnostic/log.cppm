@@ -36,12 +36,12 @@ export namespace mwc
 
       struct configuration_st
       {
-        bool m_write_timestamps = {false};
-        bool m_write_severity = {false};
-        bool m_write_thread_id = {false};
-        bool m_write_file_name = {false};
-        bool m_write_line_number = {false};
-        bool m_write_function_name = {false};
+        bool m_write_timestamps = {true};
+        bool m_write_severity = {true};
+        bool m_write_thread_id = {true};
+        bool m_write_file_name = {true};
+        bool m_write_function_name = {true};
+        bool m_write_line_number = {true};
 
         event_severity_et m_default_severity_level =
           event_severity_et::e_information;
@@ -61,8 +61,7 @@ export namespace mwc
         size_t m_sink_count = s_dynamic_extent;
       };
 
-      template <bool tp_static_configuration = true,
-                configuration_st tp_configuration = {},
+      template <configuration_st tp_configuration = {},
                 sink_configuration_st... tp_configs>
         requires(within_bounds<1, 3, decltype(tp_configs)...>())
       class log_ct

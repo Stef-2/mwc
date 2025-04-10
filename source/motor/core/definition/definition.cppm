@@ -41,14 +41,16 @@ export namespace mwc
   using file_t = std::FILE;
 
   // container types
-  template <typename t, size_t n>
-  using array_t = std::array<t, n>;
-  template <typename t, typename a = std::allocator<t>>
-  using vector_t = std::vector<t, a>;
-  template <typename t>
-  using initializer_list_t = std::initializer_list<t>;
-  template <typename t>
-  using span_t = std::span<t>;
-  template <typename... types>
-  using tuple_t = std::tuple<types...>;
+  template <typename tp, size_t tp_count>
+  using array_t = std::array<tp, tp_count>;
+  template <typename tp, typename tp_allocator = std::allocator<tp>>
+  using vector_t = std::vector<tp, tp_allocator>;
+  template <typename tp>
+  using initializer_list_t = std::initializer_list<tp>;
+  template <typename tp>
+  using span_t = std::span<tp>;
+  template <typename... tp>
+  using tuple_t = std::tuple<tp...>;
+  template <typename tp>
+  using optional_t = std::optional<tp>;
 }
