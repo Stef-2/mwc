@@ -4,14 +4,14 @@ project wide code convention:
 
     types:
         struct types:
-            suffix: "_st"
             aggregate types
+            suffix: "_st"
         class types:
-            suffix:"_ct"
             non-aggregate types
-        enumerator_c types:
+            suffix:"_ct"
+        enumerator types:
+            scoped enumerators
             suffix: "_et"
-            scoped enumerator_cs
         union types:
             suffix: "_ut"
         alias types:
@@ -21,11 +21,11 @@ project wide code convention:
         sufix: "_c"
 
     values:
-        const by default
         automatic type deduction
-        member:
+        const by default
+        members:
             prefix: "m_"
-        static member:
+        static:
             prefix: "s_"
         function arguments:
             prefix: "a_"
@@ -33,4 +33,5 @@ project wide code convention:
     functions:
         automatic type deduction
 
-            
+    template parameters:
+        prefix: "tp_"

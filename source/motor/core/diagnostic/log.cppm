@@ -1,4 +1,3 @@
-
 module;
 
 export module mwc_log;
@@ -34,17 +33,32 @@ export namespace mwc
       concept sink_c =
         concepts::any_of_c<t, ostream_ptr_t, string_ptr_t, file_ptr_t>;
 
-      struct configuration_st
+      struct static_configuration_st
       {
-        bool m_write_timestamps = {true};
-        bool m_write_severity = {true};
-        bool m_write_thread_id = {true};
-        bool m_write_file_name = {true};
-        bool m_write_function_name = {true};
-        bool m_write_line_number = {true};
+        size_t m_ostream_sink_count = {s_dynamic_extent};
+        size_t m_string_sink_count = {s_dynamic_extent};
+        size_t m_file_sink_count = {s_dynamic_extent};
+      };
 
-        event_severity_et m_default_severity_level =
-          event_severity_et::e_information;
+      struct dynamic_configuration_st
+
+      {};
+
+      template <bool tp_static_configuration = true>
+      struct configuration_st
+      : public std::conditional_t<tp_static_configuration,
+                                  static_configuration_st,
+                                  dynamic_configuration_st>
+      {
+        bool m_print_timestamps = {true};
+        bool m_print_severity = {true};
+        bool m_print_thread_id = {true};
+        bool m_print_file_name = {true};
+        bool m_print_function_name = {true};
+        bool m_print_line_number = {true};
+
+        event_severity_et m_default_severity_level = {
+          event_severity_et::e_information};
       };
 
       template <sink_c tp_sink>
@@ -61,13 +75,11 @@ export namespace mwc
         size_t m_sink_count = s_dynamic_extent;
       };
 
-      template <configuration_st tp_configuration = {},
-                sink_configuration_st... tp_configs>
-        requires(within_bounds<1, 3, decltype(tp_configs)...>())
+      template <configuration_st<true> tp_configuration = {}>
       class log_ct
       {
         public:
-        using sink_storage_t =
+        using dynamic_storage_t = using sink_storage_t =
           tuple_t<extent_t<typename decltype(tp_configs)::sink_t,
                            tp_configs.m_sink_count>...>;
 
