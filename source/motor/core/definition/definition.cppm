@@ -53,4 +53,6 @@ export namespace mwc
   using tuple_t = std::tuple<tp...>;
   template <typename tp>
   using optional_t = std::optional<tp>;
+  template <typename tp_first, typename tp_second>
+  using pair_t = std::pair<tp_first, tp_second>;
 }
