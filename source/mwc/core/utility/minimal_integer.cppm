@@ -10,6 +10,7 @@ export namespace mwc
 {
   namespace utility
   {
+    // smallest width unsigned integral type capable of storing [[tp_value]]
     template <size_t tp_value>
     struct minimal_integral_st
     {

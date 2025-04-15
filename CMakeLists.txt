@@ -29,7 +29,7 @@ if(${MWC_LOG})
 endif()
 
 # attempt to find the std module file
-set(STD_MODULE_FILE std.cc)
+set(STD_MODULE_FILE "std.cc")
 if(NOT EXISTS ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
     message(CHECK_START "attempting to find the std module file...")
     cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH CXX_COMPILER_DIR)
