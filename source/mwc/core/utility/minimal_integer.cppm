@@ -28,7 +28,7 @@ export namespace mwc
                            std::true_type, std::false_type>;
 
       public:
-      using minimal_t = std::conditional_t<
+      using type = std::conditional_t<
         width8_t::value, uint8_t,
         std::conditional_t<
           width16_t::value, uint16_t,

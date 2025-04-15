@@ -7,6 +7,7 @@ import mwc_assert;
 import mwc_concept;
 import mwc_minimal_integral;
 
+import <cassert>;
 import std;
 
 export namespace mwc
@@ -52,7 +53,8 @@ export namespace mwc
             size_t tp_key_count,
             typename tp_value,
             size_t tp_value_count>
-  //requires(tp_key_count < tp_value_count)
+    requires(not std::is_same_v<tp_key, tp_value> and
+             tp_key_count <= tp_value_count)
   struct static_multimap_st
   {
     using key_t = tp_key;
@@ -60,7 +62,7 @@ export namespace mwc
     using value_t = tp_value;
     using const_value_t = std::add_const_t<value_t>;
     using kv_pair_t = pair_t<key_t, value_t>;
-    using value_index_t = utility::minimal_integral_st<tp_value_count>;
+    using value_index_t = utility::minimal_integral_st<tp_value_count>::type;
 
     struct key_st
     {
@@ -70,7 +72,7 @@ export namespace mwc
     };
 
     constexpr static_multimap_st(
-      const kv_pair_t (&a_keys)[/*std::max(tp_key_count, tp_value_count)*/])
+      const kv_pair_t (&a_keys)[std::max(tp_key_count, tp_value_count)])
     : m_keys {},
       m_values {}
     {
@@ -80,8 +82,16 @@ export namespace mwc
                         [](const kv_pair_t a_current, const kv_pair_t a_next)
                         { return a_current.first < a_next.first; });
 
-      /*for (auto i = value_index_t {0}; i < tp_value_count; ++i)
-        ;*/
+      for (auto i = value_index_t {0}; i < tp_value_count; ++i)
+      {
+        //const auto key_exists = std::ranges::binary_search(m_keys, key);
+
+        if (not false)
+        {
+          const auto value_begin_index = i;
+          assert(i > 0);
+        }
+      }
     }
 
     array_t<key_st, tp_key_count> m_keys;
