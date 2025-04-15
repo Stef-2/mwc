@@ -71,11 +71,11 @@ export namespace mwc
     };
 
     constexpr static_multimap_st(
-      const kv_pair_t (&a_keys)[std::max(tp_key_count, tp_value_count)])
+      const kv_pair_t (&a_kv_pairs)[std::max(tp_key_count, tp_value_count)])
     : m_keys {},
       m_values {}
     {
-      auto input_array = std::to_array(a_keys);
+      auto input_array = std::to_array(a_kv_pairs);
 
       std::ranges::sort(input_array,
                         [](const kv_pair_t a_current, const kv_pair_t a_next)
@@ -83,7 +83,10 @@ export namespace mwc
 
       for (auto i = value_index_t {0}, key_count {0}; i < tp_value_count; ++i)
       {
-        //const auto key_exists = std::ranges::binary_search(m_keys, key);
+        const auto existing_key_index = std::ranges::find_if(
+          m_keys,
+          input_array[i].first,
+          [](auto a_n, auto a_nxx) { return a_n == a_nxx.m_key; });
 
         if (not false)
           const auto value_begin_index = i;
