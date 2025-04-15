@@ -14,8 +14,9 @@
                 "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_CXX_STANDARD": "26",
                 "CMAKE_MAKE_PROGRAM": "ninja",
-                "CMAKE_CXX_FLAGS": "-std=c++26 -fmodules -fno-exceptions -fdiagnostics-show-template-tree -fdiagnostics-color=always -Wall -Wextra -Wpedantic",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": true
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+                "PROJECT_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Winline",
+                "CMAKE_CXX_FLAGS": "-std=c++26 -fmodules -fno-exceptions -fdiagnostics-show-template-tree -fdiagnostics-color=always $env{PROJECT_WARNING_FLAGS}"
             }
         },
         {

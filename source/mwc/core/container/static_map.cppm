@@ -7,7 +7,6 @@ import mwc_assert;
 import mwc_concept;
 import mwc_minimal_integral;
 
-import <cassert>;
 import std;
 
 export namespace mwc
@@ -82,15 +81,12 @@ export namespace mwc
                         [](const kv_pair_t a_current, const kv_pair_t a_next)
                         { return a_current.first < a_next.first; });
 
-      for (auto i = value_index_t {0}; i < tp_value_count; ++i)
+      for (auto i = value_index_t {0}, key_count {0}; i < tp_value_count; ++i)
       {
         //const auto key_exists = std::ranges::binary_search(m_keys, key);
 
         if (not false)
-        {
           const auto value_begin_index = i;
-          assert(i > 0);
-        }
       }
     }
 

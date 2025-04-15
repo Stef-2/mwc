@@ -12,16 +12,16 @@ export namespace mwc
 {
   namespace diagnostic
   {
-    constexpr auto assert(const concepts::boolean_c auto a_condition,
-                          const string_view_t a_message = {}) -> void
+    inline constexpr auto assert(const concepts::boolean_c auto a_condition,
+                                 const string_view_t a_message = {}) -> void
     {
       if constexpr (not debugging())
-        return;
+        [[assume(a_condition)]];
 
-      if (not a_condition)
+      else if (not a_condition)
       {
         if (not a_message.empty())
-          std::print("{}\n", a_message);
+          std::print("{0}\n", a_message);
 
         std::abort();
       }
