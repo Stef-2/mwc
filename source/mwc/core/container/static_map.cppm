@@ -9,11 +9,9 @@ import mwc_minimal_integral;
 
 import std;
 
-export namespace mwc
-{
+export namespace mwc {
   template <typename tp_key, typename tp_value, size_t tp_size>
-  struct static_map_st
-  {
+  struct static_map_st {
     using key_t = tp_key;
     using const_key_t = std::add_const_t<key_t>;
     using value_t = tp_value;
@@ -25,8 +23,7 @@ export namespace mwc
                                             const auto a_value) -> auto&
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>
     {
-      for (const auto& kv_pair : m_this.m_storage)
-      {
+      for (const auto& kv_pair : m_this.m_storage) {
         if constexpr (std::is_same_v<decltype(a_value), const_key_t>)
           if (kv_pair.first == a_value)
             return kv_pair.second;
@@ -54,8 +51,7 @@ export namespace mwc
             size_t tp_value_count>
     requires(not std::is_same_v<tp_key, tp_value> and
              tp_key_count <= tp_value_count)
-  struct static_multimap_st
-  {
+  struct static_multimap_st {
     using key_t = tp_key;
     using const_key_t = std::add_const_t<key_t>;
     using value_t = tp_value;
@@ -63,8 +59,7 @@ export namespace mwc
     using kv_pair_t = pair_t<key_t, value_t>;
     using value_index_t = utility::minimal_integral_st<tp_value_count>::type;
 
-    struct key_st
-    {
+    struct key_st {
       tp_key m_key;
       value_index_t m_begin;
       value_index_t m_end;
@@ -73,23 +68,31 @@ export namespace mwc
     constexpr static_multimap_st(
       const kv_pair_t (&a_kv_pairs)[std::max(tp_key_count, tp_value_count)])
     : m_keys {},
-      m_values {}
-    {
+      m_values {} {
       auto input_array = std::to_array(a_kv_pairs);
-
       std::ranges::sort(input_array,
-                        [](const kv_pair_t a_current, const kv_pair_t a_next)
-                        { return a_current.first < a_next.first; });
+                        [](const kv_pair_t a_current, const kv_pair_t a_next) {
+                          return a_current.first < a_next.first;
+                        });
 
-      for (auto i = value_index_t {0}, key_count {0}; i < tp_value_count; ++i)
-      {
-        const auto existing_key_index = std::ranges::find_if(
-          m_keys,
-          input_array[i].first,
-          [](auto a_n, auto a_nxx) { return a_n == a_nxx.m_key; });
+      for (value_index_t i = {}, key_count = {}; i < tp_value_count; ++i) {
+        const auto current = input_array[i];
+        const auto key_exists = [this, &current]() -> bool {
+          for (const auto& key : m_keys)
+            if (key.m_key == current.first)
+              return true;
+          return false;
+        }();
 
-        if (not false)
-          const auto value_begin_index = i;
+        m_values[i] = current.second;
+
+        if (not key_exists) {
+          m_keys[key_count] = {current.first, i,
+                               static_cast<value_index_t>(i + 1)};
+          ++key_count;
+        } else {
+          m_keys[key_count - 1].m_end = i + value_index_t {1};
+        }
       }
     }
 
@@ -97,8 +100,7 @@ export namespace mwc
     array_t<tp_value, tp_value_count> m_values;
   };
 
-  void test()
-  {
+  void test() {
     constexpr auto map =
       static_map_st<int, float, 2> {pair_t {1, 2.0f}, {3, 4.0f}};
     constexpr auto f = map[1];

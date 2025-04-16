@@ -13,10 +13,8 @@ import mwc_output_stream;
 
 import std;
 
-export namespace mwc
-{
-  namespace diagnostic
-  {
+export namespace mwc {
+  namespace diagnostic {
     // possible sink drains:
     // [ostream_t] -> standard output stream type
     // [string_t] -> standard string type
@@ -35,8 +33,7 @@ export namespace mwc
     // possible drains are output streams (console / terminal), string objects in memory or files
     // sink_ct has no ownership of any drain passed to it
     template <drain_c tp_drain>
-    class sink_ct
-    {
+    class sink_ct {
       public:
       using drain_t = tp_drain;
 
@@ -118,32 +115,27 @@ export namespace mwc
       }
 */
     template <drain_c tp_drain>
-    sink_ct<tp_drain>::sink_ct() : m_drain {nullptr}
-    {}
+    sink_ct<tp_drain>::sink_ct() : m_drain {nullptr} {}
 
     template <drain_c tp_drain>
-    sink_ct<tp_drain>::sink_ct(const drain_t a_drain) : m_drain {a_drain}
-    {
+    sink_ct<tp_drain>::sink_ct(const drain_t a_drain) : m_drain {a_drain} {
       assert(m_drain);
     }
 
     template <drain_c tp_drain>
-    auto sink_ct<tp_drain>::drain(const drain_t a_drain) -> void
-    {
+    auto sink_ct<tp_drain>::drain(const drain_t a_drain) -> void {
       assert(a_drain);
       m_drain = a_drain;
     }
 
     template <drain_c tp_drain>
-    auto sink_ct<tp_drain>::drain() const -> const drain_t
-    {
+    auto sink_ct<tp_drain>::drain() const -> const drain_t {
       return m_drain;
     }
 
     template <drain_c tp_drain>
     auto sink_ct<tp_drain>::write_to_drain(const string_view_t a_string) const
-      -> void
-    {
+      -> void {
       // note: consider adding a a special constexpr check for [stream_count == 1]
       // in case the compiler doesn't optimize away the for_each loop
 
