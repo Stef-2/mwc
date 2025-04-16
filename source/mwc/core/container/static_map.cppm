@@ -11,7 +11,7 @@ import std;
 
 export namespace mwc {
   template <typename tp_key, typename tp_value, size_t tp_size>
-  struct static_map_st {
+  struct static_bimap_st {
     using key_t = tp_key;
     using const_key_t = std::add_const_t<key_t>;
     using value_t = tp_value;
@@ -42,12 +42,10 @@ export namespace mwc {
 
   // explicit deduction guide
   template <typename tp_key, typename tp_value, size_t tp_size>
-  static_map_st(const pair_t<tp_key, tp_value> (&a)[tp_size])
-    -> static_map_st<tp_key, tp_value, tp_size>;
+  static_bimap_st(const pair_t<tp_key, tp_value> (&a)[tp_size])
+    -> static_bimap_st<tp_key, tp_value, tp_size>;
 
-  template <typename tp_key,
-            size_t tp_key_count,
-            typename tp_value,
+  template <typename tp_key, size_t tp_key_count, typename tp_value,
             size_t tp_value_count>
     requires(not std::is_same_v<tp_key, tp_value> and
              tp_key_count <= tp_value_count)
@@ -60,6 +58,8 @@ export namespace mwc {
     using value_index_t = utility::minimal_integral_st<tp_value_count>::type;
 
     struct key_st {
+      auto operator<=>(const key_st&) const = default;
+
       tp_key m_key;
       value_index_t m_begin;
       value_index_t m_end;
@@ -83,6 +83,9 @@ export namespace mwc {
               return true;
           return false;
         }();
+        const auto ke = std::binary_search(
+          m_keys.cbegin(), m_keys.cend(), key_st {current.first, 0, 0},
+          [](const auto& x, const auto& y) { return x.m_key == y.m_key; });
 
         m_values[i] = current.second;
 
@@ -102,10 +105,10 @@ export namespace mwc {
 
   void test() {
     constexpr auto map =
-      static_map_st<int, float, 2> {pair_t {1, 2.0f}, {3, 4.0f}};
+      static_bimap_st<int, float, 2> {pair_t {1, 2.0f}, {3, 4.0f}};
     constexpr auto f = map[1];
     constexpr auto i = map[4.0f];
-    constexpr auto map2 = static_map_st {{pair_t {1, 2.0f}, {3, 4.0f}}};
+    constexpr auto map2 = static_bimap_st {{pair_t {1, 2.0f}, {3, 4.0f}}};
 
     constexpr auto map3 = static_multimap_st<int, 2, float, 2> {
       {pair_t {1, 2.0f}, pair_t {3, 4.0f}}};

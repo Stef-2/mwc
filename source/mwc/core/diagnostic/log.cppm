@@ -13,12 +13,9 @@ import mwc_assert;
 
 import std;
 
-export namespace mwc
-{
-  namespace diagnostic
-  {
-    namespace log
-    {
+export namespace mwc {
+  namespace diagnostic {
+    namespace log {
       // possible sink types:
       // [ostream_t] -> standard output stream type
       // [string_t] -> standard string type
@@ -33,8 +30,7 @@ export namespace mwc
       concept sink_c =
         concepts::any_of_c<t, ostream_ptr_t, string_ptr_t, file_ptr_t>;
 
-      struct static_configuration_st
-      {
+      struct static_configuration_st {
         size_t m_ostream_sink_count = {s_dynamic_extent};
         size_t m_string_sink_count = {s_dynamic_extent};
         size_t m_file_sink_count = {s_dynamic_extent};
@@ -48,8 +44,7 @@ export namespace mwc
       struct configuration_st
       : public std::conditional_t<tp_static_configuration,
                                   static_configuration_st,
-                                  dynamic_configuration_st>
-      {
+                                  dynamic_configuration_st> {
         bool m_print_timestamps = {true};
         bool m_print_severity = {true};
         bool m_print_thread_id = {true};
@@ -62,10 +57,8 @@ export namespace mwc
       };
 
       template <sink_c tp_sink>
-      struct sink_configuration_st
-      {
-        struct sink_st
-        {
+      struct sink_configuration_st {
+        struct sink_st {
           tp_sink m_resource_ptr;
           event_severity_et m_severity_level;
         };
@@ -75,9 +68,8 @@ export namespace mwc
         size_t m_sink_count = s_dynamic_extent;
       };
 
-      template <configuration_st<true> tp_configuration = {}>
-      class log_ct
-      {
+      /*template <configuration_st<true> tp_configuration = {}>
+      class log_ct {
         public:
         using dynamic_storage_t = using sink_storage_t =
           tuple_t<extent_t<typename decltype(tp_configs)::sink_t,
@@ -89,8 +81,7 @@ export namespace mwc
 
         //template <sink_c tp_sink>
         constexpr auto add_sink(const sink_c auto a_sink,
-                                const event_severity_et a_severity) -> void
-        {
+                                const event_severity_et a_severity) -> void {
           using sink_t = std::remove_const_t<decltype(a_sink)>;
           assert(a_sink);
 
@@ -100,53 +91,45 @@ export namespace mwc
           constexpr auto dynamic_extent =
             instance_of_v<decltype(sink_storage), vector_t>;
 
-          if constexpr (not dynamic_extent)
-          {
+          if constexpr (not dynamic_extent) {
             for (auto& sink : sink_storage)
               if (not sink.m_resource_ptr)
                 sink = {a_sink, a_severity};
-          }
-          else
+          } else
             m_sinks.emplace_back(a_sink, a_severity);
         }
 
         constexpr auto remove_sink();
 
         auto write_to_sinks(const string_view_t m_string,
-                            const event_severity_et a_severity) const -> void
-        {
+                            const event_severity_et a_severity) const -> void {
           constexpr auto tuple_size = std::tuple_size_v<sink_storage_t>;
 
-          static_for_loop<0, tuple_size>(
-            [&]<size_t i>
-            {
-              using tuple_element_t = std::tuple_element_t<i, sink_storage_t>;
-              using tuple_element_value_t = tuple_element_t::value_type;
-              using underlying_sink_t = tuple_element_value_t::sink_st;
+          static_for_loop<0, tuple_size>([&]<size_t i> {
+            using tuple_element_t = std::tuple_element_t<i, sink_storage_t>;
+            using tuple_element_value_t = tuple_element_t::value_type;
+            using underlying_sink_t = tuple_element_value_t::sink_st;
 
-              if constexpr (std::is_same_v<underlying_sink_t, ostream_ptr_t>)
-                for (const auto& sink : std::get<i>(m_sinks))
-                  *sink.m_resource_ptr << m_string;
-            });
+            if constexpr (std::is_same_v<underlying_sink_t, ostream_ptr_t>)
+              for (const auto& sink : std::get<i>(m_sinks))
+                *sink.m_resource_ptr << m_string;
+          });
 
           //*(std::get<0>(m_sinks)[0]) << m_string;
         }
 
         auto write_to_sink(const sink_c auto a_sink,
-                           const string_view_t m_string) const -> void
-        {
+                           const string_view_t m_string) const -> void {
           //if constexpr (std::is_same_v<decltype(a_sink), ostream_ptr_t>)
           //std::print();
         }
 
         private:
         template <sink_c tp_sink>
-        consteval auto storage_index() const -> size_t
-        {
+        consteval auto storage_index() const -> size_t {
           constexpr auto tuple_size = std::tuple_size_v<sink_storage_t>;
 
-          auto index = [&]<size_t i>(this const auto& self) -> size_t
-          {
+          auto index = [&]<size_t i>(this const auto& self) -> size_t {
             using extent_value_t =
               decltype(std::tuple_element_t<i, sink_storage_t>::value_type::
                          m_resource_ptr);
@@ -165,10 +148,9 @@ export namespace mwc
         [[no_unique_address]] std::conditional_t<tp_static_configuration,
                                                  configuration_st,
                                                  empty_st> m_configuration;
-      };
+      };*/
 
-      void testtt()
-      {
+      void testtt() {
         string_t s;
         //file_t x, y, z;
         //array_t a {&x, &y, &z};
@@ -177,14 +159,14 @@ export namespace mwc
           sink_configuration_st<ostream_t*> {s_dynamic_extent};
         //auto sa {&std::cout};
         //log_ct<asd> log {array_t<sink_ct<ostream_t*>, 1> {&std::cout}};
-        log_ct<event_severity_et::e_information, asd> log;
+        //log_ct<event_severity_et::e_information, asd> log;
         //std::get<0>(log.m_sinks)[0] = &std::cout;
-        log.add_sink(&std::cout);
+        //log.add_sink(&std::cout);
         /*static_assert(
           std::is_same_v<
             decltype(log)::sink_storage_t,
             tuple_t<array_t<sink_configuration_st<ostream_t*>::sink_t, 1>>>);*/
-        log.write_to_sinks("Hello World!");
+        //log.write_to_sinks("Hello World!");
       }
     }
   }
