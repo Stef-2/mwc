@@ -43,6 +43,14 @@ if(NOT EXISTS ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
     endif()
 endif()
 
+
+# project wide compile definitions
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+set(DEBUG_COMPILE_DEFINITIONS "MWC_DEBUG=1" "MWC_LOG=1" "_GLIBCXX_DEBUG" "_GLIBCXX_DEBUG_BACKTRACE")
+add_compile_definitions(${DEBUG_COMPILE_DEFINITIONS})
+message("adding addtional debug compile definitions: " ${DEBUG_COMPILE_DEFINITIONS})
+endif()
+
 # std module library
 add_library(std)
 target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
@@ -68,9 +76,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 )
 # engine compile definitions
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    MWC_DEBUG=${MWC_DEBUG}
-    MWC_LOG=${MWC_LOG}
-    $<IF:${MWC_LOG},MWC_LOG_DIR="${LOG_DIR}", MWC_LOG_DIR="">
+    $<IF:${MWC_LOG}, MWC_LOG_DIR="${LOG_DIR}", MWC_LOG_DIR="">
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC
     std

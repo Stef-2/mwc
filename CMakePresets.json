@@ -23,7 +23,8 @@
             "name": "debug",
             "inherits": "base",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "COMPILE_DEFINITIONS_DEBUG": "-DMWC_DEBUG=1 -DMWC_LOG=1 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_BACKTRACE"
             }
         },
         {

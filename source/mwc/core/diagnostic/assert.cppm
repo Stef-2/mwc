@@ -22,5 +22,16 @@ export namespace mwc {
         std::abort();
       }
     }
+
+    inline constexpr auto unreachable(const string_view_t a_message = {})
+      -> void {
+      if constexpr (debugging()) {
+        if (not a_message.empty())
+          std::print("unreachable path encountered");
+        assert(false, a_message);
+      }
+
+      std::unreachable();
+    }
   }
 }
