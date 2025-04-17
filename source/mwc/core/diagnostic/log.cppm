@@ -36,9 +36,7 @@ export namespace mwc {
         size_t m_file_sink_count = {s_dynamic_extent};
       };
 
-      struct dynamic_configuration_st
-
-      {};
+      struct dynamic_configuration_st {};
 
       template <bool tp_static_configuration = true>
       struct configuration_st
@@ -56,7 +54,7 @@ export namespace mwc {
           event_severity_et::e_information};
       };
 
-      template <sink_c tp_sink>
+      /*template <sink_c tp_sink>
       struct sink_configuration_st {
         struct sink_st {
           tp_sink m_resource_ptr;
@@ -66,7 +64,7 @@ export namespace mwc {
         using sink_t = sink_st;
 
         size_t m_sink_count = s_dynamic_extent;
-      };
+      };*/
 
       /*template <configuration_st<true> tp_configuration = {}>
       class log_ct {
@@ -155,8 +153,8 @@ export namespace mwc {
         //file_t x, y, z;
         //array_t a {&x, &y, &z};
 
-        constexpr auto asd =
-          sink_configuration_st<ostream_t*> {s_dynamic_extent};
+        /*constexpr auto asd =
+          sink_configuration_st<ostream_t*> {s_dynamic_extent};*/
         //auto sa {&std::cout};
         //log_ct<asd> log {array_t<sink_ct<ostream_t*>, 1> {&std::cout}};
         //log_ct<event_severity_et::e_information, asd> log;
