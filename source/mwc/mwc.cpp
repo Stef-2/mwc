@@ -42,7 +42,11 @@ int main() {
 
   constexpr auto map3 = mwc::static_multimap_st<int, 3, float, 5> {
     {mwc::pair_t {1, 2.44f}, {3, 4.1f}, {1, 1.23f}, {4, 5.1f}, {3, 12.7f}}};
-  printt("{0} {1}", map2[2.33f], map2[4.76f]);
+  constexpr int i = map3[2.44f];
+  //std::span<const float> f = map3[4];
+  static constexpr std::array<const int, 3> arr = {1, 2, 3};
+  constexpr std::span<const int, 3> sp = {arr};
+  std::print("{0} {1}", i, i);
   //auto um = std::unordered_map<mwc::diagnostic::event_severity_et, void*> {};
 
   //log.error("fuck!");

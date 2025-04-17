@@ -35,7 +35,8 @@ export namespace mwc {
             return kv_pair.first;
       }
 
-      diagnostic::unreachable("requested value not found");
+      diagnostic::assert(false, "requested value not found");
+      std::unreachable();
     }
 
     storage_t m_storage;
@@ -100,14 +101,14 @@ export namespace mwc {
 
     template <typename tp>
     [[nodiscard]] constexpr auto operator[](this tp&& a_this,
-                                            const auto a_value) -> auto&
+                                            const auto a_value) -> const auto
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>
     {
       if constexpr (std::is_same_v<decltype(a_value), const_key_t>)
         for (const auto& key : a_this.m_keys)
           if (key.m_key == a_value)
-            return span_t<value_t> {a_this.m_values.begin() + key.m_begin,
-                                    a_this.m_values.begin() + key.m_end};
+            return span_t {a_this.m_values.begin() + 1 /*key.m_begin*/,
+                           a_this.m_values.begin() + 2 /*key.m_end*/};
 
       if constexpr (std::is_same_v<decltype(a_value), const_value_t>)
         for (const auto& key : a_this.m_keys)
@@ -115,7 +116,8 @@ export namespace mwc {
             if (a_this.m_values[i] == a_value)
               return key.m_key;
 
-      diagnostic::unreachable("requested value not found");
+      diagnostic::assert(false, "requested value not found");
+      std::unreachable();
     }
 
     array_t<key_st, tp_key_count> m_keys;

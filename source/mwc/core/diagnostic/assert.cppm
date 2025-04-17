@@ -10,8 +10,9 @@ import std;
 
 export namespace mwc {
   namespace diagnostic {
-    inline constexpr auto assert(const concepts::boolean_c auto a_condition,
-                                 const string_view_t a_message = {}) -> void {
+    inline constexpr auto __attribute__((always_inline))
+    assert(const concepts::boolean_c auto a_condition,
+           const string_view_t a_message = {}) -> void {
       if constexpr (not debugging())
         [[assume(a_condition)]];
 
@@ -21,17 +22,6 @@ export namespace mwc {
 
         std::abort();
       }
-    }
-
-    inline constexpr auto unreachable(const string_view_t a_message = {})
-      -> void {
-      if constexpr (debugging()) {
-        if (not a_message.empty())
-          std::print("unreachable path encountered");
-        assert(false, a_message);
-      }
-
-      std::unreachable();
     }
   }
 }
