@@ -1,5 +1,4 @@
-#include <csignal>
-#include <stdio.h>
+#include <experimental/contract>
 
 import mwc_definition;
 import mwc_log;
@@ -14,6 +13,10 @@ import std;
 {
   std::print(a_args);
 }*/
+
+//void test_contracts(int wtf)(wtf > 0);
+
+int f(int x)[[expects audit:x > 0]] { return 1 / x; }
 
 template <typename... tp_args>
 /*requires std::
@@ -48,6 +51,7 @@ int main() {
   static constexpr std::array<const int, 3> arr = {1, 2, 3};
   constexpr auto w = std::span {arr};
   static constexpr auto f = map3[3];
+  test_contracts(666);
   //std::print("{0} {1}", i, w);
   //auto um = std::unordered_map<mwc::diagnostic::event_severity_et, void*> {};
 

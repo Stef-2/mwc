@@ -25,22 +25,6 @@ export namespace mwc {
       -> decltype(auto)
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>
     ;
-    /*{
-      if constexpr (std::is_same_v<decltype(a_value), const_key_t>) {
-        for (const auto& kv_pair : a_this.m_storage)
-          if (kv_pair.first == a_value)
-            return kv_pair.second;
-      }
-
-      if constexpr (std::is_same_v<decltype(a_value), const_value_t>) {
-        for (const auto& kv_pair : a_this.m_storage)
-          if (kv_pair.second == a_value)
-            return kv_pair.first;
-      }
-
-      diagnostic::assert(false, "requested value not found");
-      std::unreachable();
-    }*/
 
     storage_t m_storage;
   };
@@ -53,7 +37,7 @@ export namespace mwc {
   // implementation
   template <typename tp_key, typename tp_value, size_t tp_size>
   [[nodiscard]] constexpr auto
-  static_bi_map_st<tp_key, tp_value, tp_size>::operator[](this tp&& a_this,
+  static_bi_map_st<tp_key, tp_value, tp_size>::operator[](this auto&& a_this,
                                                           const auto a_value)
     -> decltype(auto)
     requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>

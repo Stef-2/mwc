@@ -39,10 +39,8 @@ export module std;
 // C library exports are appended from std-clib.cc.in.
 
 // 27.4 <algorithm>
-export namespace std
-{
-  namespace ranges
-  {
+export namespace std {
+  namespace ranges {
     using std::ranges::in_found_result;
     using std::ranges::in_fun_result;
     using std::ranges::in_in_out_result;
@@ -54,37 +52,32 @@ export namespace std
 
   using std::all_of;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::all_of;
   }
 
   using std::any_of;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::any_of;
   }
 
   using std::none_of;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::none_of;
   }
 
   using std::for_each;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::for_each;
     using std::ranges::for_each_result;
   }
 
   using std::for_each_n;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::for_each_n;
     using std::ranges::for_each_n_result;
   }
@@ -93,8 +86,7 @@ export namespace std
   using std::find_if;
   using std::find_if_not;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::find;
     using std::ranges::find_if;
     using std::ranges::find_if_not;
@@ -102,126 +94,108 @@ export namespace std
 
   using std::find_end;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::find_end;
   }
 
   using std::find_first_of;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::find_first_of;
   }
 
   using std::adjacent_find;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::adjacent_find;
   }
 
   using std::count;
   using std::count_if;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::count;
     using std::ranges::count_if;
   }
 
   using std::mismatch;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::mismatch;
     using std::ranges::mismatch_result;
   }
 
   using std::equal;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::equal;
   }
 
   using std::is_permutation;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::is_permutation;
   }
 
   using std::search;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::search;
   }
 
   using std::search_n;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::search_n;
   }
 
-  namespace ranges
-  {
-  }
+  namespace ranges {}
 
   using std::copy;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::copy;
     using std::ranges::copy_result;
   }
 
   using std::copy_n;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::copy_n;
     using std::ranges::copy_n_result;
   }
 
   using std::copy_if;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::copy_if;
     using std::ranges::copy_if_result;
   }
 
   using std::copy_backward;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::copy_backward;
     using std::ranges::copy_backward_result;
   }
 
   using std::move;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::move;
     using std::ranges::move_result;
   }
 
   using std::move_backward;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::move_backward;
     using std::ranges::move_backward_result;
   }
 
   using std::swap_ranges;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::swap_ranges;
     using std::ranges::swap_ranges_result;
   }
@@ -229,8 +203,7 @@ export namespace std
   using std::iter_swap;
   using std::transform;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::binary_transform_result;
     using std::ranges::transform;
     using std::ranges::unary_transform_result;
@@ -239,8 +212,7 @@ export namespace std
   using std::replace;
   using std::replace_if;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::replace;
     using std::ranges::replace_if;
   }
@@ -248,8 +220,7 @@ export namespace std
   using std::replace_copy;
   using std::replace_copy_if;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::replace_copy;
     using std::ranges::replace_copy_if;
     using std::ranges::replace_copy_if_result;
@@ -259,8 +230,7 @@ export namespace std
   using std::fill;
   using std::fill_n;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::fill;
     using std::ranges::fill_n;
   }
@@ -268,8 +238,7 @@ export namespace std
   using std::generate;
   using std::generate_n;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::generate;
     using std::ranges::generate_n;
   }
@@ -277,8 +246,7 @@ export namespace std
   using std::remove;
   using std::remove_if;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::remove;
     using std::ranges::remove_if;
   }
@@ -286,8 +254,7 @@ export namespace std
   using std::remove_copy;
   using std::remove_copy_if;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::remove_copy;
     using std::ranges::remove_copy_if;
     using std::ranges::remove_copy_if_result;
@@ -296,100 +263,84 @@ export namespace std
 
   using std::unique;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::unique;
   }
 
   using std::unique_copy;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::unique_copy;
     using std::ranges::unique_copy_result;
   }
 
   using std::reverse;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::reverse;
   }
 
   using std::reverse_copy;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::reverse_copy;
     using std::ranges::reverse_copy_result;
   }
 
   using std::rotate;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::rotate;
   }
 
   using std::rotate_copy;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::rotate_copy;
     using std::ranges::rotate_copy_result;
   }
 
   using std::sample;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::sample;
   }
 
   using std::shuffle;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::shuffle;
   }
 
   using std::shift_left;
 
-  namespace ranges
-  {
-  }
+  namespace ranges {}
 
   using std::shift_right;
 
-  namespace ranges
-  {
-  }
+  namespace ranges {}
 
   using std::sort;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::sort;
   }
 
   using std::stable_sort;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::stable_sort;
   }
 
   using std::partial_sort;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::partial_sort;
   }
 
   using std::partial_sort_copy;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::partial_sort_copy;
     using std::ranges::partial_sort_copy_result;
   }
@@ -397,256 +348,221 @@ export namespace std
   using std::is_sorted;
   using std::is_sorted_until;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::is_sorted;
     using std::ranges::is_sorted_until;
   }
 
   using std::nth_element;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::nth_element;
   }
 
   using std::lower_bound;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::lower_bound;
   }
 
   using std::upper_bound;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::upper_bound;
   }
 
   using std::equal_range;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::equal_range;
   }
 
   using std::binary_search;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::binary_search;
   }
 
   using std::is_partitioned;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::is_partitioned;
   }
 
   using std::partition;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::partition;
   }
 
   using std::stable_partition;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::stable_partition;
   }
 
   using std::partition_copy;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::partition_copy;
     using std::ranges::partition_copy_result;
   }
 
   using std::partition_point;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::partition_point;
   }
 
   using std::merge;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::merge;
     using std::ranges::merge_result;
   }
 
   using std::inplace_merge;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::inplace_merge;
   }
 
   using std::includes;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::includes;
   }
 
   using std::set_union;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::set_union;
     using std::ranges::set_union_result;
   }
 
   using std::set_intersection;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::set_intersection;
     using std::ranges::set_intersection_result;
   }
 
   using std::set_difference;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::set_difference;
     using std::ranges::set_difference_result;
   }
 
   using std::set_symmetric_difference;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::set_symmetric_difference;
     using std::ranges::set_symmetric_difference_result;
   }
 
   using std::push_heap;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::push_heap;
   }
 
   using std::pop_heap;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::pop_heap;
   }
 
   using std::make_heap;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::make_heap;
   }
 
   using std::sort_heap;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::sort_heap;
   }
 
   using std::is_heap;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::is_heap;
   }
 
   using std::is_heap_until;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::is_heap_until;
   }
 
   using std::min;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::min;
   }
 
   using std::max;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::max;
   }
 
   using std::minmax;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::minmax;
     using std::ranges::minmax_result;
   }
 
   using std::min_element;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::min_element;
   }
 
   using std::max_element;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::max_element;
   }
 
   using std::minmax_element;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::minmax_element;
     using std::ranges::minmax_element_result;
   }
 
   using std::clamp;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::clamp;
   }
 
   using std::lexicographical_compare;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::lexicographical_compare;
   }
 
   using std::lexicographical_compare_three_way;
   using std::next_permutation;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::next_permutation;
     using std::ranges::next_permutation_result;
   }
 
   using std::prev_permutation;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::prev_permutation;
     using std::ranges::prev_permutation_result;
   }
 
-  namespace ranges
-  {
+  namespace ranges {
 #if __cpp_lib_ranges_contains
     using ranges::contains;
     using ranges::contains_subrange;
@@ -671,8 +587,7 @@ export namespace std
 
 // 22.7.2 <any>
 #if __cpp_lib_any
-export namespace std
-{
+export namespace std {
   using std::any;
   using std::any_cast;
   using std::bad_any_cast;
@@ -682,8 +597,7 @@ export namespace std
 #endif
 
 // 24.3.2 <array>
-export namespace std
-{
+export namespace std {
   using std::array;
   using std::operator==;
   using std::operator<=>;
@@ -695,8 +609,7 @@ export namespace std
 }
 
 // 33.5.2 <atomic>
-export namespace std
-{
+export namespace std {
   using std::atomic;
   using std::atomic_bool;
   using std::atomic_char;
@@ -799,15 +712,13 @@ export namespace std
 
 // 33.9.3 <barrier>
 #if __cpp_lib_barrier
-export namespace std
-{
+export namespace std {
   using std::barrier;
 }
 #endif
 
 // 22.15 <bit>
-export namespace std
-{
+export namespace std {
   using std::bit_cast;
   using std::bit_ceil;
   using std::bit_floor;
@@ -824,8 +735,7 @@ export namespace std
 }
 
 // 22.9 <bitset>
-export namespace std
-{
+export namespace std {
   using std::bitset;
   using std::operator&;
   using std::operator|;
@@ -836,8 +746,7 @@ export namespace std
 }
 
 // 22.13 <charconv>
-export namespace std
-{
+export namespace std {
   using std::chars_format;
   using std::operator&;
   using std::operator&=;
@@ -854,18 +763,15 @@ export namespace std
 
 // 29.2 <chrono>
 #if __cpp_lib_chrono
-export namespace std
-{
-  namespace chrono
-  {
+export namespace std {
+  namespace chrono {
     using std::chrono::duration;
     using std::chrono::time_point;
   }
 
   using std::common_type;
 
-  namespace chrono
-  {
+  namespace chrono {
     using std::chrono::duration_values;
     using std::chrono::treat_as_floating_point;
     using std::chrono::treat_as_floating_point_v;
@@ -934,8 +840,7 @@ export namespace std
 
   using std::formatter;
 
-  namespace chrono
-  {
+  namespace chrono {
     using chrono::clock_cast;
     using chrono::clock_time_conversion;
     using chrono::from_stream;
@@ -998,8 +903,7 @@ export namespace std
   }
 }
 
-export namespace std::inline literals::inline chrono_literals
-{
+export namespace std::inline literals::inline chrono_literals {
   using std::literals::chrono_literals::operator""h;
   using std::literals::chrono_literals::operator""min;
   using std::literals::chrono_literals::operator""s;
@@ -1010,15 +914,13 @@ export namespace std::inline literals::inline chrono_literals
   using std::literals::chrono_literals::operator""y;
 }
 
-export namespace std::chrono
-{
+export namespace std::chrono {
   using namespace literals::chrono_literals;
 }
 #endif // __cpp_lib_chrono
 
 // <codecvt>: deprecated C++17, removed C++26
-export namespace std
-{
+export namespace std {
   using std::codecvt_mode;
   using std::codecvt_utf16;
   using std::codecvt_utf8;
@@ -1027,8 +929,7 @@ export namespace std
 
 // 17.11.1 <compare>
 #if __cpp_lib_three_way_comparison
-export namespace std
-{
+export namespace std {
   using std::common_comparison_category;
   using std::common_comparison_category_t;
   using std::compare_partial_order_fallback;
@@ -1055,8 +956,7 @@ export namespace std
 #endif // __cpp_lib_three_way_comparison
 
 // 28.4 <complex>
-export namespace std
-{
+export namespace std {
   using std::complex;
   using std::operator+;
   using std::operator-;
@@ -1099,8 +999,7 @@ export namespace std
 #endif
 }
 
-export namespace std::inline literals::inline complex_literals
-{
+export namespace std::inline literals::inline complex_literals {
   using std::operator""il;
   using std::operator""i;
   using std::operator""if;
@@ -1108,8 +1007,7 @@ export namespace std::inline literals::inline complex_literals
 
 // 18 <concepts>
 #if __cpp_lib_concepts
-export namespace std
-{
+export namespace std {
   using std::assignable_from;
   using std::common_reference_with;
   using std::common_with;
@@ -1121,8 +1019,7 @@ export namespace std
   using std::signed_integral;
   using std::unsigned_integral;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::swap;
   }
 
@@ -1151,8 +1048,7 @@ export namespace std
 #endif
 
 // 33.7 <condition_variable>
-export namespace std
-{
+export namespace std {
   using std::condition_variable;
   using std::condition_variable_any;
   using std::cv_status;
@@ -1161,8 +1057,7 @@ export namespace std
 
 // 17.12.2 <coroutine>
 #if __cpp_lib_coroutine
-export namespace std
-{
+export namespace std {
   using std::coroutine_handle;
   using std::coroutine_traits;
   using std::operator==;
@@ -1178,8 +1073,7 @@ export namespace std
 
 // 22.16 <debugging>
 #if __cpp_lib_debugging
-export namespace std
-{
+export namespace std {
   using std::breakpoint;
   using std::breakpoint_if_debugging;
   using std::is_debugger_present;
@@ -1187,8 +1081,7 @@ export namespace std
 #endif
 
 // 24.3 <deque>
-export namespace std
-{
+export namespace std {
   using std::deque;
   using std::operator==;
   using std::operator<=>;
@@ -1196,15 +1089,13 @@ export namespace std
   using std::erase_if;
   using std::swap;
 
-  namespace pmr
-  {
+  namespace pmr {
     using std::pmr::deque;
   }
 }
 
 // 17.9.2 <exception>
-export namespace std
-{
+export namespace std {
   using std::bad_exception;
   using std::current_exception;
   using std::exception;
@@ -1224,13 +1115,11 @@ export namespace std
 
 // 34.4 <execution>
 #if __cpp_lib_execution
-export namespace std
-{
+export namespace std {
   using std::is_execution_policy;
   using std::is_execution_policy_v;
 
-  namespace execution
-  {
+  namespace execution {
     using std::execution::par;
     using std::execution::par_unseq;
     using std::execution::parallel_policy;
@@ -1249,8 +1138,7 @@ export namespace std
   using std::get_stop_token_t;
   using std::stop_token_of_t;
 
-  namespace execution
-  {
+  namespace execution {
     using std::execution::apply_sender;
     using std::execution::bulk;
     using std::execution::bulk_t;
@@ -1350,8 +1238,7 @@ export namespace std
     using std::execution::when_all_with_variant_t;
   }
 
-  namespace this_thread
-  {
+  namespace this_thread {
     using std::this_thread::sync_wait;
     using std::this_thread::sync_wait_t;
     using std::this_thread::sync_wait_with_variant;
@@ -1363,8 +1250,7 @@ export namespace std
 
 // 22.8 <expected>
 #if __cpp_lib_expected
-export namespace std
-{
+export namespace std {
   using std::bad_expected_access;
   using std::expected;
   using std::unexpect;
@@ -1375,8 +1261,7 @@ export namespace std
 
 // <filesystem>
 #if __cpp_lib_filesystem
-export namespace std::filesystem
-{
+export namespace std::filesystem {
   using std::filesystem::begin;
   using std::filesystem::copy_options;
   using std::filesystem::directory_entry;
@@ -1446,8 +1331,7 @@ export namespace std::filesystem
 
 // <flat_map>
 #if __cpp_lib_flat_map
-export namespace std
-{
+export namespace std {
   using std::flat_map;
   using std::flat_multimap;
   using std::sorted_equivalent;
@@ -1459,8 +1343,7 @@ export namespace std
 
 // <flat_set>
 #if __cpp_lib_flat_set
-export namespace std
-{
+export namespace std {
   using std::flat_multiset;
   using std::flat_set;
   using std::sorted_equivalent;
@@ -1471,8 +1354,7 @@ export namespace std
 #endif
 
 // <format>
-export namespace std
-{
+export namespace std {
   using std::basic_format_arg;
   using std::basic_format_args;
   using std::basic_format_context;
@@ -1505,11 +1387,16 @@ export namespace std
   using std::wformat_context;
   using std::wformat_parse_context;
   using std::wformat_string;
+// FIXME __cpp_lib_format_ranges
+#ifdef __glibcxx_format_ranges
+  using std::format_kind;
+  using std::range_format;
+  using std::range_formatter;
+#endif
 }
 
 // <forward_list>
-export namespace std
-{
+export namespace std {
   using std::forward_list;
   using std::operator==;
   using std::operator<=>;
@@ -1517,15 +1404,13 @@ export namespace std
   using std::erase_if;
   using std::swap;
 
-  namespace pmr
-  {
+  namespace pmr {
     using std::pmr::forward_list;
   }
 }
 
 // <fstream>
-export namespace std
-{
+export namespace std {
   using std::basic_filebuf;
   using std::basic_fstream;
   using std::basic_ifstream;
@@ -1542,8 +1427,7 @@ export namespace std
 }
 
 // <functional>
-export namespace std
-{
+export namespace std {
   using std::bind;
   using std::bind_front;
 #if __cpp_lib_bind_back
@@ -1586,8 +1470,7 @@ export namespace std
   using std::ref;
   using std::reference_wrapper;
 
-  namespace placeholders
-  {
+  namespace placeholders {
     using std::placeholders::_1;
     using std::placeholders::_10;
     using std::placeholders::_2;
@@ -1610,8 +1493,7 @@ export namespace std
   using std::default_searcher;
   using std::hash;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::equal_to;
     using std::ranges::greater;
     using std::ranges::greater_equal;
@@ -1622,8 +1504,7 @@ export namespace std
 }
 
 // <future>
-export namespace std
-{
+export namespace std {
   using std::future_errc;
   using std::future_status;
   using std::launch;
@@ -1649,12 +1530,10 @@ export namespace std
 }
 
 #if __cpp_lib_generator
-export namespace std
-{
+export namespace std {
   using std::generator;
 
-  namespace pmr
-  {
+  namespace pmr {
     using pmr::generator;
   }
 }
@@ -1663,8 +1542,7 @@ export namespace std
 // <hazard_pointer> FIXME
 
 // 17.10.2 <initializer_list>
-export namespace std
-{
+export namespace std {
   using std::begin;
   using std::end;
   using std::initializer_list;
@@ -1673,8 +1551,7 @@ export namespace std
 // <inplace_vector> FIXME
 
 // <iomanip>
-export namespace std
-{
+export namespace std {
   using std::get_money;
   using std::get_time;
   using std::put_money;
@@ -1689,8 +1566,7 @@ export namespace std
 }
 
 // <ios>
-export namespace std
-{
+export namespace std {
   using std::fpos;
   using std::operator!=;
   using std::operator-;
@@ -1733,8 +1609,7 @@ export namespace std
 }
 
 // <iosfwd>
-export namespace std
-{
+export namespace std {
   using std::basic_osyncstream;
   using std::basic_syncbuf;
   using std::fpos;
@@ -1752,8 +1627,7 @@ export namespace std
 }
 
 // <iostream>
-export namespace std
-{
+export namespace std {
   using std::cerr;
   using std::cin;
   using std::clog;
@@ -1765,8 +1639,7 @@ export namespace std
 }
 
 // <istream>
-export namespace std
-{
+export namespace std {
   using std::basic_iostream;
   using std::basic_istream;
   using std::iostream;
@@ -1778,8 +1651,7 @@ export namespace std
 }
 
 // <iterator>
-export namespace std
-{
+export namespace std {
   using std::incrementable_traits;
   using std::indirectly_readable_traits;
   using std::iter_difference_t;
@@ -1791,8 +1663,7 @@ export namespace std
   // using in ranges directly, it conflicts with any friend functions of the
   // same name, which is why the customization points are in an inline
   // namespace in the first place.
-  namespace ranges::inline _Cpo
-  {
+  namespace ranges::inline _Cpo {
     using _Cpo::iter_move;
     using _Cpo::iter_swap;
   }
@@ -1841,8 +1712,7 @@ export namespace std
   using std::sortable;
   using std::weakly_incrementable;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::advance;
     using std::ranges::distance;
     using std::ranges::next;
@@ -1904,8 +1774,7 @@ export namespace std
 
 // FIXME these should be friends of __normal_iterator to avoid exporting
 // __gnu_cxx.
-export namespace __gnu_cxx
-{
+export namespace __gnu_cxx {
   using __gnu_cxx::operator==;
   using __gnu_cxx::operator<=>;
   using __gnu_cxx::operator+;
@@ -1913,14 +1782,12 @@ export namespace __gnu_cxx
 }
 
 // <latch>
-export namespace std
-{
+export namespace std {
   using std::latch;
 }
 
 // 17.3.3 <limits> [limits.syn]
-export namespace std
-{
+export namespace std {
   using std::float_denorm_style; // deprecated in C++23
   using std::float_round_style;
   using std::numeric_limits;
@@ -1929,8 +1796,7 @@ export namespace std
 // FIXME <linalg>
 
 // <list>
-export namespace std
-{
+export namespace std {
   using std::list;
   using std::operator==;
   using std::operator<=>;
@@ -1938,15 +1804,13 @@ export namespace std
   using std::erase_if;
   using std::swap;
 
-  namespace pmr
-  {
+  namespace pmr {
     using std::pmr::list;
   }
 }
 
 // <locale>
-export namespace std
-{
+export namespace std {
   using std::codecvt;
   using std::codecvt_base;
   using std::codecvt_byname;
@@ -1994,8 +1858,7 @@ export namespace std
 }
 
 // <map>
-export namespace std
-{
+export namespace std {
   using std::map;
   using std::operator==;
   using std::operator<=>;
@@ -2003,8 +1866,7 @@ export namespace std
   using std::multimap;
   using std::swap;
 
-  namespace pmr
-  {
+  namespace pmr {
     using std::pmr::map;
     using std::pmr::multimap;
   }
@@ -2013,8 +1875,7 @@ export namespace std
 // FIXME <mdspan>
 
 // 20.2 <memory>
-export namespace std
-{
+export namespace std {
   using std::align;
   using std::allocator;
   using std::allocator_arg;
@@ -2033,8 +1894,7 @@ export namespace std
   using std::uninitialized_default_construct;
   using std::uninitialized_default_construct_n;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::uninitialized_default_construct;
     using std::ranges::uninitialized_default_construct_n;
   }
@@ -2042,8 +1902,7 @@ export namespace std
   using std::uninitialized_value_construct;
   using std::uninitialized_value_construct_n;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::uninitialized_value_construct;
     using std::ranges::uninitialized_value_construct_n;
   }
@@ -2051,8 +1910,7 @@ export namespace std
   using std::uninitialized_copy;
   using std::uninitialized_copy_n;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::uninitialized_copy;
     using std::ranges::uninitialized_copy_n;
     using std::ranges::uninitialized_copy_n_result;
@@ -2062,8 +1920,7 @@ export namespace std
   using std::uninitialized_move;
   using std::uninitialized_move_n;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::uninitialized_move;
     using std::ranges::uninitialized_move_n;
     using std::ranges::uninitialized_move_n_result;
@@ -2073,16 +1930,14 @@ export namespace std
   using std::uninitialized_fill;
   using std::uninitialized_fill_n;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::uninitialized_fill;
     using std::ranges::uninitialized_fill_n;
   }
 
   using std::construct_at;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::construct_at;
   }
 
@@ -2090,8 +1945,7 @@ export namespace std
   using std::destroy_at;
   using std::destroy_n;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::destroy;
     using std::ranges::destroy_at;
     using std::ranges::destroy_n;
@@ -2141,8 +1995,7 @@ export namespace std
 }
 
 // 20.4 <memory_resource>
-export namespace std::pmr
-{
+export namespace std::pmr {
   using std::pmr::memory_resource;
   using std::pmr::operator==;
   using std::pmr::get_default_resource;
@@ -2157,8 +2010,7 @@ export namespace std::pmr
 }
 
 // <mutex>
-export namespace std
-{
+export namespace std {
   using std::adopt_lock;
   using std::adopt_lock_t;
   using std::call_once;
@@ -2180,8 +2032,7 @@ export namespace std
 }
 
 // 17.6.2 <new> [new.syn]
-export namespace std
-{
+export namespace std {
   using std::align_val_t;
   using std::bad_alloc;
   using std::bad_array_new_length;
@@ -2205,8 +2056,7 @@ export {
 }
 
 // <numbers>
-export namespace std::numbers
-{
+export namespace std::numbers {
   using std::numbers::e;
   using std::numbers::e_v;
   using std::numbers::egamma;
@@ -2236,8 +2086,7 @@ export namespace std::numbers
 }
 
 // <numeric>
-export namespace std
-{
+export namespace std {
   using std::accumulate;
   using std::adjacent_difference;
   using std::exclusive_scan;
@@ -2253,8 +2102,7 @@ export namespace std
   using std::transform_inclusive_scan;
   using std::transform_reduce;
 #if __cpp_lib_ranges_iota
-  namespace ranges
-  {
+  namespace ranges {
     using ranges::iota;
   }
 #endif
@@ -2268,8 +2116,7 @@ export namespace std
 }
 
 // <optional>
-export namespace std
-{
+export namespace std {
   using std::bad_optional_access;
   using std::nullopt;
   using std::nullopt_t;
@@ -2287,8 +2134,7 @@ export namespace std
 }
 
 // <ostream>
-export namespace std
-{
+export namespace std {
   using std::basic_ostream;
   using std::endl;
   using std::ends;
@@ -2303,8 +2149,7 @@ export namespace std
 
 // <print>
 #if __cpp_lib_print
-export namespace std
-{
+export namespace std {
   using std::print;
   using std::println;
   using std::vprint_unicode;
@@ -2315,8 +2160,7 @@ export namespace std
 #endif
 
 // <queue>
-export namespace std
-{
+export namespace std {
   using std::queue;
   using std::operator==;
   using std::operator!=;
@@ -2331,8 +2175,7 @@ export namespace std
 }
 
 // <random>
-export namespace std
-{
+export namespace std {
   using std::bernoulli_distribution;
   using std::binomial_distribution;
   using std::cauchy_distribution;
@@ -2376,10 +2219,8 @@ export namespace std
 }
 
 // <ranges>
-export namespace std
-{
-  namespace ranges
-  {
+export namespace std {
+  namespace ranges {
     using std::ranges::begin;
     using std::ranges::bidirectional_range;
     using std::ranges::borrowed_range;
@@ -2425,29 +2266,25 @@ export namespace std
 
   using std::ranges::get;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::borrowed_iterator_t;
     using std::ranges::borrowed_subrange_t;
     using std::ranges::dangling;
     using std::ranges::empty_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::empty;
     }
 
     using std::ranges::single_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::single;
     }
 
     using std::ranges::iota_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::iota;
     }
 
@@ -2455,13 +2292,11 @@ export namespace std
     using std::ranges::istream_view;
     using std::ranges::wistream_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::istream;
     }
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::all;
       using std::ranges::views::all_t;
     }
@@ -2470,78 +2305,67 @@ export namespace std
     using std::ranges::owning_view;
     using std::ranges::ref_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::filter;
     }
 
     using std::ranges::transform_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::transform;
     }
 
     using std::ranges::take_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::take;
     }
 
     using std::ranges::take_while_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::take_while;
     }
 
     using std::ranges::drop_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::drop;
     }
 
     using std::ranges::drop_while_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::drop_while;
     }
 
     using std::ranges::join_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::join;
     }
 
     using std::ranges::lazy_split_view;
     using std::ranges::split_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::lazy_split;
       using std::ranges::views::split;
     }
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::counted;
     }
 
     using std::ranges::common_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::common;
     }
 
     using std::ranges::reverse_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::reverse;
     }
 
@@ -2549,8 +2373,7 @@ export namespace std
     using std::ranges::keys_view;
     using std::ranges::values_view;
 
-    namespace views
-    {
+    namespace views {
       using std::ranges::views::elements;
       using std::ranges::views::keys;
       using std::ranges::views::values;
@@ -2563,8 +2386,7 @@ export namespace std
   using std::tuple_element;
   using std::tuple_size;
 
-  namespace ranges
-  {
+  namespace ranges {
 #if __glibcxx_ranges_as_const // >= C++23
     using ranges::as_const_view;
     using ranges::const_iterator_t;
@@ -2572,8 +2394,7 @@ export namespace std
     using ranges::constant_range;
     using ranges::range_const_reference_t;
 
-    namespace views
-    {
+    namespace views {
       using views::as_const;
     }
 #endif
@@ -2583,24 +2404,21 @@ export namespace std
 #ifdef __cpp_lib_ranges_as_rvalue // C++ >= 23
     using ranges::as_rvalue_view;
 
-    namespace views
-    {
+    namespace views {
       using views::as_rvalue;
     }
 #endif
 #ifdef __cpp_lib_ranges_chunk // C++ >= 23
     using ranges::chunk_view;
 
-    namespace views
-    {
+    namespace views {
       using views::chunk;
     }
 #endif
 #ifdef __cpp_lib_ranges_slide // C++ >= 23
     using ranges::slide_view;
 
-    namespace views
-    {
+    namespace views {
       using views::slide;
     }
 #endif
@@ -2610,8 +2428,7 @@ export namespace std
     using ranges::zip_transform_view;
     using ranges::zip_view;
 
-    namespace views
-    {
+    namespace views {
       using views::adjacent;
       using views::adjacent_transform;
       using views::pairwise;
@@ -2623,79 +2440,69 @@ export namespace std
 #ifdef __cpp_lib_ranges_chunk_by // C++ >= 23
     using ranges::chunk_by_view;
 
-    namespace views
-    {
+    namespace views {
       using views::chunk_by;
     }
 #endif
 #ifdef __cpp_lib_ranges_join_with // C++ >= 23
     using ranges::join_with_view;
 
-    namespace views
-    {
+    namespace views {
       using views::join_with;
     }
 #endif
 #ifdef __cpp_lib_ranges_repeat // C++ >= 23
     using ranges::repeat_view;
 
-    namespace views
-    {
+    namespace views {
       using views::repeat;
     }
 #endif
 #ifdef __cpp_lib_ranges_stride // C++ >= 23
     using ranges::stride_view;
 
-    namespace views
-    {
+    namespace views {
       using views::stride;
     }
 #endif
 #ifdef __cpp_lib_ranges_cartesian_product // C++ >= 23
     using ranges::cartesian_product_view;
 
-    namespace views
-    {
+    namespace views {
       using views::cartesian_product;
     }
 #endif
 #ifdef __cpp_lib_ranges_enumerate // C++ >= 23
     using ranges::enumerate_view;
 
-    namespace views
-    {
+    namespace views {
       using views::enumerate;
     }
 #endif
 #if __cpp_lib_ranges_concat // C++ >= C++26
     using ranges::concat_view;
 
-    namespace views
-    {
+    namespace views {
       using views::concat;
     }
 #endif
 #if __cpp_lib_ranges_cache_latest // C++ >= C++26
     using ranges::cache_latest_view;
 
-    namespace views
-    {
+    namespace views {
       using views::cache_latest;
     }
 #endif
 #if __glibcxx_ranges_to_input // C++ >= 26
     using ranges::to_input_view;
 
-    namespace views
-    {
+    namespace views {
       using views::to_input;
     }
 #endif
   }
 #if __glibcxx_ranges_to_container // C++ >= 23
-  namespace ranges
-  {
+  namespace ranges {
     using ranges::to;
   }
 
@@ -2705,8 +2512,7 @@ export namespace std
 }
 
 // <ratio>
-export namespace std
-{
+export namespace std {
   using std::atto;
   using std::centi;
   using std::deca;
@@ -2745,10 +2551,8 @@ export namespace std
 // FIXME <rcu>
 
 // <regex>
-export namespace std
-{
-  namespace regex_constants
-  {
+export namespace std {
+  namespace regex_constants {
     using std::regex_constants::error_type;
     using std::regex_constants::match_flag_type;
     using std::regex_constants::syntax_option_type;
@@ -2794,8 +2598,7 @@ export namespace std
   using std::wsregex_iterator;
   using std::wsregex_token_iterator;
 
-  namespace pmr
-  {
+  namespace pmr {
     using std::pmr::cmatch;
     using std::pmr::match_results;
     using std::pmr::smatch;
@@ -2805,22 +2608,19 @@ export namespace std
 }
 
 // 20.5 <scoped_allocator>
-export namespace std
-{
+export namespace std {
   using std::scoped_allocator_adaptor;
   using std::operator==;
 }
 
 // <semaphore>
-export namespace std
-{
+export namespace std {
   using std::binary_semaphore;
   using std::counting_semaphore;
 }
 
 // <set>
-export namespace std
-{
+export namespace std {
   using std::set;
   using std::operator==;
   using std::operator<=>;
@@ -2828,16 +2628,14 @@ export namespace std
   using std::multiset;
   using std::swap;
 
-  namespace pmr
-  {
+  namespace pmr {
     using std::pmr::multiset;
     using std::pmr::set;
   }
 }
 
 // <shared_mutex>
-export namespace std
-{
+export namespace std {
   using std::shared_lock;
   using std::shared_mutex;
   using std::shared_timed_mutex;
@@ -2845,19 +2643,16 @@ export namespace std
 }
 
 // 17.8.1 <source_location>
-export namespace std
-{
+export namespace std {
   using std::source_location;
 }
 
 // <span>
-export namespace std
-{
+export namespace std {
   using std::dynamic_extent;
   using std::span;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::enable_borrowed_range;
     using std::ranges::enable_view;
   }
@@ -2868,8 +2663,7 @@ export namespace std
 
 #if __cpp_lib_spanstream
 // <spanstream>
-export namespace std
-{
+export namespace std {
   using std::basic_ispanstream;
   using std::basic_ospanstream;
   using std::basic_spanbuf;
@@ -2886,8 +2680,7 @@ export namespace std
 #endif
 
 // <sstream>
-export namespace std
-{
+export namespace std {
   using std::basic_istringstream;
   using std::basic_ostringstream;
   using std::basic_stringbuf;
@@ -2904,8 +2697,7 @@ export namespace std
 }
 
 // <stack>
-export namespace std
-{
+export namespace std {
   using std::stack;
   using std::operator==;
   using std::operator!=;
@@ -2920,8 +2712,7 @@ export namespace std
 
 // 19.6 <stacktrace>
 #if __cpp_lib_stacktrace
-export namespace std
-{
+export namespace std {
   using std::basic_stacktrace;
   using std::stacktrace;
   using std::stacktrace_entry;
@@ -2930,8 +2721,7 @@ export namespace std
   using std::operator<<;
   using std::formatter;
 
-  namespace pmr
-  {
+  namespace pmr {
     using std::pmr::stacktrace;
   }
 
@@ -2940,8 +2730,7 @@ export namespace std
 #endif
 
 // 19.2 <stdexcept>
-export namespace std
-{
+export namespace std {
   using std::domain_error;
   using std::invalid_argument;
   using std::length_error;
@@ -2954,8 +2743,7 @@ export namespace std
 }
 
 // 17.4.2 <stdfloat>
-export namespace std
-{
+export namespace std {
 #ifdef __STDCPP_FLOAT16_T__
   using std::float16_t;
 #endif
@@ -2975,8 +2763,7 @@ export namespace std
 
 // <stop_token>
 #if __cpp_lib_jthread
-export namespace std
-{
+export namespace std {
   using std::nostopstate;
   using std::nostopstate_t;
   using std::stop_callback;
@@ -2993,16 +2780,14 @@ export namespace std
 #endif
 
 // <streambuf>
-export namespace std
-{
+export namespace std {
   using std::basic_streambuf;
   using std::streambuf;
   using std::wstreambuf;
 }
 
 // <string>
-export namespace std
-{
+export namespace std {
   using std::basic_string;
   using std::char_traits;
   using std::operator+;
@@ -3030,8 +2815,7 @@ export namespace std
   using std::u8string;
   using std::wstring;
 
-  namespace pmr
-  {
+  namespace pmr {
     using std::pmr::basic_string;
     using std::pmr::string;
     using std::pmr::u16string;
@@ -3043,18 +2827,15 @@ export namespace std
   using std::hash;
 }
 
-export namespace std::inline literals::inline string_literals
-{
+export namespace std::inline literals::inline string_literals {
   using std::operator""s;
 }
 
 // <string_view>
-export namespace std
-{
+export namespace std {
   using std::basic_string_view;
 
-  namespace ranges
-  {
+  namespace ranges {
     using std::ranges::enable_borrowed_range;
     using std::ranges::enable_view;
   }
@@ -3070,14 +2851,12 @@ export namespace std
   using std::wstring_view;
 }
 
-export namespace std::inline literals::inline string_view_literals
-{
+export namespace std::inline literals::inline string_view_literals {
   using string_view_literals::operator""sv;
 }
 
 // <strstream>: deprecated C++98, removed C++26
-export namespace std
-{
+export namespace std {
   using std::istrstream;
   using std::ostrstream;
   using std::strstream;
@@ -3085,8 +2864,7 @@ export namespace std
 }
 
 // <syncstream>
-export namespace std
-{
+export namespace std {
   using std::basic_osyncstream;
   using std::basic_syncbuf;
   using std::osyncstream;
@@ -3097,8 +2875,7 @@ export namespace std
 }
 
 // 19.5 <system_error>
-export namespace std
-{
+export namespace std {
   using std::errc;
   using std::error_category;
   using std::error_code;
@@ -3120,21 +2897,18 @@ export namespace std
 
 // <text_encoding>
 #if __cpp_lib_text_encoding
-export namespace std
-{
+export namespace std {
   using std::text_encoding;
 }
 #endif
 
 // <thread>
-export namespace std
-{
+export namespace std {
   using std::jthread;
   using std::swap;
   using std::thread;
 
-  namespace this_thread
-  {
+  namespace this_thread {
     using std::this_thread::get_id;
     using std::this_thread::sleep_for;
     using std::this_thread::sleep_until;
@@ -3148,8 +2922,7 @@ export namespace std
 }
 
 // <tuple>
-export namespace std
-{
+export namespace std {
   using std::apply;
   using std::forward_as_tuple;
   using std::get;
@@ -3170,8 +2943,7 @@ export namespace std
 }
 
 // <type_traits>
-export namespace std
-{
+export namespace std {
   using std::add_const;
   using std::add_const_t;
   using std::add_cv;
@@ -3419,55 +3191,48 @@ export namespace std
 }
 
 // <typeindex>
-export namespace std
-{
+export namespace std {
   using std::hash;
   using std::type_index;
 }
 
 // 17.7.2 <typeinfo> [typeinfo.syn]
-export namespace std
-{
+export namespace std {
   using std::bad_cast;
   using std::bad_typeid;
   using std::type_info;
 }
 
 // <unordered_map>
-export namespace std
-{
+export namespace std {
   using std::unordered_map;
   using std::unordered_multimap;
   using std::operator==;
   using std::erase_if;
   using std::swap;
 
-  namespace pmr
-  {
+  namespace pmr {
     using std::pmr::unordered_map;
     using std::pmr::unordered_multimap;
   }
 }
 
 // <unordered_set>
-export namespace std
-{
+export namespace std {
   using std::unordered_multiset;
   using std::unordered_set;
   using std::operator==;
   using std::erase_if;
   using std::swap;
 
-  namespace pmr
-  {
+  namespace pmr {
     using std::pmr::unordered_multiset;
     using std::pmr::unordered_set;
   }
 }
 
 // <utility>
-export namespace std
-{
+export namespace std {
   using std::as_const;
   using std::cmp_equal;
   using std::cmp_greater;
@@ -3511,8 +3276,7 @@ export namespace std
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
-  namespace rel_ops
-  {
+  namespace rel_ops {
     using std::rel_ops::operator!=;
     using std::rel_ops::operator>;
     using std::rel_ops::operator<=;
@@ -3526,8 +3290,7 @@ export namespace std
 }
 
 // <valarray>
-export namespace std
-{
+export namespace std {
   using std::gslice;
   using std::gslice_array;
   using std::indirect_array;
@@ -3575,8 +3338,7 @@ export namespace std
 }
 
 // <variant>
-export namespace std
-{
+export namespace std {
   using std::get;
   using std::get_if;
   using std::holds_alternative;
@@ -3601,8 +3363,7 @@ export namespace std
 }
 
 // <vector>
-export namespace std
-{
+export namespace std {
   using std::vector;
   using std::operator==;
   using std::operator<=>;
@@ -3610,8 +3371,7 @@ export namespace std
   using std::erase_if;
   using std::swap;
 
-  namespace pmr
-  {
+  namespace pmr {
     using std::pmr::vector;
   }
 
@@ -3633,8 +3393,7 @@ export namespace std
 // No exports
 
 // 23.5.1 <cctype>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::isalnum;
   using std::isalpha;
 #ifdef _GLIBCXX_USE_C99_CTYPE
@@ -3657,8 +3416,7 @@ export C_LIB_NAMESPACE
 // No exports
 
 // 28.3 <cfenv>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
 #ifdef _GLIBCXX_USE_C99_FENV
   using std::feclearexcept;
   using std::fegetenv;
@@ -3680,8 +3438,7 @@ export C_LIB_NAMESPACE
 // No exports, only provides macros
 
 // 31.13.2 <cinttypes>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
 #ifdef _GLIBCXX_USE_C99_INTTYPES
   using std::imaxabs;
   using std::imaxdiv;
@@ -3699,8 +3456,7 @@ export C_LIB_NAMESPACE
 // No exports, only provides macros
 
 // 30.5 <clocale>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::lconv;
   using std::localeconv;
   using std::setlocale;
@@ -3708,8 +3464,7 @@ export C_LIB_NAMESPACE
 }
 
 // 28.7.1 <cmath>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::abs;
   using std::acos;
   using std::acosf;
@@ -3968,16 +3723,14 @@ export C_LIB_NAMESPACE
 }
 
 // 17.13.3 <csetjmp>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::jmp_buf;
   using std::longjmp;
   // setjmp macro not exported
 }
 
 // 17.13.4 <csignal>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::raise;
   using std::sig_atomic_t;
   using std::signal;
@@ -3985,15 +3738,13 @@ export C_LIB_NAMESPACE
 }
 
 // 17.13.2 <cstdarg>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::va_list;
   // va_arg and friend macros not exported
 }
 
 // 17.2.1 <cstddef> [cstddef.syn]
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::max_align_t;
   using std::nullptr_t;
   using std::ptrdiff_t;
@@ -4017,8 +3768,7 @@ export C_LIB_NAMESPACE
 }
 
 // 17.4 <cstdint>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::int16_t;
   using std::int32_t;
   using std::int64_t;
@@ -4050,8 +3800,7 @@ export C_LIB_NAMESPACE
 }
 
 // 31.13.1 <cstdio>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::clearerr;
   using std::fclose;
   using std::feof;
@@ -4105,8 +3854,7 @@ export C_LIB_NAMESPACE
 }
 
 // 17.2.2 <cstdlib> [cstdlib.syn]
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::_Exit;
   using std::abort;
   using std::abs;
@@ -4163,8 +3911,7 @@ export C_LIB_NAMESPACE
 }
 
 // 23.5.3 <cstring>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::memchr;
   using std::memcmp;
   using std::memcpy;
@@ -4191,8 +3938,7 @@ export C_LIB_NAMESPACE
 }
 
 // 29.15 <ctime>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::asctime;
   using std::clock;
   using std::clock_t;
@@ -4213,8 +3959,7 @@ export C_LIB_NAMESPACE
 }
 
 // 23.5.5 <cuchar>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
 #if _GLIBCXX_USE_UCHAR_C8RTOMB_MBRTOC8_CXX20
   using std::c8rtomb;
   using std::mbrtoc8;
@@ -4229,8 +3974,7 @@ export C_LIB_NAMESPACE
 
 #if _GLIBCXX_USE_WCHAR_T
 // 23.5.4 <cwchar>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::btowc;
   using std::fgetwc;
   using std::fgetws;
@@ -4313,8 +4057,7 @@ export C_LIB_NAMESPACE
 
 #if _GLIBCXX_USE_WCHAR_T
 // 23.5.2 <cwctype>
-export C_LIB_NAMESPACE
-{
+export C_LIB_NAMESPACE {
   using std::iswalnum;
   using std::iswalpha;
   #if _GLIBCXX_HAVE_ISWBLANK
