@@ -15,8 +15,10 @@
                 "CMAKE_CXX_STANDARD": "26",
                 "CMAKE_MAKE_PROGRAM": "ninja",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": true,
-                "PROJECT_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Winline",
-                "CMAKE_CXX_FLAGS": "-std=c++26 -fmodules -fcontracts -fno-exceptions -fno-rtti -fstrict-enums -fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree -fdiagnostics-color=always -fanalyzer $env{PROJECT_WARNING_FLAGS}"
+                "PROJECT_FEATURE_FLAGS": "-fmodules -fcontracts -fno-exceptions -fno-rtti -fstrict-enums",
+                "PROJECT_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Winvalid-constexpr -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
+                "PROJECT_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree -fdiagnostics-color=always -fanalyzer",
+                "CMAKE_CXX_FLAGS": "-std=c++26 $env{PROJECT_FEATURE_FLAGS} $env{PROJECT_WARNING_FLAGS} $env{PROJECT_DIAGNOSTIC_FLAGS}"
             }
         },
         {
@@ -24,7 +26,8 @@
             "inherits": "base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "COMPILE_DEFINITIONS_DEBUG": "-DMWC_DEBUG=1 -DMWC_LOG=1 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_BACKTRACE"
+                "PROJECT_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1",
+                "COMPILER_DEBUG_DEFINITIONS": "-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG_BACKTRACE"
             }
         },
         {

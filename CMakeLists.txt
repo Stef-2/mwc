@@ -43,12 +43,12 @@ if(NOT EXISTS ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
     endif()
 endif()
 
-
-# project wide compile definitions
+# project compile definitions
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-set(DEBUG_COMPILE_DEFINITIONS "MWC_DEBUG=1" "MWC_LOG=1" "_GLIBCXX_DEBUG" "_GLIBCXX_DEBUG_BACKTRACE")
-add_compile_definitions(${DEBUG_COMPILE_DEFINITIONS})
-message("adding addtional debug compile definitions: " ${DEBUG_COMPILE_DEFINITIONS})
+    #set(DEBUG_COMPILE_DEFINITIONS "MWC_DEBUG=1" "MWC_LOG=1" "_GLIBCXX_DEBUG" "_GLIBCXX_DEBUG_BACKTRACE")
+    string(CONCAT COMPLETE_DEBUG_DEFINITIONS ${PROJECT_DEBUG_DEFINITIONS} " " ${COMPILER_DEBUG_DEFINITIONS})
+    message("adding addtional debug compile definitions: " ${COMPLETE_DEBUG_DEFINITIONS})
+    add_compile_options(${COMPLETE_DEBUG_DEFINITIONS})
 endif()
 
 # std module library
@@ -64,20 +64,21 @@ target_compile_definitions(vulkan PRIVATE VULKAN_HPP_NO_EXCEPTIONS)
 target_include_directories(vulkan PRIVATE ${VULKAN_INCLUDE_DIR})
 target_sources(vulkan PUBLIC FILE_SET CXX_MODULES FILES ${VULKAN_INCLUDE_DIR}/vulkan/vulkan.cppm)]]
 
-# engine executable
+# project executable
 add_executable(${PROJECT_NAME})
-# engine module sources
+# project module sources
 file(GLOB_RECURSE MODULE_SOURCES CONFIGURE_DEPENDS ${MODULE_DIR}/*${CXX_MODULE_FILE_EXTENSION})
 target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES FILES ${MODULE_SOURCES})
-# engine translation units
+# project sources
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${SOURCE_DIR}/*${CXX_SOURCE_FILE_EXTENSION})
 target_sources(${PROJECT_NAME} PRIVATE
     ${SOURCES}
 )
-# engine compile definitions
+# project compile definitions
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     $<IF:${MWC_LOG}, MWC_LOG_DIR="${LOG_DIR}", MWC_LOG_DIR="">
 )
+# project libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC
     std
     stdc++exp
