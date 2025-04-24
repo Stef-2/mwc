@@ -15,8 +15,6 @@ import std;
 
 export namespace mwc {
   namespace diagnostic {
-    consteval auto logging() { return bool {MWC_LOG}; }
-
     namespace log {
       // possible sink types:
       // [ostream_t] -> standard output stream type
@@ -40,11 +38,13 @@ export namespace mwc {
 
       struct dynamic_configuration_st {};
 
-      template <bool tp_static_configuration = true>
+      template <bool tp_static_cfg = true>
       struct configuration_st
-      : public std::conditional_t<tp_static_configuration,
+      : public std::conditional_t<tp_static_cfg,
                                   static_configuration_st,
                                   dynamic_configuration_st> {
+        static constexpr auto s_static_cfg = tp_static_cfg;
+
         bool m_print_timestamps = {true};
         bool m_print_severity = {true};
         bool m_print_thread_id = {true};
@@ -68,14 +68,20 @@ export namespace mwc {
         size_t m_sink_count = s_dynamic_extent;
       };*/
 
-      /*template <configuration_st<true> tp_configuration = {}>
+      template <configuration_st<true> tp_cfg = {}>
       class log_ct {
         public:
-        using dynamic_storage_t = using sink_storage_t =
-          tuple_t<extent_t<typename decltype(tp_configs)::sink_t,
-                           tp_configs.m_sink_count>...>;
+        struct sink_st {
+          enum class sink_et { e_ostream, e_string, e_file };
 
-        //static constexpr auto s_default_severity = tp_default_severity;
+          observer_ptr_t<void> m_ptr;
+          sink_et m_type;
+        };
+
+        using dynamic_storage_t = map_t<event_severity_et, sink_st>;
+
+        using static_storage_t =
+          std::conditional_t<tp_cfg::s_static_cfg, tuple_t<>>;
 
         constexpr log_ct() : m_sinks {} {}
 
@@ -115,7 +121,7 @@ export namespace mwc {
                 *sink.m_resource_ptr << m_string;
           });
 
-        (std::get<0>(m_sinks)[0]) << m_string;
+          (std::get<0>(m_sinks)[0]) << m_string;
         }
 
         auto write_to_sink(const sink_c auto a_sink,
@@ -148,7 +154,7 @@ export namespace mwc {
         [[no_unique_address]] std::conditional_t<tp_static_configuration,
                                                  configuration_st,
                                                  empty_st> m_configuration;
-      };*/
+      };
 
       void testtt() {
         string_t s;
