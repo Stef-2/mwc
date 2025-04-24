@@ -7,6 +7,12 @@
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+            "environment": {
+                "PROJECT_CXX_FEATURE_FLAGS": "-std=c++26 -fmodules -fcontracts -fno-exceptions -fno-rtti -fstrict-enums",
+                "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Winvalid-constexpr -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
+                "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree -fdiagnostics-color=always -fanalyzer",
+            },
+            "warnings": {},
             "cacheVariables": {
                 "VCPKG_HOST_TRIPLET": "x64-mingw-dynamic",
                 "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic",
@@ -15,19 +21,19 @@
                 "CMAKE_CXX_STANDARD": "26",
                 "CMAKE_MAKE_PROGRAM": "ninja",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": true,
-                "PROJECT_FEATURE_FLAGS": "-fmodules -fcontracts -fno-exceptions -fno-rtti -fstrict-enums",
-                "PROJECT_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Winvalid-constexpr -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
-                "PROJECT_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree -fdiagnostics-color=always -fanalyzer",
-                "CMAKE_CXX_FLAGS": "-std=c++26 $env{PROJECT_FEATURE_FLAGS} $env{PROJECT_WARNING_FLAGS} $env{PROJECT_DIAGNOSTIC_FLAGS}"
+                "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS} $env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
             }
         },
         {
             "name": "debug",
             "inherits": "base",
+            "environment": {
+                "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1",
+                "COMPILER_CXX_DEBUG_DEFINITIONS": "-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG_BACKTRACE"
+            },
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "PROJECT_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1",
-                "COMPILER_DEBUG_DEFINITIONS": "-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG_BACKTRACE"
+                "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}"
             }
         },
         {

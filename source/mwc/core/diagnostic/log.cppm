@@ -15,6 +15,8 @@ import std;
 
 export namespace mwc {
   namespace diagnostic {
+    consteval auto logging() { return bool {MWC_LOG}; }
+
     namespace log {
       // possible sink types:
       // [ostream_t] -> standard output stream type
@@ -113,7 +115,7 @@ export namespace mwc {
                 *sink.m_resource_ptr << m_string;
           });
 
-          //*(std::get<0>(m_sinks)[0]) << m_string;
+        (std::get<0>(m_sinks)[0]) << m_string;
         }
 
         auto write_to_sink(const sink_c auto a_sink,

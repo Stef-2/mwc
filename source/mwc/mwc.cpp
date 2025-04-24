@@ -5,6 +5,7 @@ import mwc_log;
 import mwc_event_severity;
 import mwc_static_bi_map;
 import mwc_static_bi_multimap;
+import mwc_contract_violation;
 
 import std;
 
@@ -16,7 +17,7 @@ import std;
 
 //void test_contracts(int wtf)(wtf > 0);
 
-int f(int x)[[expects audit:x > 0]] { return 1 / x; }
+int fn(int x)[[pre:x > 0]][[post r:r != 0]] { return 1 / x; }
 
 template <typename... tp_args>
 /*requires std::
@@ -28,6 +29,7 @@ auto printt(const std::format_string<tp_args...>& a_format,
 }
 
 int main() {
+
   /*constexpr auto asd =
     mwc::diagnostic::log::static_configuration_st<mwc::ostream_t*> {1};
   mwc::diagnostic::log::
@@ -51,7 +53,7 @@ int main() {
   static constexpr std::array<const int, 3> arr = {1, 2, 3};
   constexpr auto w = std::span {arr};
   static constexpr auto f = map3[3];
-  test_contracts(666);
+  fn(-1);
   //std::print("{0} {1}", i, w);
   //auto um = std::unordered_map<mwc::diagnostic::event_severity_et, void*> {};
 
