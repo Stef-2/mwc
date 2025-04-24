@@ -13,6 +13,4 @@ export auto handle_contract_violation(
 
   mwc::breakpoint();
   std::cout << "omfg!!!";
-  //std::is_debugger_present();
-  std::abort();
 }

@@ -12,7 +12,6 @@
                 "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Winvalid-constexpr -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
                 "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree -fdiagnostics-color=always -fanalyzer",
             },
-            "warnings": {},
             "cacheVariables": {
                 "VCPKG_HOST_TRIPLET": "x64-mingw-dynamic",
                 "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic",

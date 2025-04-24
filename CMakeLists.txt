@@ -43,14 +43,6 @@ if(NOT EXISTS ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
     endif()
 endif()
 
-# project compile definitions
-#[[if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    string(CONCAT COMPLETE_DEBUG_DEFINITIONS ${PROJECT_DEBUG_DEFINITIONS} " " ${COMPILER_DEBUG_DEFINITIONS})
-    message("adding addtional debug compile definitions: " ${COMPLETE_DEBUG_DEFINITIONS})
-    #add_compile_options(${COMPLETE_DEBUG_DEFINITIONS})
-    add_compile_definitions(-DMWC_DEBUG=1 -DMWC_LOG=1 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG_BACKTRACE)
-endif()]]
-
 # std module library
 add_library(std)
 target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MODULE_FILE})

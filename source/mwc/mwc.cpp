@@ -28,7 +28,7 @@ auto printt(const std::format_string<tp_args...>& a_format,
              std::forward<tp_args>(a_args)...);
 }
 
-int main() {
+int main()[[pre:true == false]] {
 
   /*constexpr auto asd =
     mwc::diagnostic::log::static_configuration_st<mwc::ostream_t*> {1};
