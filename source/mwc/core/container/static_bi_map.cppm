@@ -9,15 +9,16 @@ import mwc_concept;
 import std;
 
 export namespace mwc {
-  // static storage bidirectonal map
+  // static storage unordered bidirectonal map
   // suitable for use in constant evaluation contexts
   template <typename tp_key, typename tp_value, size_t tp_size>
-  struct static_bi_map_st {
+  struct static_unordered_bi_map_st {
     using key_t = tp_key;
     using const_key_t = std::add_const_t<key_t>;
     using value_t = tp_value;
     using const_value_t = std::add_const_t<value_t>;
-    using storage_t = std::array<pair_t<key_t, value_t>, tp_size>;
+    using kv_pair_t = pair_t<key_t, value_t>;
+    using storage_t = std::array<kv_pair_t, tp_size>;
 
     template <typename tp>
     [[nodiscard]] constexpr auto operator[](this tp&& a_this,
@@ -31,15 +32,17 @@ export namespace mwc {
 
   // explicit deduction guide
   template <typename tp_key, typename tp_value, size_t tp_size>
-  static_bi_map_st(const pair_t<tp_key, tp_value> (&)[tp_size])
-    -> static_bi_map_st<tp_key, tp_value, tp_size>;
+  static_unordered_bi_map_st(const pair_t<tp_key, tp_value> (&)[tp_size])
+    -> static_unordered_bi_map_st<tp_key, tp_value, tp_size>;
 
   // implementation
   template <typename tp_key, typename tp_value, size_t tp_size>
   [[nodiscard]] constexpr auto
-  static_bi_map_st<tp_key, tp_value, tp_size>::operator[](this auto&& a_this,
-                                                          const auto a_value)
-    -> decltype(auto)
+  static_unordered_bi_map_st<tp_key, tp_value, tp_size>::operator[](
+    this auto&& a_this,
+    const auto a_value)[
+    [pre:std::ranges::contains(a_this.m_storage, kv_pair_t {a_value, 2.33f}) ==
+         true]] -> decltype(auto)
     requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>
   {
     if constexpr (std::is_same_v<decltype(a_value), const_key_t>) {
@@ -56,5 +59,11 @@ export namespace mwc {
 
     diagnostic::assert(false, "requested value not found");
     std::unreachable();
+  }
+
+  void test() {
+    auto map2 =
+      mwc::static_unordered_bi_map_st {{mwc::pair_t {1, 2.33f}, {3, 4.76f}}};
+    auto wtf = map2[1];
   }
 }

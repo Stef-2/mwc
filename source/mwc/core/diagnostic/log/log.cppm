@@ -78,10 +78,9 @@ export namespace mwc {
           sink_et m_type;
         };
 
-        using dynamic_storage_t = map_t<event_severity_et, sink_st>;
+        using dynamic_storage_t = unordered_map_t<event_severity_et, sink_st>;
 
-        using static_storage_t =
-          std::conditional_t<tp_cfg::s_static_cfg, tuple_t<>>;
+        using static_storage_t = std::conditional_t<>;
 
         constexpr log_ct() : m_sinks {} {}
 
