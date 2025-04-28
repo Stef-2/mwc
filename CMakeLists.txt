@@ -29,7 +29,7 @@ if(${MWC_LOG})
 endif()
 
 # attempt to find the std module file
-set(STD_MODULE_FILE "std.cc")
+set(STD_MODULE_FILE $<IF:${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" , "std.cc" , "std.cppm" >)
 if(NOT EXISTS ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
     message(CHECK_START "attempting to find the std module file...")
     cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH CXX_COMPILER_DIR)
@@ -44,8 +44,8 @@ if(NOT EXISTS ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
 endif()
 
 # std module library
-add_library(std)
-target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
+#add_library(std)
+#target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
 
 # vulkan library
 #[[
@@ -72,7 +72,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 # project libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    std
+    #std
     stdc++exp
     #vulkan
 )

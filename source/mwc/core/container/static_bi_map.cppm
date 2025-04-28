@@ -40,9 +40,10 @@ export namespace mwc {
   [[nodiscard]] constexpr auto
   static_unordered_bi_map_st<tp_key, tp_value, tp_size>::operator[](
     this auto&& a_this,
-    const auto a_value)[
+    const auto a_value) /*[
     [pre:std::ranges::contains(a_this.m_storage, kv_pair_t {a_value, 2.33f}) ==
-         true]] -> decltype(auto)
+         true]]*/
+    -> decltype(auto)
     requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>
   {
     if constexpr (std::is_same_v<decltype(a_value), const_key_t>) {

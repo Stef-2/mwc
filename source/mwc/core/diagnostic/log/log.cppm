@@ -40,8 +40,7 @@ export namespace mwc {
 
       template <bool tp_static_cfg = true>
       struct configuration_st
-      : public std::conditional_t<tp_static_cfg,
-                                  static_configuration_st,
+      : public std::conditional_t<tp_static_cfg, static_configuration_st,
                                   dynamic_configuration_st> {
         static constexpr auto s_static_cfg = tp_static_cfg;
 
@@ -68,7 +67,7 @@ export namespace mwc {
         size_t m_sink_count = s_dynamic_extent;
       };*/
 
-      template <configuration_st<true> tp_cfg = {}>
+      /*template <configuration_st<true> tp_cfg = {}>
       class log_ct {
         public:
         struct sink_st {
@@ -162,17 +161,18 @@ export namespace mwc {
 
         /*constexpr auto asd =
           sink_configuration_st<ostream_t*> {s_dynamic_extent};*/
-        //auto sa {&std::cout};
-        //log_ct<asd> log {array_t<sink_ct<ostream_t*>, 1> {&std::cout}};
-        //log_ct<event_severity_et::e_information, asd> log;
-        //std::get<0>(log.m_sinks)[0] = &std::cout;
-        //log.add_sink(&std::cout);
-        /*static_assert(
+      //auto sa {&std::cout};
+      //log_ct<asd> log {array_t<sink_ct<ostream_t*>, 1> {&std::cout}};
+      //log_ct<event_severity_et::e_information, asd> log;
+      //std::get<0>(log.m_sinks)[0] = &std::cout;
+      //log.add_sink(&std::cout);
+      /*static_assert(
           std::is_same_v<
             decltype(log)::sink_storage_t,
             tuple_t<array_t<sink_configuration_st<ostream_t*>::sink_t, 1>>>);*/
-        //log.write_to_sinks("Hello World!");
-      }
+      //log.write_to_sinks("Hello World!");
     }
   }
 }
+
+//}

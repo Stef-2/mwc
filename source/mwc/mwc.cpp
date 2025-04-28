@@ -44,7 +44,7 @@ int main()[[pre:true == false]] {
   std::vector<int> a {1, 2, 3};
   //a[3] = 4;
   constexpr auto map2 =
-    mwc::static_bi_map_st {{mwc::pair_t {1, 2.33f}, {3, 4.76f}}};
+    mwc::static_unordered_bi_map_st {{mwc::pair_t {1, 2.33f}, {3, 4.76f}}};
 
   static constexpr auto map3 = mwc::static_bi_multimap_st<int, 3, float, 5> {
     {mwc::pair_t {1, 2.44f}, {3, 4.1f}, {1, 1.23f}, {4, 5.1f}, {3, 12.7f}}};
