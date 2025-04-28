@@ -18,12 +18,21 @@ export namespace mwc {
   using uintptr_t = std::uintptr_t;
   using size_t = std::size_t;
 
-  // floating point types
+// floating point types
+// note: replace this once clang implements C++23 <stdfloat>
+#ifdef __clang__
+  using float16_t = __fp16;
+  using bfloat16_t = __bf16;
+  using float32_t = float;
+  using float64_t = double;
+  using float128_t = long double;
+#else
   using float16_t = std::float16_t;
   using bfloat16_t = std::bfloat16_t;
   using float32_t = std::float32_t;
   using float64_t = std::float64_t;
   using float128_t = std::float128_t;
+#endif
 
   // character / string types
   using char_t = char;

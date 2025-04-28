@@ -1,6 +1,8 @@
 module;
 
-#include <experimental/contract>
+#ifndef __clang__
+  #include <experimental/contract>
+#endif
 
 export module mwc_contract_violation;
 

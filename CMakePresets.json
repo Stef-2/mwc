@@ -6,7 +6,10 @@
             "hidden": true,
             "binaryDir": "${sourceDir}/build/${presetName}",
             "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-            "environment": {},
+            "generator": "Ninja",
+            "environment": {
+                "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1"
+            },
             "cacheVariables": {
                 "VCPKG_HOST_TRIPLET": "x64-mingw-dynamic",
                 "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic",
@@ -14,6 +17,7 @@
                 "CMAKE_EXPORT_COMPILE_COMMANDS": true
             }
         },
+        // ======== gcc ========
         {
             "name": "gcc_debug",
             "inherits": "base",
@@ -21,25 +25,26 @@
                 "PROJECT_CXX_FEATURE_FLAGS": "-fmodules -fcontracts -fno-exceptions -fno-rtti -fstrict-enums",
                 "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Winvalid-constexpr -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
                 "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree -fdiagnostics-color=always -fdiagnostics-set-output=text:experimental-nesting=yes -fanalyzer",
-                "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1",
                 "COMPILER_CXX_DEBUG_DEFINITIONS": "-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG_BACKTRACE"
             },
             "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
-                "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS} $env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
             }
         },
+        // ======== clang ========
         {
             "name": "clang_debug",
             "inherits": "base",
             "environment": {
-                "PROJECT_CXX_FEATURE_FLAGS": "-stdlib=libc++ -fno-exceptions -fno-rtti -fstrict-enums"
+                "PROJECT_CXX_FEATURE_FLAGS": "-fno-exceptions -fno-rtti -fstrict-enums"
             },
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
                 "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS}"
             }
         }

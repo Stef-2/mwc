@@ -874,7 +874,7 @@ export namespace std {
     using std::chrono::Thursday;
     using std::chrono::Tuesday;
     using std::chrono::Wednesday;
-  #if __cpp_lib_chrono >= 201'907L
+  #if __cpp_lib_chrono >= 201907L
     using chrono::ambiguous_local_time;
     using chrono::choose;
     using chrono::current_zone;
@@ -990,7 +990,7 @@ export namespace std {
   using std::sqrt;
   using std::tan;
   using std::tanh;
-#if __cpp_lib_tuple_like >= 202'311L
+#if __cpp_lib_tuple_like >= 202311L
   using std::get;
   using std::tuple_element;
   using std::tuple_element_t;
@@ -1371,13 +1371,13 @@ export namespace std {
   using std::format_to_n_result;
   using std::formatted_size;
 // FIXME __cpp_lib_format_ranges
-#if __cplusplus > 202'002L
+#if __cplusplus > 202002L
   using std::formattable;
 #endif
   using std::formatter;
   using std::make_format_args;
   using std::make_wformat_args;
-#if __cpp_lib_format >= 202'311L // >= C++26
+#if __cpp_lib_format >= 202311L // >= C++26
   using std::runtime_format;
 #endif
   using std::vformat;
@@ -2378,7 +2378,7 @@ export namespace std {
       using std::ranges::views::keys;
       using std::ranges::views::values;
     }
-#if __cpp_lib_ranges >= 202'202L
+#if __cpp_lib_ranges >= 202202L
     using ranges::range_adaptor_closure;
 #endif
   }

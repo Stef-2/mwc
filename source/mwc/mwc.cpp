@@ -1,4 +1,6 @@
-#include <experimental/contract>
+#ifndef __clang__
+  #include <experimental/contract>
+#endif
 
 import mwc_definition;
 import mwc_log;

@@ -31,11 +31,11 @@ NamespaceIndentation: All
 MaxEmptyLinesToKeep: 1
 Language: Cpp
 LambdaBodyIndentation: Signature
-IntegerLiteralSeparator:
-  Binary: 4
-  BinaryMinDigits: 8
-  Decimal: 3
-  DecimalMinDigits: 6
+#IntegerLiteralSeparator:
+#  Binary: 4
+#  BinaryMinDigits: 8
+#  Decimal: 3
+#  DecimalMinDigits: 6
 IndentRequiresClause: true
 IndentWidth: 2
 IndentPPDirectives: BeforeHash
