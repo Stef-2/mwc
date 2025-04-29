@@ -39,7 +39,7 @@
             "name": "clang_debug",
             "inherits": "base",
             "environment": {
-                "PROJECT_CXX_FEATURE_FLAGS": "-fno-exceptions -fno-rtti -fstrict-enums"
+                "PROJECT_CXX_FEATURE_FLAGS": "-fmodules -fcontracts -fno-exceptions -fno-rtti -fstrict-enums"
             },
             "cacheVariables": {
                 "CMAKE_CXX_COMPILER": "clang++",

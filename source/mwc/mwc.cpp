@@ -19,7 +19,7 @@ import std;
 
 //void test_contracts(int wtf)(wtf > 0);
 
-int fn(int x)[[pre:x > 0]][[post r:r != 0]] { return 1 / x; }
+int fn(int x)(pre : x > 0) /*[[pre:x > 0]][[post r:r != 0]]*/ { return 1 / x; }
 
 template <typename... tp_args>
 /*requires std::
@@ -30,7 +30,7 @@ auto printt(const std::format_string<tp_args...>& a_format,
              std::forward<tp_args>(a_args)...);
 }
 
-int main()[[pre:true == false]] {
+int main() {
 
   /*constexpr auto asd =
     mwc::diagnostic::log::static_configuration_st<mwc::ostream_t*> {1};
