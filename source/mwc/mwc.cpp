@@ -2,6 +2,8 @@
   #include <experimental/contract>
 #endif
 
+#include "mwc/core/contract/natural_syntax.hpp"
+
 import mwc_definition;
 import mwc_log;
 import mwc_event_severity;
@@ -19,7 +21,10 @@ import std;
 
 //void test_contracts(int wtf)(wtf > 0);
 
-int fn(int x)(pre : x > 0) /*[[pre:x > 0]][[post r:r != 0]]*/ { return 1 / x; }
+int fn(int x) pre(x > 0) post(r : r != 0) /*[[pre:x > 0]][[post r:r != 0]]*/ {
+  contract_assert(x != 0);
+  return 1 / x;
+}
 
 template <typename... tp_args>
 /*requires std::

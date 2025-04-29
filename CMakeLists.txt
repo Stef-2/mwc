@@ -63,6 +63,8 @@ target_sources(vulkan PUBLIC FILE_SET CXX_MODULES FILES ${VULKAN_INCLUDE_DIR}/vu
 
 # project executable
 add_executable(${PROJECT_NAME})
+# project include directories
+target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 # project module sources
 file(GLOB_RECURSE MODULE_SOURCES CONFIGURE_DEPENDS ${MODULE_DIR}/*${CXX_MODULE_FILE_EXTENSION})
 target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES FILES ${MODULE_SOURCES})

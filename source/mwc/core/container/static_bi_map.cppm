@@ -1,5 +1,7 @@
 module;
 
+#include "mwc/core/contract/natural_syntax.hpp"
+
 export module mwc_static_bi_map;
 
 import mwc_definition;
@@ -40,10 +42,11 @@ export namespace mwc {
   [[nodiscard]] constexpr auto
   static_unordered_bi_map_st<tp_key, tp_value, tp_size>::operator[](
     this auto&& a_this,
-    const auto a_value) /*[
-    [pre:std::ranges::contains(a_this.m_storage, kv_pair_t {a_value, 2.33f}) ==
-         true]]*/
-    -> decltype(auto)
+    const auto a_value) pre((auto entry_exists = false;
+                             for (const auto& kv_pair : a_this.m_storage) if (
+                               kv_pair.first == a_value or
+                               kv_pair.second == a_value) entry_exists = true;
+                             return entry_exists;)) -> decltype(auto)
     requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>
   {
     if constexpr (std::is_same_v<decltype(a_value), const_key_t>) {

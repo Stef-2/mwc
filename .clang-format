@@ -21,7 +21,7 @@ SeparateDefinitionBlocks: Always
 RequiresExpressionIndentation: Keyword
 RequiresClausePosition: OwnLine
 RemoveSemicolon: true
-RemoveParentheses: MultipleParentheses
+#RemoveParentheses: MultipleParentheses
 RemoveBracesLLVM: true
 ReferenceAlignment: Pointer
 PointerAlignment: Left

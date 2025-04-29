@@ -8,7 +8,7 @@ export namespace mwc {
 #ifdef __clang__
     __builtin_debugtrap();
 #else
-    __asm__("int 3");
+    __asm__("int3");
 #endif
   }
 }
