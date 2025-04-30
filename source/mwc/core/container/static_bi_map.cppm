@@ -23,11 +23,40 @@ export namespace mwc {
     using storage_t = std::array<kv_pair_t, tp_size>;
 
     template <typename tp>
-    [[nodiscard]] constexpr auto operator[](this tp&& a_this,
-                                            const auto a_value)
-      -> decltype(auto)
+    [[nodiscard]] constexpr auto operator[](
+      this tp&& a_this, const auto a_value)[[pre:[/*&a_this, &a_value*/] {
+      return true;
+      /*if constexpr (std::is_same_v<decltype(a_value), const_key_t>) {
+        for (const auto& kv_pair : a_this.m_storage)
+          if (kv_pair.first == a_value)
+            return true;
+      }
+      if constexpr (std::is_same_v<decltype(a_value), const_value_t>) {
+        for (const auto& kv_pair : a_this.m_storage)
+          if (kv_pair.second == a_value)
+            return true;
+
+        return false;
+      }*/
+    }() == true]] -> decltype(auto)
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>
-    ;
+    {
+
+      if constexpr (std::is_same_v<decltype(a_value), const_key_t>) {
+        for (const auto& kv_pair : a_this.m_storage)
+          if (kv_pair.first == a_value)
+            return kv_pair.second;
+      }
+
+      if constexpr (std::is_same_v<decltype(a_value), const_value_t>) {
+        for (const auto& kv_pair : a_this.m_storage)
+          if (kv_pair.second == a_value)
+            return kv_pair.first;
+      }
+
+      //diagnostic::assert(false, "requested value not found");
+      //std::unreachable();
+    }
 
     storage_t m_storage;
   };
@@ -38,15 +67,16 @@ export namespace mwc {
     -> static_unordered_bi_map_st<tp_key, tp_value, tp_size>;
 
   // implementation
-  template <typename tp_key, typename tp_value, size_t tp_size>
+  /*template <typename tp_key, typename tp_value, size_t tp_size>
   [[nodiscard]] constexpr auto
   static_unordered_bi_map_st<tp_key, tp_value, tp_size>::operator[](
     this auto&& a_this,
-    const auto a_value) pre((auto entry_exists = false;
-                             for (const auto& kv_pair : a_this.m_storage) if (
-                               kv_pair.first == a_value or
-                               kv_pair.second == a_value) entry_exists = true;
-                             return entry_exists;)) -> decltype(auto)
+    const auto a_value) pre([&]() {
+    for (const auto& kv_pair : a_this.m_storage)
+      if (kv_pair.first == a_value or kv_pair.second == a_value)
+        return true;
+    return false;
+  }.operator()) -> decltype(auto)
     requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>
   {
     if constexpr (std::is_same_v<decltype(a_value), const_key_t>) {
@@ -61,9 +91,9 @@ export namespace mwc {
           return kv_pair.first;
     }
 
-    diagnostic::assert(false, "requested value not found");
-    std::unreachable();
-  }
+    //diagnostic::assert(false, "requested value not found");
+    //std::unreachable();
+  }*/
 
   void test() {
     auto map2 =
