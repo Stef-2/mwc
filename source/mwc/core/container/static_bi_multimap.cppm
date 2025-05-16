@@ -1,5 +1,7 @@
 module;
 
+#include <mwc/core/contract/natural_syntax.hpp>
+
 export module mwc_static_bi_multimap;
 
 import mwc_definition;
@@ -10,10 +12,7 @@ import mwc_minimal_integral;
 import std;
 
 export namespace mwc {
-  template <typename tp_key,
-            size_t tp_key_count,
-            typename tp_value,
-            size_t tp_value_count>
+  template <typename tp_key, size_t tp_key_count, typename tp_value, size_t tp_value_count>
     requires(not std::is_same_v<tp_key, tp_value> and
              tp_key_count <= tp_value_count)
   struct static_bi_multimap_st {
@@ -22,8 +21,7 @@ export namespace mwc {
     using value_t = tp_value;
     using const_value_t = std::add_const_t<value_t>;
     using kv_pair_t = pair_t<key_t, value_t>;
-    using value_index_t =
-      utility::minimal_integral_st<tp_value_count + 1>::type;
+    using value_index_t = utility::minimal_integral_st<tp_value_count + 1>::type;
 
     struct key_st {
       tp_key m_key;
@@ -63,8 +61,8 @@ export namespace mwc {
     }
 
     template <typename tp>
-    [[nodiscard]] constexpr auto operator[](this tp&& a_this,
-                                            const auto a_value) -> const auto
+    [[nodiscard]] constexpr auto
+    operator[](this tp&& a_this, const auto a_value) -> const auto
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>
     {
       if constexpr (std::is_same_v<decltype(a_value), const_key_t>)
@@ -79,8 +77,7 @@ export namespace mwc {
             if (a_this.m_values[i] == a_value)
               return key.m_key;
 
-      diagnostic::assert(false, "requested value not found");
-      std::unreachable();
+      contract_assert(false);
     }
 
     array_t<key_st, tp_key_count> m_keys;

@@ -8,6 +8,7 @@ import mwc_definition;
 import mwc_log;
 import mwc_event_severity;
 import mwc_static_bi_map;
+import mwc_concept;
 import mwc_static_bi_multimap;
 import mwc_contract_violation;
 
@@ -35,6 +36,8 @@ auto printt(const std::format_string<tp_args...>& a_format,
              std::forward<tp_args>(a_args)...);
 }
 
+// done testing
+
 int main() {
 
   /*constexpr auto asd =
@@ -50,17 +53,17 @@ int main() {
   //printt("fuck !!!");
   std::vector<int> a {1, 2, 3};
   //a[3] = 4;
-  constexpr auto map2 =
-    mwc::static_unordered_bi_map_st {{mwc::pair_t {1, 2.33f}, {3, 4.76f}}};
+  auto map2 = static_unordered_bi_map_st {{mwc::pair_t {1, 2.33f}, {3, 4.76f}}};
+  auto wtf = map2[1];
 
-  static constexpr auto map3 = mwc::static_bi_multimap_st<int, 3, float, 5> {
+  /*static constexpr auto map3 = mwc::static_bi_multimap_st<int, 3, float, 5> {
     {mwc::pair_t {1, 2.44f}, {3, 4.1f}, {1, 1.23f}, {4, 5.1f}, {3, 12.7f}}};
   constexpr int i = map3[2.44f];
   //std::span<const float> f = map3[4];
   static constexpr std::array<const int, 3> arr = {1, 2, 3};
   constexpr auto w = std::span {arr};
   static constexpr auto f = map3[3];
-  fn(-1);
+  fn(-1);*/
   //std::print("{0} {1}", i, w);
   //auto um = std::unordered_map<mwc::diagnostic::event_severity_et, void*> {};
 

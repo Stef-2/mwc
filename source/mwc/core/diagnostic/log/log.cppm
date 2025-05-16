@@ -9,6 +9,7 @@ import mwc_empty_type;
 import mwc_metaprogramming_utility;
 import mwc_concept;
 import mwc_observer_ptr;
+import mwc_static_bi_multimap;
 import mwc_assert;
 
 import std;
@@ -34,13 +35,16 @@ export namespace mwc {
         size_t m_ostream_sink_count = {s_dynamic_extent};
         size_t m_string_sink_count = {s_dynamic_extent};
         size_t m_file_sink_count = {s_dynamic_extent};
+        size_t m_severity_level_count =
+          static_cast<size_t>(event_severity_et::end);
       };
 
       struct dynamic_configuration_st {};
 
       template <bool tp_static_cfg = true>
       struct configuration_st
-      : public std::conditional_t<tp_static_cfg, static_configuration_st,
+      : public std::conditional_t<tp_static_cfg,
+                                  static_configuration_st,
                                   dynamic_configuration_st> {
         static constexpr auto s_static_cfg = tp_static_cfg;
 
@@ -67,7 +71,7 @@ export namespace mwc {
         size_t m_sink_count = s_dynamic_extent;
       };*/
 
-      /*template <configuration_st<true> tp_cfg = {}>
+      template <configuration_st<true> tp_cfg = {}>
       class log_ct {
         public:
         struct sink_st {
@@ -78,8 +82,12 @@ export namespace mwc {
         };
 
         using dynamic_storage_t = unordered_map_t<event_severity_et, sink_st>;
-
-        using static_storage_t = std::conditional_t<>;
+        using static_storage_t =
+          static_bi_multimap_st<event_severity_et,
+                                tp_cfg.m_severity_level_count,
+                                sink_st,
+                                tp_cfg.m_ostream_sink_count + tp_cfg.m_string_sink_count +
+                                  tp_cfg.m_file_sink_count>;
 
         constexpr log_ct() : m_sinks {} {}
 
@@ -135,8 +143,7 @@ export namespace mwc {
 
           auto index = [&]<size_t i>(this const auto& self) -> size_t {
             using extent_value_t =
-              decltype(std::tuple_element_t<i, sink_storage_t>::value_type::
-                         m_resource_ptr);
+              decltype(std::tuple_element_t<i, sink_storage_t>::value_type::m_resource_ptr);
 
             if constexpr (std::is_same_v<tp_sink, extent_value_t>)
               return i;
@@ -148,10 +155,9 @@ export namespace mwc {
           return index.template operator()<0>();
         }
 
-        sink_storage_t m_sinks;
-        [[no_unique_address]] std::conditional_t<tp_static_configuration,
-                                                 configuration_st,
-                                                 empty_st> m_configuration;
+        std::conditional_t<tp_cfg.s_static_cfg, static_storage_t, dynamic_storage_t>
+          m_sinks;
+        configuration_st<tp_cfg.s_static_cfg> m_configuration;
       };
 
       void testtt() {
@@ -161,18 +167,18 @@ export namespace mwc {
 
         /*constexpr auto asd =
           sink_configuration_st<ostream_t*> {s_dynamic_extent};*/
-      //auto sa {&std::cout};
-      //log_ct<asd> log {array_t<sink_ct<ostream_t*>, 1> {&std::cout}};
-      //log_ct<event_severity_et::e_information, asd> log;
-      //std::get<0>(log.m_sinks)[0] = &std::cout;
-      //log.add_sink(&std::cout);
-      /*static_assert(
+        //auto sa {&std::cout};
+        //log_ct<asd> log {array_t<sink_ct<ostream_t*>, 1> {&std::cout}};
+        //log_ct<event_severity_et::e_information, asd> log;
+        //std::get<0>(log.m_sinks)[0] = &std::cout;
+        //log.add_sink(&std::cout);
+        /*static_assert(
           std::is_same_v<
             decltype(log)::sink_storage_t,
             tuple_t<array_t<sink_configuration_st<ostream_t*>::sink_t, 1>>>);*/
-      //log.write_to_sinks("Hello World!");
+        //log.write_to_sinks("Hello World!");
+      }
     }
   }
-}
 
-//}
+  //}

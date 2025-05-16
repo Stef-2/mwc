@@ -18,7 +18,7 @@ project wide code convention:
             suffix: "_t"
 
     concepts:
-        sufix: "_c"
+        suffix: "_c"
 
     values:
         automatic type deduction
@@ -29,7 +29,9 @@ project wide code convention:
             prefix: "s_"
         function arguments:
             prefix: "a_"
-        
+        enumerators:
+            prefix: "e_"
+
     functions:
         automatic type deduction
 

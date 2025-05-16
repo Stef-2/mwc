@@ -23,7 +23,7 @@ export namespace mwc
   {
     using enum_t = decltype(enum_key_value);
 
-    static constexpr inline auto s_enum_value = enum_key_value;
+    static constexpr auto s_enum_value = enum_key_value;
     using value_t = value_type;
   };
 }

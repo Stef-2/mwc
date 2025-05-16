@@ -8,20 +8,23 @@ import std;
 
 export namespace mwc
 {
-  template <class T, template <class...> class U>
+  template <typename tp_specialization, template <typename...> typename tp>
   constexpr inline bool instance_of_v = std::false_type {};
 
-  template <template <class...> class U, class... Vs>
-  constexpr inline bool instance_of_v<U<Vs...>, U> = std::true_type {};
+  // assert that [tp_specialization] is a specialization of [tp]
+  template <template <typename...> typename tp_specialization, typename... tp>
+  constexpr inline bool instance_of_v<tp_specialization<tp...>, tp_specialization> = std::true_type {};
 
-  template <size_t tp_min, size_t tp_max, typename... t>
+  // compile time assertion that the number of [tp] template parameters is within [tp_min] and [tp_max]
+  template <size_t tp_min, size_t tp_max, typename... tp>
   consteval auto within_bounds()
   {
-    constexpr auto check = sizeof...(t) >= tp_min and sizeof...(t) <= tp_max;
+    constexpr auto check = sizeof...(tp) >= tp_min and sizeof...(tp) <= tp_max;
 
     return check;
   }
 
+  // compile time for-loop
   template <size_t i, size_t n, typename functor>
   consteval auto static_for_loop(const functor& a_functor)
   {
@@ -32,6 +35,4 @@ export namespace mwc
       static_for_loop<i + 1, n>(a_functor);
     }
   }
-
-  //constexpr auto test = static_for_loop<0, 10>([&]<size_t i>() {
 }

@@ -4,27 +4,30 @@ export module mwc_concept;
 
 import std;
 
-export namespace mwc
-{
-  namespace concepts
-  {
-    // concept modeling enumerator_cs
-    template <typename type>
-    concept enumerator_c = std::is_enum_v<type> or std::is_scoped_enum_v<type>;
+export namespace mwc {
+  namespace concepts {
+    // concept modeling enumerator types
+    template <typename tp>
+    concept enumerator_c = std::is_enum_v<tp> or std::is_scoped_enum_v<tp>;
 
-    // concept modeling boolean_c or convertible-to-boolean_c types
-    template <typename type>
+    // concept modeling boolean or boolean-convertible types
+    template <typename tp>
     concept boolean_c =
-      std::is_same_v<type, bool> or std::is_convertible_v<type, bool>;
+      std::is_same_v<tp, bool> or std::is_convertible_v<tp, bool>;
 
-    // concept modeling a predicate which asserts that [type] must be one of the
-    // [types]
-    template <typename type, typename... types>
-    concept any_of_c = std::disjunction_v<std::is_same<type, types>...>;
+    // concept modeling a predicate that asserts that [tp] must be one of the [tps]
+    template <typename tp, typename... tps>
+    concept any_of_c = std::disjunction_v<std::is_same<tp, tps>...>;
 
-    // concept modeling a predicate which asserts that [type] must be the same
-    // type as [types]
-    template <typename type, typename... types>
-    concept all_of_c = std::conjunction_v<std::is_same<type, types>...>;
+    // concept modeling a predicate that asserts that [tp] must be the same as [tps]
+    template <typename tp, typename... tps>
+    concept all_of_c = std::conjunction_v<std::is_same<tp, tps>...>;
+
+    // concept modeling storage types that provides [data] and [size] functions
+    template <typename tp>
+    concept data_size_storage_c = requires(tp a_value) {
+                                    a_value.data();
+                                    a_value.size();
+                                  };
   }
 }

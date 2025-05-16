@@ -34,7 +34,8 @@ export namespace mwc {
   using float128_t = std::float128_t;
 #endif
 
-  // character / string types
+  // byte / character / string types
+  using byte_t = std::byte;
   using char_t = char;
   using string_t = std::basic_string<char_t>;
   using string_view_t = std::basic_string_view<char_t>;
@@ -63,14 +64,12 @@ export namespace mwc {
   using optional_t = std::optional<tp>;
   template <typename tp_first, typename tp_second>
   using pair_t = std::pair<tp_first, tp_second>;
-  template <
-    typename tp_key, typename tp_value, typename tp_compare = std::less<tp_key>,
-    typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
+  template <typename tp_key, typename tp_value, typename tp_compare = std::less<tp_key>,
+            typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
   using map_t = std::map<tp_key, tp_value, tp_compare, tp_allocator>;
-  template <
-    typename tp_key, typename tp_value, typename tp_hash = std::hash<tp_key>,
-    typename tp_key_equal = std::equal_to<tp_key>,
-    typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
+  template <typename tp_key, typename tp_value, typename tp_hash = std::hash<tp_key>,
+            typename tp_key_equal = std::equal_to<tp_key>,
+            typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
   using unordered_map_t =
     std::unordered_map<tp_key, tp_value, tp_hash, tp_key_equal, tp_allocator>;
 }

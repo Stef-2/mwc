@@ -21,7 +21,7 @@ SeparateDefinitionBlocks: Always
 RequiresExpressionIndentation: Keyword
 RequiresClausePosition: OwnLine
 RemoveSemicolon: true
-#RemoveParentheses: MultipleParentheses
+RemoveParentheses: MultipleParentheses
 RemoveBracesLLVM: true
 ReferenceAlignment: Pointer
 PointerAlignment: Left
@@ -31,11 +31,11 @@ NamespaceIndentation: All
 MaxEmptyLinesToKeep: 1
 Language: Cpp
 LambdaBodyIndentation: Signature
-#IntegerLiteralSeparator:
-#  Binary: 4
-#  BinaryMinDigits: 8
-#  Decimal: 3
-#  DecimalMinDigits: 6
+IntegerLiteralSeparator:
+  Binary: 4
+  BinaryMinDigits: 8
+  Decimal: 3
+  DecimalMinDigits: 6
 IndentRequiresClause: true
 IndentWidth: 2
 IndentPPDirectives: BeforeHash
@@ -90,4 +90,6 @@ BracedInitializerIndentWidth: 0
 ContinuationIndentWidth: 2
 ConstructorInitializerIndentWidth: 0
 ReflowComments: false
-PenaltyReturnTypeOnItsOwnLine: 100
+PenaltyBreakOpenParenthesis: 10
+PenaltyExcessCharacter: 10
+PenaltyReturnTypeOnItsOwnLine: 10
