@@ -11,5 +11,5 @@ export namespace mwc {
 
   template <typename t, size_t n = s_dynamic_extent>
   using extent_t =
-    std::conditional_t<n == std::dynamic_extent, vector_t<t>, array_t<t, n>>;
+    std::conditional_t<n == s_dynamic_extent, vector_t<t>, array_t<t, n>>;
 }

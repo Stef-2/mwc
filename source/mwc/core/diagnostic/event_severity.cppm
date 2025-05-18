@@ -1,14 +1,8 @@
 module;
 
-#include "mwc/core/contract/natural_syntax.hpp"
-
 export module mwc_event_severity;
 
-import mwc_static_string;
-import mwc_contract_assertions;
 import mwc_definition;
-
-import std;
 
 export namespace mwc {
   namespace diagnostic {

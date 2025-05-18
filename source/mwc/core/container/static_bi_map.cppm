@@ -5,13 +5,13 @@ module;
 export module mwc_static_bi_map;
 
 import mwc_definition;
-import mwc_assert;
+import mwc_contract_assertion;
 import mwc_concept;
 
 import std;
 
 export namespace mwc {
-  // static storage unordered bidirectonal map
+  // static storage unordered bidirectional map
   // suitable for use in constant evaluation contexts
   template <typename tp_key, typename tp_value, size_t tp_size>
   struct static_unordered_bi_map_st {
@@ -22,9 +22,15 @@ export namespace mwc {
     using kv_pair_t = pair_t<key_t, value_t>;
     using storage_t = array_t<kv_pair_t, tp_size>;
 
+    constexpr static_unordered_bi_map_st(const span_t<kv_pair_t, tp_size> a_span)
+      pre(contract::validate_data_size(a_span))
+    : m_storage {} {
+      std::ranges::copy(a_span, m_storage.begin());
+    }
+
     template <typename tp>
-    [[nodiscard]] constexpr auto
-    operator[](this tp&& a_this, const auto a_value) -> decltype(auto)
+    [[nodiscard]] constexpr auto operator[](this tp&& a_this, const auto a_value)
+      pre(validate_data_size(a_this.m_storage)) -> decltype(auto)
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>;
 
     storage_t m_storage;

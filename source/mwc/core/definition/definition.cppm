@@ -56,8 +56,8 @@ export namespace mwc {
   using vector_t = std::vector<tp, tp_allocator>;
   template <typename tp>
   using initializer_list_t = std::initializer_list<tp>;
-  template <typename tp>
-  using span_t = std::span<tp>;
+  template <typename tp, size_t tp_size>
+  using span_t = std::span<tp, tp_size>;
   template <typename... tp>
   using tuple_t = std::tuple<tp...>;
   template <typename tp>

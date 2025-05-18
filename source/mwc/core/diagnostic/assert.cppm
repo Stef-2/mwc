@@ -10,9 +10,9 @@ import std;
 
 export namespace mwc {
   namespace diagnostic {
-    inline constexpr auto __attribute__((always_inline))
-    assert(const concepts::boolean_c auto a_condition,
-           const string_view_t a_message = {}) -> void {
+    constexpr auto assert(const concepts::boolean_c auto a_condition,
+                          const string_view_t a_message = {})
+      [[gnu::always_inline]] -> void {
       if constexpr (not debugging())
         [[assume(a_condition)]];
 
