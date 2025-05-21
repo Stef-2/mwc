@@ -5,8 +5,9 @@ import mwc_log;
 import mwc_event_severity;
 import mwc_static_bi_map;
 import mwc_concept;
-import mwc_static_bi_multimap;
+//import mwc_static_bi_multimap;
 import mwc_contract_violation;
+import mwc_data;
 
 import std;
 
@@ -63,4 +64,5 @@ int main() {
   //auto um = std::unordered_map<mwc::diagnostic::event_severity_et, void*> {};
 
   //log.error("fuck!");
+  //mwc::test();
 }

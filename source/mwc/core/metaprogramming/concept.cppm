@@ -25,9 +25,9 @@ export namespace mwc {
 
     // concept modeling storage types that provides [data] and [size] functions
     template <typename tp>
-    concept data_size_storage_c = requires(tp a_value) {
-                                    a_value.data();
-                                    a_value.size();
-                                  };
+    concept contiguous_storage_c = requires(tp a_value) {
+                                     a_value.data();
+                                     a_value.size();
+                                   };
   }
 }

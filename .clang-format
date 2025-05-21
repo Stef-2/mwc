@@ -17,7 +17,7 @@ SpaceBeforeCaseColon: true
 SpaceBeforeAssignmentOperators: true
 SpaceAfterTemplateKeyword: true
 SpaceAfterLogicalNot: true
-SeparateDefinitionBlocks: Always
+SeparateDefinitionBlocks: Leave
 RequiresExpressionIndentation: Keyword
 RequiresClausePosition: OwnLine
 RemoveSemicolon: true

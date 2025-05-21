@@ -33,8 +33,8 @@ export namespace mwc {
       value_index_t m_end;
     };
 
-    constexpr static_bi_multimap_st(
-      const kv_pair_t (&a_kv_pairs)[std::max(tp_key_count, tp_value_count)]);
+    constexpr static_bi_multimap_st(const span_t<const kv_pair_t, tp_value_count>
+                                      a_kv_pairs);
 
     template <typename tp>
     [[nodiscard]] constexpr auto operator[](this tp&& a_this, const auto a_value)
@@ -50,11 +50,13 @@ export namespace mwc {
   template <typename tp_key, size_t tp_key_count, typename tp_value, size_t tp_value_count>
     requires(not std::is_same_v<tp_key, tp_value> &&
              tp_key_count <= tp_value_count)
-  constexpr static_bi_multimap_st<tp_key, tp_key_count, tp_value, tp_value_count>::static_bi_multimap_st(
-    const kv_pair_t (&a_kv_pairs)[std::max(tp_key_count, tp_value_count)])
+  constexpr static_bi_multimap_st<tp_key, tp_key_count, tp_value, tp_value_count>::
+    static_bi_multimap_st(const span_t<const kv_pair_t, tp_value_count> a_kv_pairs)
   : m_keys {},
     m_values {} {
-    auto input_array = std::to_array(a_kv_pairs);
+    array_t<kv_pair_t, tp_value_count> input_array;
+    std::ranges::copy(a_kv_pairs, input_array.begin());
+
     // sort the input by keys
     std::ranges::sort(input_array,
                       [](const kv_pair_t a_current, const kv_pair_t a_next) {
@@ -110,10 +112,9 @@ export namespace mwc {
   }
 
   void test() {
-    //pair_t<int, float> wtf[2] = {{1, 2.0f}, {3, 5.0f}};
-    /*array_t<pair_t<int, float>, 2> wtf = {pair_t {1, 2.0f}, {3, 5.0f}};
-    auto omg = span_t {wtf};
-    auto qwe = wtf.data();
-    static_bi_multimap_st<int, 2, float, 2> map {qwe};*/
+    pair_t<int, float> wtf[2] = {{1, 2.0f}, {3, 5.0f}};
+    const array_t<pair_t<int, float>, 2> arr;
+
+    static_bi_multimap_st<int, 2, float, 2> map {arr};
   }
 }
