@@ -63,15 +63,4 @@ export namespace mwc {
 
     contract_assert(false);
   }
-
-  int test(float f) {
-
-    //using return_t = typename decltype(std::function(test))::result_type;
-    //return_t a_test = 23;
-    array_t<pair_t<int, float>, 3> array;
-    pair_t<int, float> arr[3];
-    auto wtf = std::span {array};
-
-    auto map = static_unordered_bi_map_st {arr};
-  }
 }

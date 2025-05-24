@@ -38,8 +38,8 @@ export namespace mwc {
       using drain_t = tp_drain;
 
       // underlying drain storage depends on the [m_drain_count] template parameter
-      // if [m_drain_count] is not [s_dynamic_extent], the storage is [array_t<drain_t, m_drain_count>]
-      // if [m_drain_count] is [s_dynamic_extent], the storage is [vector_t<drain_t>]
+      // if [m_drain_count] is not [std::dynamic_extent], the storage is [array_t<drain_t, m_drain_count>]
+      // if [m_drain_count] is [std::dynamic_extent], the storage is [vector_t<drain_t>]
       //using drain_storage_t = extent_t<drain_t, tp_cfg.m_drain_count>;
 
       sink_ct();
@@ -59,7 +59,7 @@ export namespace mwc {
 
     // explicit deduction guides
     /*template <drain_c d>
-      sink_ct(vector_t<d> a_value) -> sink_ct<d, s_dynamic_extent>;
+      sink_ct(vector_t<d> a_value) -> sink_ct<d, std::dynamic_extent>;
       template <drain_c d, size_t n>
       sink_ct(array_t<d, n> a_value) -> sink_ct<d, n>;
       template <drain_c d>

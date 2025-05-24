@@ -23,7 +23,7 @@ export namespace mwc {
     template <typename tp, typename... tps>
     concept all_of_c = std::conjunction_v<std::is_same<tp, tps>...>;
 
-    // concept modeling storage types that provides [data] and [size] functions
+    // concept modeling storage types that provide [data] and [size] functions
     template <typename tp>
     concept contiguous_storage_c = requires(tp a_value) {
                                      a_value.data();

@@ -63,20 +63,28 @@ export namespace mwc {
                         return a_current.first < a_next.first;
                       });
 
-    const auto key_exists = [this,
+    /*const auto key_exists = [this,
                              &input_array](const value_index_t a_idx) -> bool {
       for (const auto& key : m_keys)
         if (key.m_key == input_array[a_idx].first)
           return true;
       return false;
-    };
+    };*/
 
     // generate key - value pairs
     for (value_index_t i = {}, key_count = {}; i < tp_value_count; ++i) {
       const auto& current = input_array[i];
+
+      const auto key_exists = [this, &current]() -> bool {
+        for (const auto& key : m_keys)
+          if (key.m_key == current.first)
+            return true;
+        return false;
+      }();
+
       m_values[i] = current.second;
 
-      if (not key_exists(i)) {
+      if (not key_exists) {
         m_keys[key_count] = {current.first, i, static_cast<value_index_t>(i + 1)};
         ++key_count;
       } else {
@@ -109,12 +117,5 @@ export namespace mwc {
             return key.m_key;
 
     contract_assert(false);
-  }
-
-  void test() {
-    pair_t<int, float> wtf[2] = {{1, 2.0f}, {3, 5.0f}};
-    const array_t<pair_t<int, float>, 2> arr;
-
-    static_bi_multimap_st<int, 2, float, 2> map {arr};
   }
 }

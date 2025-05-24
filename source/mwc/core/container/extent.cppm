@@ -7,9 +7,7 @@ import mwc_definition;
 import std;
 
 export namespace mwc {
-  constexpr auto s_dynamic_extent = std::dynamic_extent;
-
-  template <typename t, size_t n = s_dynamic_extent>
-  using extent_t =
-    std::conditional_t<n == s_dynamic_extent, vector_t<t>, array_t<t, n>>;
+  template <typename tp, size_t tp_size = std::dynamic_extent>
+  using extent_t = std::conditional_t<tp_size == std::dynamic_extent,
+                                      vector_t<tp>, array_t<tp, tp_size>>;
 }

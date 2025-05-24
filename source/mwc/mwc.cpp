@@ -64,5 +64,5 @@ int main() {
   //auto um = std::unordered_map<mwc::diagnostic::event_severity_et, void*> {};
 
   //log.error("fuck!");
-  //mwc::test();
+  mwc::diagnostic::log::testtt();
 }
