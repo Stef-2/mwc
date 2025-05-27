@@ -6,24 +6,21 @@ import mwc_concept;
 
 import std;
 
-export namespace mwc
-{
-  // map [key_type] to [value_type]
-  template <typename key_type, typename value_type>
-  struct type_map_st
-  {
-    using key_t = key_type;
-    using value_t = value_type;
+export namespace mwc {
+  // map [tp_key] to [tp_value]
+  template <typename tp_key, typename tp_value>
+  struct type_map_st {
+    using key_t = tp_key;
+    using value_t = tp_value;
   };
 
-  // map [enum_key_value] to [value_type]
+  // map [tp_enumerator] to [tp]
   // enum_key_value must be a constant value expression
-  template <auto enum_key_value, typename value_type>
-  struct enum_map_st
-  {
-    using enum_t = decltype(enum_key_value);
+  template <auto tp_enumerator, typename tp>
+  struct enum_map_st {
+    using enum_t = decltype(tp_enumerator);
 
-    static constexpr auto s_enum_value = enum_key_value;
-    using value_t = value_type;
+    static constexpr auto s_enumerator = tp_enumerator;
+    using value_t = tp;
   };
 }

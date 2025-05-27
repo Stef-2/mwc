@@ -56,4 +56,10 @@ export namespace mwc {
             typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
   using unordered_map_t =
     std::unordered_map<tp_key, tp_value, tp_hash, tp_key_equal, tp_allocator>;
+  template <typename tp_key, typename tp_value, typename tp_hash = std::hash<tp_key>,
+            typename tp_key_equal = std::equal_to<tp_key>,
+            typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
+  using unordered_multimap_t =
+    std::unordered_multimap<tp_key, tp_value, tp_hash, tp_key_equal, tp_allocator>;
+
 }

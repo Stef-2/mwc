@@ -25,7 +25,7 @@ export namespace mwc {
     using const_value_t = std::add_const_t<value_t>;
     using kv_pair_t = pair_t<key_t, value_t>;
     using value_index_t =
-      typename utility::minimal_integral_st<tp_value_count + 1>::type;
+      /*typename utility::minimal_integral_st<tp_value_count + 1>::type*/ size_t;
 
     struct key_st {
       tp_key m_key;
@@ -36,11 +36,23 @@ export namespace mwc {
     constexpr static_bi_multimap_st(const span_t<const kv_pair_t, tp_value_count>
                                       a_kv_pairs);
 
-    template <typename tp>
-    [[nodiscard]] constexpr auto operator[](this tp&& a_this, const auto a_value)
-      pre(validate_data_size(a_this.m_keys))
-        pre(validate_data_size(a_this.m_values)) -> decltype(auto)
+    template <typename tp_this>
+    [[nodiscard]] constexpr auto
+    operator[](this tp_this&& a_this, const auto a_value)
+      /*pre(contract::validate_data_size(a_this.m_keys))
+        pre(contract::validate_data_size(a_this.m_values))*/
+      -> decltype(auto)
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>;
+    template <typename tp_this>
+    [[nodiscard]] constexpr auto
+    equal_range(this tp_this&& a_this, const auto a_key)
+      /*pre(contract::validate_data_size(a_this.m_keys))
+      pre(contract::validate_data_size(a_this.m_values))*/
+      -> decltype(auto);
+
+    constexpr auto begin() const pre(not m_keys.empty()) post(r : r != nullptr);
+    constexpr auto end() const pre(not m_keys.empty())
+      post(r : r != nullptr and r != begin());
 
     array_t<key_st, tp_key_count> m_keys;
     array_t<tp_value, tp_value_count> m_values;
@@ -62,14 +74,6 @@ export namespace mwc {
                       [](const kv_pair_t a_current, const kv_pair_t a_next) {
                         return a_current.first < a_next.first;
                       });
-
-    /*const auto key_exists = [this,
-                             &input_array](const value_index_t a_idx) -> bool {
-      for (const auto& key : m_keys)
-        if (key.m_key == input_array[a_idx].first)
-          return true;
-      return false;
-    };*/
 
     // generate key - value pairs
     for (value_index_t i = {}, key_count = {}; i < tp_value_count; ++i) {
@@ -107,7 +111,7 @@ export namespace mwc {
     if constexpr (std::is_same_v<decltype(a_value), const_key_t>)
       for (const auto& key : a_this.m_keys)
         if (key.m_key == a_value)
-          return span_t {a_this.m_values.begin() + key.m_begin,
+          return pair_t {a_this.m_values.begin() + key.m_begin,
                          a_this.m_values.begin() + key.m_end};
 
     if constexpr (std::is_same_v<decltype(a_value), const_value_t>)
@@ -117,5 +121,25 @@ export namespace mwc {
             return key.m_key;
 
     contract_assert(false);
+  }
+  template <typename tp_key, size_t tp_key_count, typename tp_value, size_t tp_value_count>
+    requires(! std::is_same_v<tp_key, tp_value> && tp_key_count <= tp_value_count)
+  constexpr auto
+  static_bi_multimap_st<tp_key, tp_key_count, tp_value, tp_value_count>::equal_range(
+    this auto&& a_this,
+    const auto a_key) -> decltype(auto) {
+    return a_this[a_key];
+  }
+  template <typename tp_key, size_t tp_key_count, typename tp_value, size_t tp_value_count>
+    requires(! std::is_same_v<tp_key, tp_value> && tp_key_count <= tp_value_count)
+  constexpr auto
+  static_bi_multimap_st<tp_key, tp_key_count, tp_value, tp_value_count>::begin() const {
+    return m_keys.begin();
+  }
+  template <typename tp_key, size_t tp_key_count, typename tp_value, size_t tp_value_count>
+    requires(! std::is_same_v<tp_key, tp_value> && tp_key_count <= tp_value_count)
+  constexpr auto
+  static_bi_multimap_st<tp_key, tp_key_count, tp_value, tp_value_count>::end() const {
+    return m_keys.end();
   }
 }
