@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 4.0.0 FATAL_ERROR)
-include(CMakePrintHelpers)
+#include(CMakePrintHelpers)
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "a9e1cf81-9932-4810-974b-6eccaf14e457")
+
+set(CMAKE_CXX_STANDARD_REQUIRED OFF)
+set(CMAKE_CXX_MODULE_STD 1)
 
 project(mwc LANGUAGES CXX)
 
@@ -18,18 +23,18 @@ set(MODULE_DIR ${SOURCE_DIR})
 set(LOG_DIR ${ROOT_DIR}/log)
 
 # if logging is enabled, attempt to find the logging directory, if not present, create one
-if(${MWC_LOG})
+if (${MWC_LOG})
     message(CHECK_START "logging is enabled, attempting to find the log directory...")
-    if(EXISTS ${LOG_DIR})
+    if (EXISTS ${LOG_DIR})
         message(CHECK_PASS "logging directory found: " ${LOG_DIR})
-    else()
+    else ()
         message(CHECK_FAIL "logging directory not found, creating one at: " ${LOG_DIR})
         make_directory(${LOG_DIR})
-    endif()
-endif()
+    endif ()
+endif ()
 
 # attempt to find the std module file
-if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+#[[if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     set(STD_MODULE_FILE "std.cc")
 else()
     #set(STD_MODULE_FILE "std.cppm")
@@ -50,7 +55,7 @@ endif()
 
 # std module library
 add_library(std)
-target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
+target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MODULE_FILE})]]
 
 # vulkan library
 #[[
@@ -71,15 +76,15 @@ target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES FILES ${MODULE_SOURC
 # project sources
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${SOURCE_DIR}/*${CXX_SOURCE_FILE_EXTENSION})
 target_sources(${PROJECT_NAME} PRIVATE
-    ${SOURCES}
+        ${SOURCES}
 )
 # project compile definitions
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    $<IF:${MWC_LOG}, MWC_LOG_DIR="${LOG_DIR}", MWC_LOG_DIR="">
+        $<IF:${MWC_LOG}, MWC_LOG_DIR="${LOG_DIR}", MWC_LOG_DIR="">
 )
 # project libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    std
-    stdc++exp
-    #vulkan
+        std
+        stdc++exp
+        #vulkan
 )

@@ -1,19 +1,18 @@
 module;
 
-#include <mwc/core/contract/natural_syntax.hpp>
+//#include <mwc/core/contract/natural_syntax.hpp>
 
 export module mwc_log;
 
 import mwc_definition;
-import mwc_configuration_type;
+//import mwc_configuration_type;
 import mwc_event_severity;
 import mwc_concept;
 import mwc_observer_ptr;
 import mwc_static_bi_multimap;
-import mwc_empty_type;
+//import mwc_empty_type;
 import mwc_metaprogramming_utility;
 import mwc_data;
-import mwc_optional;
 
 import std;
 
@@ -73,8 +72,7 @@ export namespace mwc {
       // configuration, either static or dynamic
       template <auto tp_specialization = dynamic_configuration_st {}>
         requires concepts::any_of_c<decltype(tp_specialization),
-                                    static_configuration_st,
-                                    dynamic_configuration_st>
+                                    static_configuration_st, dynamic_configuration_st>
       struct configuration_st {
         static constexpr auto static_cfg() {
           return std::is_same_v<decltype(tp_specialization), static_configuration_st>;
@@ -94,10 +92,9 @@ export namespace mwc {
         // underlying log storage that will be used for the severity-sink mapping
         using storage_t = std::conditional_t<
           static_cfg(),
-          decltype(std::declval<static_bi_multimap_st<event_severity_et,
-                                                      initial_severity_level_count(),
-                                                      sink_st,
-                                                      initial_sink_count()>>()),
+          std::remove_cvref_t<decltype(std::declval<static_bi_multimap_st<
+                                         event_severity_et, initial_severity_level_count(),
+                                         sink_st, initial_sink_count()>>())>,
           dynamic_configuration_st::storage_t>;
 
         bool m_print_timestamps = {true};
@@ -132,7 +129,7 @@ export namespace mwc {
 
         // dynamic constructor
         constexpr log_ct(
-          const configuration_st<dynamic_configuration_st {}>& a_cfg)
+          const configuration_st<dynamic_configuration_st {}>& a_cfg = {})
           requires(not tp_cfg.static_cfg())
         : m_configuration {a_cfg},
           m_storage {a_cfg.initial_sink_count()} {
@@ -144,15 +141,15 @@ export namespace mwc {
         log_ct(const log_ct&) = delete("move only type");
         auto operator=(const log_ct&) -> log_ct& = delete("move only type");
 
-        template <typename tp_this>
+        /*template <typename tp_this>
         auto configuration(this tp_this&& a_this) -> configuration_t& {
           return a_this.m_configuration;
         }
         auto insert_sink(
           const sink_st& a_sink,
           const event_severity_et a_event_severity = tp_cfg.m_default_severity_level)
-          pre(a_sink.m_ptr != nullptr)
-            pre(a_event_severity != event_severity_et::end) -> void
+          -> void pre(a_sink.m_ptr != nullptr and
+                      a_event_severity != event_severity_et::end)
           requires(not tp_cfg.static_cfg())
         {
           m_storage.emplace(a_event_severity, a_sink);
@@ -187,7 +184,7 @@ export namespace mwc {
           else
             for (; begin != end; ++begin)
               begin->second.print(a_string);
-        }
+        }*/
 
         //private:
         configuration_t m_configuration;
@@ -203,7 +200,8 @@ export namespace mwc {
           array_t<pair_t<event_severity_et, sink_st>, 1> {pair_t {
           event_severity_et::e_error, sink_st {&s, sink_st::sink_et::e_string}}};
         std::cout << "address of std::cout: " << &std::cout << '\n';
-        static constexpr auto scfg = configuration_st<static_configuration_st {1, 1}> {
+        static constexpr auto scfg =
+          configuration_st<static_configuration_st {1, 1}> {
           .m_sinks =
             data_st<pair_t<event_severity_et, sink_st>> {std::span(sinks)}};
 
@@ -212,6 +210,7 @@ export namespace mwc {
                   << slog.m_storage.m_values[0].m_ptr << '\n';
         slog.print("im so static bro im an error brooo ahhh",
                    event_severity_et::e_error);
+
         auto dcfg = configuration_st<dynamic_configuration_st {}> {};
         static log_ct dlog {dcfg};
         dlog.insert_sink(sinks[0].second, event_severity_et::e_error);

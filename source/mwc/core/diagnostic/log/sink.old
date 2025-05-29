@@ -1,4 +1,4 @@
-module;
+/*module;
 
 export module mwc_sink;
 
@@ -65,17 +65,17 @@ export namespace mwc {
       template <drain_c d>
       sink_ct(d a_value) -> sink_ct<d, 1>;*/
 
-    // ================================
-    // implementation
-    // ================================
-    /*template <auto>
+// ================================
+// implementation
+// ================================
+/*template <auto>
       sink_ct<static_configuration_st>::sink_ct(const auto& a_drains)
       : m_drains {a_drains}
       {
         for (const auto drain : m_drains)
           assert(drain);
       }*/
-    /*
+/*
       template <static_configuration_st>
       auto sink_ct<static_configuration_st>::add_drain(const drain_t a_drain)
         -> void
@@ -84,7 +84,7 @@ export namespace mwc {
         assert(a_drain);
         m_drains.emplace_back(a_drain);
       }*/
-    /*
+/*
       template <drain_c drain_t, size_t drain_count>
       auto sink_ct<drain_t, drain_count>::remove_drain(const drain_t a_drain)
         -> void
@@ -93,7 +93,7 @@ export namespace mwc {
         assert(a_drain);
         std::erase(m_drains, a_drain);
       }*/
-    /*
+/*
       template <drain_c drain_t, size_t drain_count>
       auto sink_ct<drain_t, drain_count>::write_to_drains(
         const string_view_t a_string) -> void
@@ -113,7 +113,7 @@ export namespace mwc {
           for (const auto drain : m_drains)
             drain->append(a_string);
       }
-*/
+*//*
     template <drain_c tp_drain>
     sink_ct<tp_drain>::sink_ct() : m_drain {nullptr} {}
 
@@ -149,4 +149,4 @@ export namespace mwc {
         m_drain->append(a_string);
     }
   }
-}
+}*/

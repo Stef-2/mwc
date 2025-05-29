@@ -30,7 +30,7 @@ export namespace mwc {
 
     template <typename tp>
     [[nodiscard]] constexpr auto operator[](this tp&& a_this, const auto a_value)
-      pre(validate_data_size(a_this.m_storage)) -> decltype(auto)
+      -> decltype(auto) pre(contract::validate_data_size(a_this.m_storage))
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>;
 
     storage_t m_storage;

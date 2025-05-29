@@ -5,7 +5,7 @@ module;
 export module mwc_static_bi_multimap;
 
 import mwc_definition;
-import mwc_assert;
+//import mwc_assert;
 import mwc_concept;
 import mwc_contract_assertion;
 import mwc_minimal_integral;
@@ -25,7 +25,7 @@ export namespace mwc {
     using const_value_t = std::add_const_t<value_t>;
     using kv_pair_t = pair_t<key_t, value_t>;
     using value_index_t =
-      /*typename utility::minimal_integral_st<tp_value_count + 1>::type*/ size_t;
+      typename utility::minimal_integral_st<tp_value_count + 1>::type;
 
     struct key_st {
       tp_key m_key;
@@ -45,9 +45,9 @@ export namespace mwc {
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>;
     template <typename tp_this>
     [[nodiscard]] constexpr auto
-    equal_range(this tp_this&& a_this, const auto a_key)
+    equal_range(this tp_this&& a_this, const key_t a_key)
       /*pre(contract::validate_data_size(a_this.m_keys))
-      pre(contract::validate_data_size(a_this.m_values))*/
+        pre(contract::validate_data_size(a_this.m_values))*/
       -> decltype(auto);
 
     constexpr auto begin() const pre(not m_keys.empty()) post(r : r != nullptr);
@@ -127,7 +127,7 @@ export namespace mwc {
   constexpr auto
   static_bi_multimap_st<tp_key, tp_key_count, tp_value, tp_value_count>::equal_range(
     this auto&& a_this,
-    const auto a_key) -> decltype(auto) {
+    const key_t a_key) -> decltype(auto) {
     return a_this[a_key];
   }
   template <typename tp_key, size_t tp_key_count, typename tp_value, size_t tp_value_count>
