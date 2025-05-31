@@ -4,8 +4,6 @@ export module mwc_type_map;
 
 import mwc_concept;
 
-import std;
-
 export namespace mwc {
   // map [tp_key] to [tp_value]
   template <typename tp_key, typename tp_value>

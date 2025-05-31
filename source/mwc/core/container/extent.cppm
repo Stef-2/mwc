@@ -1,10 +1,12 @@
 module;
 
+#include "mwc/core/definition/definition.hpp"
+
+
+#include <type_traits>
+#include <span>
+
 export module mwc_extent;
-
-import mwc_definition;
-
-import std;
 
 export namespace mwc {
   template <typename tp, size_t tp_size = std::dynamic_extent>

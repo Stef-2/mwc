@@ -1,10 +1,15 @@
-module;
+#pragma once
 
-export module mwc_definition;
+#include <cstddef>
+#include <cstdint>
+#include <filesystem>
+#include <map>
+#include <string>
+#include <unordered_map>
+#include <span>
+#include <optional>
 
-import std;
-
-export namespace mwc {
+namespace mwc {
   // integral types
   using sint8_t = std::int8_t;
   using uint8_t = std::uint8_t;
@@ -61,5 +66,4 @@ export namespace mwc {
             typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
   using unordered_multimap_t =
     std::unordered_multimap<tp_key, tp_value, tp_hash, tp_key_equal, tp_allocator>;
-
 }

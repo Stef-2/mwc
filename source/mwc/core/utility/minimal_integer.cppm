@@ -1,10 +1,11 @@
 module;
 
+#include "mwc/core/definition/definition.hpp"
+
+#include <limits>
+#include <type_traits>
+
 export module mwc_minimal_integral;
-
-import mwc_definition;
-
-import std;
 
 export namespace mwc
 {

@@ -1,10 +1,10 @@
 module;
 
+#include <utility>
+
 export module mwc_enum_bitwise_operators;
 
 import mwc_concept;
-
-import std;
 
 export namespace mwc {
   constexpr auto operator not(const concepts::enumerator_c auto x) {

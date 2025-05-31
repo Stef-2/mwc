@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 4.0.0 FATAL_ERROR)
 #include(CMakePrintHelpers)
-set(CMAKE_CXX_STANDARD 26)
-set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "a9e1cf81-9932-4810-974b-6eccaf14e457")
-
-set(CMAKE_CXX_STANDARD_REQUIRED OFF)
-set(CMAKE_CXX_MODULE_STD 1)
 
 project(mwc LANGUAGES CXX)
 
@@ -55,7 +50,9 @@ endif()
 
 # std module library
 add_library(std)
-target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MODULE_FILE})]]
+target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
+#target_link_libraries(std PUBLIC ${ROOT_DIR}/libstdc++exp.a)]]
+
 
 # vulkan library
 #[[
@@ -72,6 +69,7 @@ add_executable(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 # project module sources
 file(GLOB_RECURSE MODULE_SOURCES CONFIGURE_DEPENDS ${MODULE_DIR}/*${CXX_MODULE_FILE_EXTENSION})
+#file(GLOB_RECURSE MODULE_SOURCES CONFIGURE_DEPENDS ${MODULE_DIR}/*test.cppm)
 target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES FILES ${MODULE_SOURCES})
 # project sources
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${SOURCE_DIR}/*${CXX_SOURCE_FILE_EXTENSION})
@@ -84,7 +82,11 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 # project libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC
-        std
-        stdc++exp
+        #std
+        #stdc++exp
+        #${ROOT_DIR}/libstdc++exp.a
+        #"-lstdc++exp"
         #vulkan
 )
+target_link_options(${PROJECT_NAME} PUBLIC -static -lc++ -lc++abi -lc++experimental -fuse-ld=lld)
+

@@ -1,8 +1,8 @@
 module;
 
-export module mwc_global_logging;
+#include "mwc/core/definition/definition.hpp"
 
-import mwc_definition;
+export module mwc_global_logging;
 
 export namespace mwc {
   namespace diagnostic {

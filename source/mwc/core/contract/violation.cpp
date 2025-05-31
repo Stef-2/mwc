@@ -1,6 +1,6 @@
 //#include <experimental/contract>
-
-import std;
+//#include <print>
+//import std;
 //#include <iostream>
 
 // gcc currently does not support combining contracts and modules as both are experimental

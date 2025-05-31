@@ -1,10 +1,11 @@
 module;
 
+#include <mwc/core/definition/definition.hpp>
+
+#include <limits>
+
 export module mwc_bit;
 
-import mwc_definition;
-
-import std;
 
 export namespace mwc
 {

@@ -1,10 +1,10 @@
 module;
 
+#include "mwc/core/definition/definition.hpp"
+
+#include <type_traits>
+
 export module mwc_metaprogramming_utility;
-
-import mwc_definition;
-
-import std;
 
 export namespace mwc {
   template <typename tp_specialization, template <typename...> typename tp>

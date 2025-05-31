@@ -2,7 +2,7 @@
 
 export module mwc_assert;
 
-import mwc_definition;
+//import mwc_definition;
 import mwc_debug;
 import mwc_concept;
 

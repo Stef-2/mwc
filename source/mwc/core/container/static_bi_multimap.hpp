@@ -1,18 +1,17 @@
-module;
+#pragma once
 
-#include <mwc/core/contract/natural_syntax.hpp>
+#include "mwc/core/contract/assertion.hpp"
+#include "mwc/core/definition/definition.hpp"
 
-export module mwc_static_bi_multimap;
 
-import mwc_definition;
-//import mwc_assert;
+#include <type_traits>
+#include <algorithm>
+
+//import mwc_definition;
 import mwc_concept;
-import mwc_contract_assertion;
 import mwc_minimal_integral;
 
-import std;
-
-export namespace mwc {
+namespace mwc {
   // static storage bidirectional multimap
   // suitable for use in constant evaluation contexts
   template <typename tp_key, size_t tp_key_count, typename tp_value, size_t tp_value_count>
@@ -43,12 +42,11 @@ export namespace mwc {
         pre(contract::validate_data_size(a_this.m_values))*/
       -> decltype(auto)
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>;
-    template <typename tp_this>
+    //template <typename tp_this>
     [[nodiscard]] constexpr auto
-    equal_range(this tp_this&& a_this, const key_t a_key)
-      /*pre(contract::validate_data_size(a_this.m_keys))
-        pre(contract::validate_data_size(a_this.m_values))*/
-      -> decltype(auto);
+    equal_range(/*this tp_this&& a_this, */const key_t a_key) -> decltype(auto)
+      pre(m_keys.size() != 0)
+        /*pre(contract::validate_data_size(a_this.m_values))*/;
 
     constexpr auto begin() const pre(not m_keys.empty()) post(r : r != nullptr);
     constexpr auto end() const pre(not m_keys.empty())
@@ -123,21 +121,21 @@ export namespace mwc {
     contract_assert(false);
   }
   template <typename tp_key, size_t tp_key_count, typename tp_value, size_t tp_value_count>
-    requires(! std::is_same_v<tp_key, tp_value> && tp_key_count <= tp_value_count)
+    requires(not std::is_same_v<tp_key, tp_value> && tp_key_count <= tp_value_count)
   constexpr auto
   static_bi_multimap_st<tp_key, tp_key_count, tp_value, tp_value_count>::equal_range(
-    this auto&& a_this,
+    /*this auto&& a_this,*/
     const key_t a_key) -> decltype(auto) {
-    return a_this[a_key];
+    return this->operator[](a_key);
   }
   template <typename tp_key, size_t tp_key_count, typename tp_value, size_t tp_value_count>
-    requires(! std::is_same_v<tp_key, tp_value> && tp_key_count <= tp_value_count)
+    requires(not std::is_same_v<tp_key, tp_value> && tp_key_count <= tp_value_count)
   constexpr auto
   static_bi_multimap_st<tp_key, tp_key_count, tp_value, tp_value_count>::begin() const {
     return m_keys.begin();
   }
   template <typename tp_key, size_t tp_key_count, typename tp_value, size_t tp_value_count>
-    requires(! std::is_same_v<tp_key, tp_value> && tp_key_count <= tp_value_count)
+    requires(not std::is_same_v<tp_key, tp_value> && tp_key_count <= tp_value_count)
   constexpr auto
   static_bi_multimap_st<tp_key, tp_key_count, tp_value, tp_value_count>::end() const {
     return m_keys.end();

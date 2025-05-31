@@ -2,7 +2,7 @@
 
 export module mwc_sink;
 
-import mwc_definition;
+//import mwc_definition;
 import mwc_extent;
 import mwc_bit;
 import mwc_enum_bitwise_operators;

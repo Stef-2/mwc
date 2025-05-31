@@ -1,13 +1,13 @@
-module;
+#pragma once
 
-export module mwc_contract_assertion;
+#include "mwc/core/definition/definition.hpp"
 
-import mwc_definition;
+#include <limits>
+
+//import mwc_definition;
 import mwc_concept;
 
-import std;
-
-export namespace mwc {
+namespace mwc {
   namespace contract {
     constexpr bool
     validate_data_size(const concepts::contiguous_storage_c auto& a_storage) {

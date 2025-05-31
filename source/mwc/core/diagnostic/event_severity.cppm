@@ -1,8 +1,8 @@
 module;
 
-export module mwc_event_severity;
+#include <mwc/core/definition/definition.hpp>
 
-import mwc_definition;
+export module mwc_event_severity;
 
 export namespace mwc {
   namespace diagnostic {

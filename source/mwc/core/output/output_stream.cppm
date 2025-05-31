@@ -1,10 +1,10 @@
 module;
 
+#include "mwc/core/definition/definition.hpp"
+
+#include <iostream>
+
 export module mwc_output_stream;
-
-import mwc_definition;
-
-import std;
 
 export namespace mwc
 {

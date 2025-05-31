@@ -1,17 +1,15 @@
-module;
+#pragma once
 
-#include "mwc/core/contract/natural_syntax.hpp"
+#include "mwc/core/contract/assertion.hpp"
+#include "mwc/core/definition/definition.hpp"
 
-export module mwc_data;
+#include <span>
 
-import mwc_definition;
 import mwc_observer_ptr;
-import mwc_contract_assertion;
+//import mwc_contract_assertion;
 import mwc_concept;
 
-import std;
-
-export namespace mwc {
+namespace mwc {
   // type erased non-owning structural span over contiguous storage
   struct void_data_st {
     observer_ptr_t<void> m_data;
