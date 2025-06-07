@@ -1,17 +1,21 @@
-#pragma once
+module;
+//#pragma once
 
-#include "mwc/core/contract/assertion.hpp"
-#include "mwc/core/definition/definition.hpp"
+//#include "mwc/core/contract/assertion.cppm"
+//#include "mwc/core/definition/definition.cppm"
 
+//#include <algorithm>
+//#include <type_traits>
 
-#include <type_traits>
-#include <algorithm>
+export module mwc_static_bi_multimap;
 
-//import mwc_definition;
+import mwc_definition;
 import mwc_concept;
 import mwc_minimal_integral;
 
-namespace mwc {
+import std;
+
+export namespace mwc {
   // static storage bidirectional multimap
   // suitable for use in constant evaluation contexts
   template <typename tp_key, size_t tp_key_count, typename tp_value, size_t tp_value_count>
@@ -45,12 +49,12 @@ namespace mwc {
     //template <typename tp_this>
     [[nodiscard]] constexpr auto
     equal_range(/*this tp_this&& a_this, */const key_t a_key) -> decltype(auto)
-      pre(m_keys.size() != 0)
+      //pre(m_keys.size() != 0)
         /*pre(contract::validate_data_size(a_this.m_values))*/;
 
-    constexpr auto begin() const pre(not m_keys.empty()) post(r : r != nullptr);
-    constexpr auto end() const pre(not m_keys.empty())
-      post(r : r != nullptr and r != begin());
+    constexpr auto begin() const /*pre(not m_keys.empty()) post(r : r != nullptr)*/;
+    constexpr auto end() const /*pre(not m_keys.empty())
+      /*post(r : r != nullptr and r != begin())*/;
 
     array_t<key_st, tp_key_count> m_keys;
     array_t<tp_value, tp_value_count> m_values;

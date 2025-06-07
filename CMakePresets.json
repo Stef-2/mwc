@@ -10,7 +10,6 @@
         "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1"
       },
       "cacheVariables": {
-        "CMAKE_CXX_STANDARD": "26",
         "CMAKE_EXPORT_COMPILE_COMMANDS": true
       }
     },
@@ -18,13 +17,13 @@
       "name": "gcc_debug",
       "inherits": "base",
       "environment": {
-        "PROJECT_CXX_FEATURE_FLAGS": "-stdlib=libc++ -fcontracts -fmodules -fno-exceptions -fno-rtti -fstrict-enums --embed-dir=${sourceDir}",
+        "PROJECT_CXX_FEATURE_FLAGS": "-fcontracts -fcontracts-nonattr -fno-exceptions -fno-rtti -fstrict-enums --embed-dir=${sourceDir}",
         "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Winvalid-constexpr -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
-        "PROJECT_CXX_DIAGNOSTIC_FLAGS": " -fdiagnostics-show-template-tree -fdiagnostics-color=always",
-        "COMPILER_CXX_DEBUG_DEFINITIONS": "-ggdb"
+        "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree -fdiagnostics-color=always -fdiagnostics-set-output=text:experimental-nesting=yes",
+        "COMPILER_CXX_DEBUG_DEFINITIONS": "-ggdb -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG_BACKTRACE -D_GLIBCXX_ASSERTIONS"
       },
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "/opt/compiler-explorer/clang-ericwf-contracts-trunk/bin/clang++",
+        "CMAKE_CXX_COMPILER": "g++",
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
         "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS} $env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
@@ -34,13 +33,16 @@
       "name": "clang_debug",
       "inherits": "base",
       "environment": {
-        "PROJECT_CXX_FEATURE_FLAGS": "-fmodules -fcontracts -fno-exceptions -fno-rtti -fstrict-enums"
+        "PROJECT_CXX_FEATURE_FLAGS": "-stdlib=libc++ -fcontracts -fno-exceptions -fno-rtti -fstrict-enums --embed-dir=${sourceDir}",
+        "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Winvalid-constexpr -Wdeprecated -Winline -Wextra-semi -Wsuggest-override",
+        "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fdiagnostics-show-template-tree -fdiagnostics-color=always",
+        "COMPILER_CXX_DEBUG_DEFINITIONS": "-ggdb"
       },
       "cacheVariables": {
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
-        "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS}"
+        "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS} $env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
       }
     }
   ],

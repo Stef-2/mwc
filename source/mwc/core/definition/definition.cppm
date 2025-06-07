@@ -1,16 +1,11 @@
-#pragma once
+module;
 
-#include <cstddef>
-#include <cstdint>
-#include <filesystem>
-#include <map>
-#include <string>
-#include <unordered_map>
-#include <span>
-#include <optional>
+export module mwc_definition;
 
-namespace mwc {
-  // integral types
+import std;
+
+export namespace mwc {
+  // integral numeric types
   using sint8_t = std::int8_t;
   using uint8_t = std::uint8_t;
   using sint16_t = std::int16_t;
@@ -22,6 +17,14 @@ namespace mwc {
   using sintptr_t = std::intptr_t;
   using uintptr_t = std::uintptr_t;
   using size_t = std::size_t;
+
+  // floating point numeric types
+  // note: change these once clang implements <stdfloat>
+  using float16_t = __fp16;
+  using bfloat16_t = __bf16;
+  using float32_t = float;
+  using float64_t = double;
+  using float128_t = long double;
 
   // byte / character / string types
   using byte_t = std::byte;

@@ -1,11 +1,13 @@
 module;
 
-#include "mwc/core/definition/definition.hpp"
+//#include "mwc/core/definition/definition.cppm"
 
 #include <limits>
 #include <type_traits>
 
 export module mwc_minimal_integral;
+
+import mwc_definition;
 
 export namespace mwc
 {

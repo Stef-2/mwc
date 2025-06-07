@@ -1,8 +1,8 @@
 module;
 
-#include <type_traits>
-
 export module mwc_concept;
+
+import std;
 
 export namespace mwc {
   namespace concepts {

@@ -1,13 +1,11 @@
 #pragma once
 
-#include "mwc/core/contract/assertion.hpp"
-#include "mwc/core/definition/definition.hpp"
-
-#include <span>
-
+import mwc_definition;
 import mwc_observer_ptr;
-//import mwc_contract_assertion;
+import mwc_contract_assertion;
 import mwc_concept;
+
+import std;
 
 namespace mwc {
   // type erased non-owning structural span over contiguous storage
@@ -23,7 +21,7 @@ namespace mwc {
     constexpr data_st(observer_ptr_t<tp> a_data, const size_t a_size)
       pre(a_data != nullptr and a_size != 0);
     constexpr data_st(const concepts::contiguous_storage_c auto& a_data)
-      pre(contract::validate_data_size(a_data));
+      pre(contract::validate_storage(a_data));
 
     [[nodiscard]] constexpr auto data(this auto&& a_this) post(r : r != nullptr);
     [[nodiscard]] constexpr auto size() const post(r : r != 0);
@@ -31,7 +29,7 @@ namespace mwc {
     [[nodiscard]] constexpr auto empty() const;
     template <typename tp_this>
     [[nodiscard]] constexpr auto span(this tp_this&& a_this)
-      post(r : contract::validate_data_size(r));
+      post(r : contract::validate_storage(r));
 
     constexpr auto begin() const pre(m_size != 0) post(r : r != nullptr);
     constexpr auto end() const pre(m_size != 0)
@@ -43,9 +41,12 @@ namespace mwc {
   };
 
   // explicit deduction guide
-  template <typename tp>
+  // clang doesn't like this
+  /*
+  template <typename tp, size_t tp_size>
     requires concepts::contiguous_storage_c<tp>
-  data_st(const auto& a_data) -> data_st<typename decltype(a_data)::value_type>;
+  data_st(const auto& a_data) -> data_st<typename decltype(a_data)::value_type, tp_size>;
+  */
 
   // implementation
   template <typename tp, size_t tp_size>
@@ -82,8 +83,8 @@ namespace mwc {
     return span_t<tp, tp_size> {a_this.m_data, a_this.m_size};
   }
   template <typename tp, size_t tp_size>
-  constexpr auto data_st<tp, tp_size>::begin() const pre(m_size != 0)
-    post(r : r != nullptr) {
+  constexpr auto data_st<tp, tp_size>::begin() const/* pre(m_size != 0)
+    post(r : r != nullptr)*/ {
     return m_data;
   }
   template <typename tp, size_t tp_size>

@@ -1,16 +1,21 @@
-#pragma once
+module;
+//#pragma once
 
-#include "mwc/core/contract/assertion.hpp"
-#include "mwc/core/definition/definition.hpp"
+//#include "mwc/core/contract/assertion.hpp"
+//#include "mwc/core/definition/definition.hpp"
 
 
-#include <type_traits>
-#include <algorithm>
+//#include <type_traits>
+//#include <algorithm>
+export module mwc_static_unordered_bi_map;
 
-//import mwc_contract_assertion;
+import mwc_definition;
+import mwc_contract_assertion;
 import mwc_concept;
 
-namespace mwc {
+import std;
+
+export namespace mwc {
   // static storage unordered bidirectional map
   // suitable for use in constant evaluation contexts
   template <typename tp_key, typename tp_value, size_t tp_size>
@@ -23,7 +28,7 @@ namespace mwc {
     using storage_t = array_t<kv_pair_t, tp_size>;
 
     constexpr static_unordered_bi_map_st(const span_t<kv_pair_t, tp_size> a_span)
-      /*pre(contract::validate_data_size(a_span))*/
+      /*pre(contract::validate_storage(a_span))*/
     : m_storage {} {
       std::ranges::copy(a_span, m_storage.begin());
     }
