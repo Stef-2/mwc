@@ -22,7 +22,7 @@ SeparateDefinitionBlocks: Leave
 RequiresExpressionIndentation: Keyword
 RequiresClausePosition: OwnLineWithBrace
 RemoveSemicolon: true
-RemoveParentheses: MultipleParentheses
+RemoveParentheses: Leave
 RemoveBracesLLVM: true
 ReferenceAlignment: Pointer
 PointerAlignment: Left

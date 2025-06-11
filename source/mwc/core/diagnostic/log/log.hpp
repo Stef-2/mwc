@@ -31,6 +31,7 @@ namespace mwc {
         // default severity level to which sinks and logs subscribe to
         static constexpr auto s_default_severity_level = event_severity_et::e_information;
 
+        // note: add support for stacktrace printing once clang implements <stacktrace>
         enum class bit_flags_et : uint8_t {
           e_print_timestamp = utility::set_bit<1>(),
           e_print_severity_level = utility::set_bit<2>(),
@@ -40,11 +41,13 @@ namespace mwc {
           e_cover_higher_severities = utility::set_bit<6>()
         };
 
+        // note: consider using std::bitset for this bit mask
         bit_mask_t<bit_flags_et> m_bit_mask = std::numeric_limits<bit_mask_t<bit_flags_et>>::max();
       };
 
       // type erased internal sink structure
       struct sink_st {
+        // note: consider using std::variant instead of type erasure
         enum class sink_et : uint8_t { e_ostream, e_string, e_file };
 
         constexpr sink_st(const sink_c auto a_sink,
@@ -66,22 +69,35 @@ namespace mwc {
         public:
         using storage_t = vector_t<sink_st>;
 
-        log_ct(const span_t<sink_st> a_sinks = {},
-               const event_severity_et a_default_severity_level = configuration_st::s_default_severity_level,
-               const configuration_st& a_cfg = {}) pre(a_default_severity_level != event_severity_et::end);
+        log_ct(const span_t<sink_st> a_sinks = {}, const configuration_st& a_cfg = {});
         log_ct(const log_ct&) = delete("move only type");
         auto operator=(const log_ct&) -> log_ct& = delete("move only type");
 
+        template <typename tp_this>
+        auto storage(this tp_this&& a_this) -> decltype(auto);
         auto configuration(this auto&& a_this) -> configuration_st&;
         auto insert_sink(const sink_st& a_sink) -> void pre(a_sink.m_sink_ptr != nullptr);
         auto remove_sink(const sink_st& a_sink) -> void pre(not m_storage.empty());
-        auto print(const string_view_t a_string, const optional_t<event_severity_et> a_event_severity,
+        auto information(const string_view_t a_message,
+                         const std::source_location& a_source_location = std::source_location::current()) const
+          -> void pre(contract::validate_storage(a_message));
+        auto warning(const string_view_t a_message,
+                     const std::source_location& a_source_location = std::source_location::current()) const
+          -> void pre(contract::validate_storage(a_message));
+        auto error(const string_view_t a_message,
                    const std::source_location& a_source_location = std::source_location::current()) const
-          -> void pre(contract::validate_storage(a_string)) pre(a_event_severity.value() != event_severity_et::end);
+          -> void pre(contract::validate_storage(a_message));
+        auto critical(const string_view_t a_message,
+                      const std::source_location& a_source_location = std::source_location::current()) const
+          -> void pre(contract::validate_storage(a_message));
 
         private:
+        template <event_severity_et tp_event_severity_level>
+        auto print(const string_view_t a_message, const std::source_location& a_source_location) const
+          -> void pre(tp_event_severity_level != event_severity_et::end);
+
         storage_t m_storage;
-        event_severity_et m_default_severity_level;
+        // configuration to be used if a sink has no configuration of its own
         configuration_st m_configuration;
       };
 
@@ -102,6 +118,10 @@ namespace mwc {
           m_type = sink_et::e_file;
         else
           contract_assert(false);
+      }
+      template <typename tp_this>
+      auto log_ct::storage(this tp_this&& a_this) -> decltype(auto) {
+        return a_this.m_storage;
       }
     }
   }
