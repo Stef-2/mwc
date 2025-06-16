@@ -1,12 +1,16 @@
-cmake_minimum_required(VERSION 4.0.0 FATAL_ERROR)
-#include(CMakePrintHelpers)
+cmake_minimum_required(VERSION 4.0.3 FATAL_ERROR)
+include(CMakePrintHelpers)
+include(FetchContent)
+
 set(CMAKE_CXX_STANDARD 26)
-set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "a9e1cf81-9932-4810-974b-6eccaf14e457")
-set(CMAKE_CXX_STANDARD_REQUIRED OFF)
-set(CMAKE_CXX_MODULE_STD 1)
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")
+set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
+set(CMAKE_CXX_MODULE_STD TRUE)
+
 project(mwc LANGUAGES CXX)
 
 # project configuration
+set(CXX_HEADER_FILE_EXTENSION ".hpp")
 set(CXX_SOURCE_FILE_EXTENSION ".cpp")
 set(CXX_MODULE_FILE_EXTENSION ".cppm")
 set(MWC_DEBUG 1)
@@ -31,40 +35,28 @@ if (${MWC_LOG})
     endif ()
 endif ()
 
-# attempt to find the std module file
-#[[if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-    set(STD_MODULE_FILE "std.cc")
-else()
-    #set(STD_MODULE_FILE "std.cppm")
-    set(STD_MODULE_FILE "std.cc")
-endif()
-if(NOT EXISTS ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
-    message(CHECK_START "attempting to find the std module file...")
-    cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH CXX_COMPILER_DIR)
-    cmake_path(GET CXX_COMPILER_DIR PARENT_PATH CXX_COMPILER_ROOT)
-    file(GLOB_RECURSE STD_MODULE_FILEPATH LIST_DIRECTORIES false ABSOLUTE ${CXX_COMPILER_ROOT}/*/${STD_MODULE_FILE})
-    if(STD_MODULE_FILEPATH)
-        message(CHECK_PASS "std module file found: " ${STD_MODULE_FILEPATH} " copying std module file to: " ${SOURCE_STD_DIR})
-        file(COPY ${STD_MODULE_FILEPATH} DESTINATION ${SOURCE_STD_DIR})
-    else()
-        message(CHECK_FAIL "std module file not found")
-    endif()
-endif()
-
-# std module library
-add_library(std)
-target_sources(std PUBLIC FILE_SET CXX_MODULES FILES ${SOURCE_STD_DIR}/${STD_MODULE_FILE})
-#target_link_libraries(std PUBLIC ${ROOT_DIR}/libstdc++exp.a)]]
-
-
 # vulkan library
-#[[
 add_library(vulkan)
 find_package(VulkanHeaders CONFIG REQUIRED)
 get_target_property(VULKAN_INCLUDE_DIR Vulkan::Headers INTERFACE_INCLUDE_DIRECTORIES)
-target_compile_definitions(vulkan PRIVATE VULKAN_HPP_NO_EXCEPTIONS)
-target_include_directories(vulkan PRIVATE ${VULKAN_INCLUDE_DIR})
-target_sources(vulkan PUBLIC FILE_SET CXX_MODULES FILES ${VULKAN_INCLUDE_DIR}/vulkan/vulkan.cppm)]]
+target_compile_definitions(vulkan PRIVATE
+        VULKAN_HPP_NO_EXCEPTIONS
+        VULKAN_HPP_ASSERT=contract_assert
+        VULKAN_HPP_ASSERT_ON_RESULT=VULKAN_HPP_ASSERT
+)
+target_sources(vulkan PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${VULKAN_INCLUDE_DIR} FILES ${VULKAN_INCLUDE_DIR}/vulkan/vulkan.cppm)
+
+# vkfw library
+set(VKFW_BUILD_CXX_MODULE 1)
+FetchContent_Declare(vkfw GIT_REPOSITORY https://github.com/Cvelth/vkfw GIT_TAG main)
+FetchContent_MakeAvailable(vkfw)
+target_compile_definitions(vkfw INTERFACE
+        VKFW_NO_EXCEPTIONS
+        VKFW_NO_STRUCT_CONSTRUCTORS
+        VKFW_ASSERT=contract_assert
+        VKFW_ASSERT_ON_RESULT=VKFW_ASSERT
+        assert=VKFW_ASSERT
+)
 
 # project executable
 add_executable(${PROJECT_NAME})
@@ -72,8 +64,7 @@ add_executable(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 # project module sources
 file(GLOB_RECURSE MODULE_SOURCES CONFIGURE_DEPENDS ${MODULE_DIR}/*${CXX_MODULE_FILE_EXTENSION})
-#file(GLOB_RECURSE MODULE_SOURCES CONFIGURE_DEPENDS ${MODULE_DIR}/*test.cppm)
-target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES FILES ${MODULE_SOURCES})
+target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES BASE_DIRS ${MODULE_DIR} FILES ${MODULE_SOURCES})
 # project sources
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${SOURCE_DIR}/*${CXX_SOURCE_FILE_EXTENSION})
 target_sources(${PROJECT_NAME} PRIVATE
@@ -85,18 +76,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 # project libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC
-        #std
-        #stdc++exp
-        #${ROOT_DIR}/libstdc++exp.a
-        #"-lstdc++exp"
-        #vulkan
+        vulkan
+        vkfw-module
 )
 target_link_options(${PROJECT_NAME} PUBLIC
-        -static
-        -lc++
-        -lc++abi
-        -lc++experimental
-        -fuse-ld=lld
-        -stdlib=libc++
 )
-

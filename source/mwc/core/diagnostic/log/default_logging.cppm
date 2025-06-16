@@ -3,7 +3,6 @@ module;
 export module mwc_default_logging;
 
 import mwc_definition;
-import mwc_empty_type;
 
 export namespace mwc {
   namespace diagnostic {

@@ -18,9 +18,9 @@ namespace mwc {
       // [ostream_t] -> standard output stream type
       // [string_t] -> standard string type
       // [file_t] -> standard file type
-      using ostream_ptr_t = observer_ptr_t<ostream_t>;
-      using string_ptr_t = observer_ptr_t<string_t>;
-      using file_ptr_t = observer_ptr_t<file_t>;
+      using ostream_ptr_t = obs_ptr_t<ostream_t>;
+      using string_ptr_t = obs_ptr_t<string_t>;
+      using file_ptr_t = obs_ptr_t<file_t>;
 
       // concept modeling types which can be used as log sinks
       template <typename tp>
@@ -41,8 +41,9 @@ namespace mwc {
           e_cover_higher_severities = utility::set_bit<6>()
         };
 
+        static constexpr auto default_configuration() -> const configuration_st;
         // note: consider using std::bitset for this bit mask
-        bit_mask_t<bit_flags_et> m_bit_mask = std::numeric_limits<bit_mask_t<bit_flags_et>>::max();
+        bit_mask_t<bit_flags_et> m_bit_mask;
       };
 
       // type erased internal sink structure
@@ -52,13 +53,13 @@ namespace mwc {
 
         constexpr sink_st(const sink_c auto a_sink,
                           optional_t<event_severity_et> a_event_severity = configuration_st::s_default_severity_level,
-                          optional_t<configuration_st> a_cfg = {}) pre(a_sink != nullptr)
+                          optional_t<configuration_st> a_cfg = configuration_st::default_configuration()) pre(a_sink != nullptr)
           pre(a_event_severity != event_severity_et::end);
         constexpr auto operator==(const sink_st& a_other) const -> bool;
         constexpr auto operator==(const sink_c auto a_sink) const -> bool pre(a_sink != nullptr);
         auto print(const string_view_t a_string) const -> void;
 
-        observer_ptr_t<void> m_sink_ptr;
+        obs_ptr_t<void> m_sink_ptr;
         sink_et m_type;
         optional_t<event_severity_et> m_event_severity;
         optional_t<configuration_st> m_configuration;
@@ -69,7 +70,7 @@ namespace mwc {
         public:
         using storage_t = vector_t<sink_st>;
 
-        log_ct(const span_t<sink_st> a_sinks = {}, const configuration_st& a_cfg = {});
+        log_ct(const span_t<sink_st> a_sinks = {}, const configuration_st& a_cfg = configuration_st::default_configuration());
         log_ct(const log_ct&) = delete("move only type");
         auto operator=(const log_ct&) -> log_ct& = delete("move only type");
 
@@ -102,6 +103,10 @@ namespace mwc {
       };
 
       // implementation
+      constexpr auto configuration_st::default_configuration() -> const configuration_st {
+        return {std::numeric_limits<bit_mask_t<bit_flags_et>>::max()};
+      }
+
       constexpr sink_st::sink_st(const sink_c auto a_sink, optional_t<event_severity_et> a_event_severity,
                                  optional_t<configuration_st> a_cfg)
       : m_sink_ptr {a_sink},

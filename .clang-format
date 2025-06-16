@@ -1,5 +1,5 @@
 ---
-ColumnLimit: '128'
+ColumnLimit: 128
 AccessModifierOffset: 0
 UseTab: Never
 Standard: Latest
