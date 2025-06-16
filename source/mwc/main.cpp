@@ -1,14 +1,19 @@
-#include "mwc/core/diagnostic/log/default_log.hpp"
+#include "mwc/core/diagnostic/log/subsystem.hpp"
 #include "mwc/core/window/window.hpp"
 #include "mwc/mwc.hpp"
+
+import mwc_subsystem;
 
 import vkfw;
 
 import std;
 
 int main() {
-  vkfw::init();
+  mwc::initialize_subsystems();
+  //vkfw::init();
   mwc::mwc_ct mwc {};
   while (true)
     ;
+  mwc::finalize_subsystems();
+  return 0;
 }

@@ -1,8 +1,8 @@
-#include <mwc/core/diagnostic/log/default_log.hpp>
+#include <mwc/core/diagnostic/log/subsystem.hpp>
 
 #include <contracts>
 
-import mwc_default_logging;
+import mwc_logging_subsystem_switch;
 
 import std;
 
@@ -37,7 +37,7 @@ void handle_contract_violation(const std::contracts::contract_violation& a_viola
   const auto assertion_kind = assertion_kind_string(a_violation.kind());
   const auto evaluation_semantic = evaluation_semantic_string(a_violation.semantic());
   const auto detection_mode = detection_mode_string(a_violation.detection_mode());
-  if constexpr (mwc::diagnostic::default_logging()) {
+  if constexpr (mwc::diagnostic::logging_subsystem_switch()) {
     mwc::critical(std::format("contract violation: {0}\nassertion kind: {1}\nevaluation semantic: {2}\ndetection mode: {3}\n",
                               a_violation.comment(),
                               assertion_kind,
@@ -45,6 +45,6 @@ void handle_contract_violation(const std::contracts::contract_violation& a_viola
                               detection_mode),
                   a_violation.location());
 
-    mwc::diagnostic::log::finalize_default_log();
+    mwc::diagnostic::log::s_logging_subsystem.finalize();
   }
 }

@@ -73,6 +73,8 @@ namespace mwc {
         log_ct(const span_t<sink_st> a_sinks = {}, const configuration_st& a_cfg = configuration_st::default_configuration());
         log_ct(const log_ct&) = delete("move only type");
         auto operator=(const log_ct&) -> log_ct& = delete("move only type");
+        log_ct(log_ct&&) noexcept = default;
+        auto operator=(log_ct&&) noexcept -> log_ct& = default;
 
         template <typename tp_this>
         auto storage(this tp_this&& a_this) -> decltype(auto);

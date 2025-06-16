@@ -11,9 +11,9 @@ namespace mwc::diagnostic::log {
   }
   auto sink_st::print(const string_view_t a_message) const -> void {
     switch (m_type) {
-      case sink_et::e_ostream : std::print(*static_cast<ostream_ptr_t>(m_sink_ptr), "{0}", a_message); break;
-      case sink_et::e_string : static_cast<string_ptr_t>(m_sink_ptr)->append(a_message); break;
-      case sink_et::e_file : std::print(static_cast<file_ptr_t>(m_sink_ptr), "{0}", a_message); break;
+      case sink_et::e_ostream : std::println(*static_cast<ostream_ptr_t>(m_sink_ptr), "{0}", a_message); break;
+      case sink_et::e_string : static_cast<string_ptr_t>(m_sink_ptr)->append(a_message).append("\n"); break;
+      case sink_et::e_file : std::println(static_cast<file_ptr_t>(m_sink_ptr), "{0}", a_message); break;
     }
   }
   log_ct::log_ct(const span_t<sink_st> a_sinks, const configuration_st& a_cfg)
@@ -37,14 +37,14 @@ namespace mwc::diagnostic::log {
     // form an estimate on how large prefixed data is in terms of character length
     // this can be used later when reserving storage for the fully formed string
     // thus avoiding unnecessary heap allocations and reallocations
-    constexpr auto prefix_length = string_view_t {"[1993-01-22 - 03:40:00] event_severity_level thread 00000000 "
+    constexpr auto prefix_length = string_view_t {"[1993-01-22 - 03:40:00] event_severity_level thread 0000000000 "
                                                   "directory/directory/directory/some_file_name.cpp clever_function_name 96:81"}
                                      .length();
 
     using timestamp_precision_t = std::chrono::seconds;
 
     // data
-    const auto time = std::chrono::floor<timestamp_precision_t>(std::chrono::system_clock::now());
+    const auto time = std::chrono::floor<timestamp_precision_t>(chrono::current_time<chrono::system_clock_t>());
     const auto thread_id = std::this_thread::get_id();
 
     for (const auto& sink : m_storage) {
@@ -79,7 +79,7 @@ namespace mwc::diagnostic::log {
           std::format_to(std::back_inserter(buffer), "[thread{2}{0}]{1}", thread_id, prefix_delimiter, prefix_punctuator);
         // source location
         if (configuration.m_bit_mask bitand std::to_underlying(e_print_source_location))
-          std::format_to(std::back_inserter(buffer), "[source{5}{0} at: {1}{4}{2}{5}{3}]", a_source_location.file_name(),
+          std::format_to(std::back_inserter(buffer), "[source{5}{4}{0} at: {1}{4}{2}{5}{3}]", a_source_location.file_name(),
                          a_source_location.function_name(), a_source_location.line(), a_source_location.column(),
                          prefix_delimiter, prefix_punctuator);
         // stacktrace
