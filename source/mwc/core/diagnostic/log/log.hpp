@@ -6,6 +6,7 @@ import mwc_contract_assertion;
 import mwc_concept;
 import mwc_set_bit;
 import mwc_bit_mask;
+import mwc_chrono;
 import mwc_enum_bitwise_operators;
 import mwc_observer_ptr;
 
@@ -29,7 +30,7 @@ namespace mwc {
       // configuration for individual sinks and the logger
       struct configuration_st {
         // default severity level to which sinks and logs subscribe to
-        static constexpr auto s_default_severity_level = event_severity_et::e_information;
+        static constexpr auto default_severity_level = event_severity_et::e_information;
 
         // note: add support for stacktrace printing once clang implements <stacktrace>
         enum class bit_flags_et : uint8_t {
@@ -52,7 +53,7 @@ namespace mwc {
         enum class sink_et : uint8_t { e_ostream, e_string, e_file };
 
         constexpr sink_st(const sink_c auto a_sink,
-                          optional_t<event_severity_et> a_event_severity = configuration_st::s_default_severity_level,
+                          optional_t<event_severity_et> a_event_severity = configuration_st::default_severity_level,
                           optional_t<configuration_st> a_cfg = configuration_st::default_configuration()) pre(a_sink != nullptr)
           pre(a_event_severity != event_severity_et::end);
         constexpr auto operator==(const sink_st& a_other) const -> bool;

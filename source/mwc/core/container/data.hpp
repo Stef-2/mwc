@@ -35,7 +35,7 @@ namespace mwc {
     constexpr auto end() const pre(m_size != 0)
       post(r : r != nullptr and r != begin());
 
-    static constexpr size_t s_extent = tp_size;
+    static constexpr size_t extent = tp_size;
     observer_ptr_t<tp> m_data;
     size_t m_size;
   };

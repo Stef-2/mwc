@@ -1,7 +1,5 @@
 #include "mwc/core/diagnostic/log/log.hpp"
 
-import mwc_chrono;
-
 namespace mwc::diagnostic::log {
   constexpr auto sink_st::operator==(const sink_st& a_other) const -> bool {
     return m_sink_ptr == a_other.m_sink_ptr;
@@ -44,7 +42,7 @@ namespace mwc::diagnostic::log {
     using timestamp_precision_t = std::chrono::seconds;
 
     // data
-    const auto time = std::chrono::floor<timestamp_precision_t>(chrono::current_time<chrono::system_clock_t>());
+    const auto time = std::chrono::floor<timestamp_precision_t>(chrono::current_time<system_clock_t>());
     const auto thread_id = std::this_thread::get_id();
 
     for (const auto& sink : m_storage) {

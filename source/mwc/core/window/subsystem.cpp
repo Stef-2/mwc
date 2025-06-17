@@ -2,16 +2,16 @@
 
 namespace mwc {
   auto window_subsystem_st::initialize() -> void {
-    information("initializing window subsystem");
+    information(std::format("initializing {0}", m_name));
     const auto vkfw_initialization = vkfw::init();
     contract_assert(vkfw::check(vkfw_initialization));
-    information("window subsystem initialized");
+    information(std::format("{0} initialized", m_name));
     m_initialized = true;
   }
   auto window_subsystem_st::finalize() -> void {
-    information("finalizing window subsystem");
+    information(std::format("finalizing {0}", m_name));
     std::ignore = vkfw::terminate();
-    information("window subsystem finalized");
+    information(std::format("{0} finalized", m_name));
     m_initialized = false;
   }
 }

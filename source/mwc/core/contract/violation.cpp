@@ -45,6 +45,6 @@ void handle_contract_violation(const std::contracts::contract_violation& a_viola
                               detection_mode),
                   a_violation.location());
 
-    mwc::diagnostic::log::s_logging_subsystem.finalize();
+    mwc::diagnostic::log::global::logging_subsystem.finalize();
   }
 }

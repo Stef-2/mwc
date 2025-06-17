@@ -18,7 +18,7 @@ export namespace mwc {
   struct enum_map_st {
     using enum_t = decltype(tp_enumerator);
 
-    static constexpr auto s_enumerator = tp_enumerator;
+    static constexpr auto enumerator = tp_enumerator;
     using value_t = tp;
   };
 }

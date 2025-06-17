@@ -4,8 +4,8 @@ namespace mwc {
   namespace diagnostic {
     namespace log {
       auto log_subsystem_st::initialize() -> void {
-        std::println("initializing logging subsystem");
-        std::println("redirecting diagnostics to the standard output until the logging subsystem is initialized");
+        std::println("initializing {0}", m_name);
+        std::println("redirecting diagnostics to the standard output until the {0} is initialized", m_name);
         using enum configuration_st::bit_flags_et;
         constexpr auto sink_count = 5;
         // initialize log files
@@ -14,7 +14,7 @@ namespace mwc {
         auto sinks = array_t<sink_st, sink_count> {file_ptr_t {nullptr}, file_ptr_t {nullptr}, file_ptr_t {nullptr},
                                                    file_ptr_t {nullptr}, ostream_ptr_t {nullptr}};
 
-        std::println("generating {0} sinks for the logging subsystem:", sink_count);
+        std::println("generating {0} sinks for the {1}:", sink_count, m_name);
         for (auto i = std::underlying_type_t<event_severity_et> {0}; i < std::to_underlying(event_severity_et::end); ++i) {
           const auto sink_path =
             (filepath_t {logging_subsystem_directory()} /= event_severity_level_string(event_severity_et {i})) +=
@@ -36,7 +36,7 @@ namespace mwc {
         std::println("[{0}] {1} at address {2}", sink_count - 1, "standard log output", static_cast<void*>(&output::log_stream()));
 
         m_log = log_ct {sinks};
-        std::println("logging subsystem initialized");
+        std::println("{0} initialized", m_name);
         m_initialized = true;
       }
     }
@@ -44,22 +44,22 @@ namespace mwc {
   template <>
   auto information<true>(const string_view_t a_message, const std::source_location& a_source_location)
     -> void pre(contract::validate_storage(a_message)) {
-    diagnostic::log::s_logging_subsystem.m_log.information(a_message, a_source_location);
+    diagnostic::log::global::logging_subsystem.m_log.information(a_message, a_source_location);
   }
   template <>
   auto warning<true>(const string_view_t a_message, const std::source_location& a_source_location)
     -> void pre(contract::validate_storage(a_message)) {
-    diagnostic::log::s_logging_subsystem.m_log.warning(a_message, a_source_location);
+    diagnostic::log::global::logging_subsystem.m_log.warning(a_message, a_source_location);
   }
   template <>
   auto error<true>(const string_view_t a_message, const std::source_location& a_source_location)
     -> void pre(contract::validate_storage(a_message)) {
-    diagnostic::log::s_logging_subsystem.m_log.error(a_message, a_source_location);
+    diagnostic::log::global::logging_subsystem.m_log.error(a_message, a_source_location);
   }
   template <>
   auto critical<true>(const string_view_t a_message, const std::source_location& a_source_location)
     -> void pre(contract::validate_storage(a_message)) {
-    diagnostic::log::s_logging_subsystem.m_log.critical(a_message, a_source_location);
+    diagnostic::log::global::logging_subsystem.m_log.critical(a_message, a_source_location);
   }
 }
 
@@ -67,11 +67,11 @@ namespace mwc {
   namespace diagnostic {
     namespace log {
       auto log_subsystem_st::finalize() -> void {
-        information("finalizing logging subsystem");
+        information(std::format("finalizing {0}", m_name));
         for (const auto& sink : m_log.storage())
           if (sink.m_type == sink_st::sink_et::e_file)
             std::fclose(static_cast<file_ptr_t>(sink.m_sink_ptr));
-        information("logging subsystem finalized");
+        information(std::format("{0} finalized", m_name));
         m_initialized = false;
       }
     }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mwc/core/chrono/subsystem.hpp"
 #include "mwc/core/diagnostic/log/log.hpp"
 
 import mwc_logging_subsystem_switch;
@@ -8,6 +9,7 @@ import mwc_file_type;
 import mwc_output_stream;
 import mwc_contract_assertion;
 import mwc_empty_type;
+import mwc_chrono;
 import mwc_subsystem;
 
 import std;
@@ -26,7 +28,9 @@ namespace mwc {
         log_t m_log;
       };
 
-      inline auto s_logging_subsystem = log_subsystem_st {{&s_root_subsystem}, string_view_t {"log subsystem"}};
+      namespace global {
+        inline auto logging_subsystem = log_subsystem_st {{&chrono::global::chrono_subsystem}, string_view_t {"log subsystem"}};
+      }
     }
   }
   // globally available logging functions

@@ -41,6 +41,15 @@ export namespace mwc {
   using iostream_t = std::iostream;
   using file_t = std::FILE;
 
+  // chrono types
+  using high_resolution_clock_t = std::chrono::high_resolution_clock;
+  using system_clock_t = std::chrono::system_clock;
+  using time_point_t = std::chrono::time_point<high_resolution_clock_t>;
+  using precision_t = std::nano;
+  using integral_duration_t = std::chrono::duration<uint64_t, precision_t>;
+  using floating_duration_t = std::chrono::duration<float64_t, precision_t>;
+  using default_duration_t = std::chrono::nanoseconds;
+
   // container types
   template <typename tp, size_t tp_count>
   using array_t = std::array<tp, tp_count>;
@@ -60,13 +69,9 @@ export namespace mwc {
             typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
   using map_t = std::map<tp_key, tp_value, tp_compare, tp_allocator>;
   template <typename tp_key, typename tp_value, typename tp_hash = std::hash<tp_key>,
-            typename tp_key_equal = std::equal_to<tp_key>,
-            typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
-  using unordered_map_t =
-    std::unordered_map<tp_key, tp_value, tp_hash, tp_key_equal, tp_allocator>;
+            typename tp_key_equal = std::equal_to<tp_key>, typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
+  using unordered_map_t = std::unordered_map<tp_key, tp_value, tp_hash, tp_key_equal, tp_allocator>;
   template <typename tp_key, typename tp_value, typename tp_hash = std::hash<tp_key>,
-            typename tp_key_equal = std::equal_to<tp_key>,
-            typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
-  using unordered_multimap_t =
-    std::unordered_multimap<tp_key, tp_value, tp_hash, tp_key_equal, tp_allocator>;
+            typename tp_key_equal = std::equal_to<tp_key>, typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
+  using unordered_multimap_t = std::unordered_multimap<tp_key, tp_value, tp_hash, tp_key_equal, tp_allocator>;
 }
