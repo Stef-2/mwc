@@ -1,12 +1,5 @@
 module;
-//#pragma once
 
-//#include "mwc/core/contract/assertion.hpp"
-//#include "mwc/core/definition/definition.hpp"
-
-
-//#include <type_traits>
-//#include <algorithm>
 export module mwc_static_unordered_bi_map;
 
 import mwc_definition;
@@ -28,13 +21,13 @@ export namespace mwc {
     using storage_t = array_t<kv_pair_t, tp_size>;
 
     constexpr static_unordered_bi_map_st(const span_t<kv_pair_t, tp_size> a_span)
-      /*pre(contract::validate_storage(a_span))*/
+    /*pre(contract::validate_storage(a_span))*/
     : m_storage {} {
       std::ranges::copy(a_span, m_storage.begin());
     }
 
     //template <typename tp>
-    [[nodiscard]] constexpr auto operator[](/*this tp&& a_this, */const auto a_value)
+    [[nodiscard]] constexpr auto operator[](/*this tp&& a_this, */ const auto a_value)
       -> decltype(auto) /*pre(m_storage.size() != 0)*/
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>;
 
@@ -48,20 +41,18 @@ export namespace mwc {
 
   // implementation
   template <typename tp_key, typename tp_value, size_t tp_size>
-  [[nodiscard]] constexpr auto
-  static_unordered_bi_map_st<tp_key, tp_value, tp_size>::operator[](
+  [[nodiscard]] constexpr auto static_unordered_bi_map_st<tp_key, tp_value, tp_size>::operator[](
     /*this auto&& a_this,*/
     const auto a_value) -> decltype(auto)
-    requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>
-  {
+    requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t> {
     if constexpr (std::is_same_v<decltype(a_value), const_key_t>) {
-      for (const auto& kv_pair : /*a_this.*/m_storage)
+      for (const auto& kv_pair : /*a_this.*/ m_storage)
         if (kv_pair.first == a_value)
           return kv_pair.second;
     }
 
     if constexpr (std::is_same_v<decltype(a_value), const_value_t>) {
-      for (const auto& kv_pair : /*a_this.*/m_storage)
+      for (const auto& kv_pair : /*a_this.*/ m_storage)
         if (kv_pair.second == a_value)
           return kv_pair.first;
     }

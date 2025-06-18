@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mwc/core/utility/version.hpp"
 #include "mwc/core/window/window.hpp"
 
 namespace mwc {
@@ -7,6 +8,8 @@ namespace mwc {
     public:
     struct configuration_st {
       static constexpr auto default_configuration() -> const configuration_st;
+
+      semantic_version m_version;
       window_ct::configuration_st m_window_configuration;
     };
     mwc_ct(const configuration_st& a_configuration = configuration_st::default_configuration());
@@ -22,6 +25,6 @@ namespace mwc {
 
   // implementation
   constexpr auto mwc_ct::configuration_st::default_configuration() -> const configuration_st {
-    return configuration_st {window_ct::configuration_st::default_configuration()};
+    return configuration_st {{0, 3, 2}, window_ct::configuration_st::default_configuration()};
   }
 }

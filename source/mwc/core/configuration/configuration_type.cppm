@@ -1,7 +1,5 @@
 module;
 
-//#include "mwc/core/definition/definition.cppm"
-
 export module mwc_configuration_type;
 
 import mwc_definition;

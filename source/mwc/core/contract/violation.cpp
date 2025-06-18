@@ -1,4 +1,4 @@
-#include <mwc/core/diagnostic/log/subsystem.hpp>
+#include "mwc/core/diagnostic/log/subsystem.hpp"
 
 #include <contracts>
 

@@ -10,7 +10,6 @@ import std;
 
 int main() {
   mwc::initialize_subsystems();
-  //vkfw::init();
   mwc::mwc_ct mwc {};
   while (true)
     ;
