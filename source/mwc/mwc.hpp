@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mwc/core/utility/version.hpp"
-#include "mwc/core/window/window.hpp"
+#include "mwc/window/window.hpp"
 
 namespace mwc {
   class mwc_ct {
@@ -21,6 +21,7 @@ namespace mwc {
 
     private:
     window_ct m_window;
+    configuration_st m_configuration;
   };
 
   // implementation

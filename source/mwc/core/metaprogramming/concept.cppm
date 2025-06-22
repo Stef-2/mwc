@@ -10,10 +10,23 @@ export namespace mwc {
     template <typename tp>
     concept enumerator_c = std::is_enum_v<tp> or std::is_scoped_enum_v<tp>;
 
-    // concept modeling boolean or boolean-convertible types
+    // concept modeling enumerator types with a terminating [end] value
     template <typename tp>
-    concept boolean_c =
-      std::is_same_v<tp, bool> or std::is_convertible_v<tp, bool>;
+    concept end_terminated_enum_c = enumerator_c<tp> and requires { tp::end; };
+
+    // concept modeling [end] terminated enumerator types with strictly and steadily increasing monotonic values
+    template <typename tp>
+    concept steady_monotonic_enum_c =
+      end_terminated_enum_c<tp> and requires {
+                                      std::invoke([] {
+                                        for (auto i = std::underlying_type_t<tp> {0}; i < std::to_underlying(tp::end); ++i)
+                                          [[maybe_unused]]
+                                          const auto enumerator = tp {i};
+                                      });
+                                    };
+    // concept modeling boolean or boolean convertible types
+    template <typename tp>
+    concept boolean_c = std::is_same_v<tp, bool> or std::is_convertible_v<tp, bool>;
 
     // concept modeling a predicate that asserts that [tp] must be one of the [tps]
     template <typename tp, typename... tps>

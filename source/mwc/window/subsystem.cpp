@@ -1,4 +1,4 @@
-#include "mwc/core/window/subsystem.hpp"
+#include "mwc/window/subsystem.hpp"
 
 namespace mwc {
   auto window_subsystem_st::initialize() -> void {

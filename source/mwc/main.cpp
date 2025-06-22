@@ -1,5 +1,4 @@
 #include "mwc/core/diagnostic/log/subsystem.hpp"
-#include "mwc/core/window/window.hpp"
 #include "mwc/mwc.hpp"
 
 import mwc_subsystem;

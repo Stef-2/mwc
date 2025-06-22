@@ -19,9 +19,9 @@ namespace mwc {
       pre(std::max({a_major, a_minor, a_patch}) > 0)
         pre(std::min({a_major, a_minor, a_patch}) <= std::numeric_limits<version_t>::max());
 
-    [[nodiscard]] auto major() const -> const version_t;
-    [[nodiscard]] auto minor() const -> const version_t;
-    [[nodiscard]] auto patch() const -> const version_t;
+    [[nodiscard]] auto major() const -> version_t;
+    [[nodiscard]] auto minor() const -> version_t;
+    [[nodiscard]] auto patch() const -> version_t;
 
     // explicit conversion to a human readable string format
     [[nodiscard]] explicit operator const string_t() const;

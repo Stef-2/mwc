@@ -57,6 +57,7 @@ namespace mwc {
   auto critical<true>(const string_view_t a_message, const std::source_location& a_source_location)
     -> void pre(contract::validate_storage(a_message)) {
     diagnostic::log::global::logging_subsystem.m_log.critical(a_message, a_source_location);
+    std::abort();
   }
 }
 

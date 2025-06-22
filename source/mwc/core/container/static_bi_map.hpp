@@ -1,6 +1,4 @@
-module;
-
-export module mwc_static_unordered_bi_map;
+#pragma once
 
 import mwc_definition;
 import mwc_contract_assertion;
@@ -8,7 +6,7 @@ import mwc_concept;
 
 import std;
 
-export namespace mwc {
+namespace mwc {
   // static storage unordered bidirectional map
   // suitable for use in constant evaluation contexts
   template <typename tp_key, typename tp_value, size_t tp_size>
@@ -20,15 +18,12 @@ export namespace mwc {
     using kv_pair_t = pair_t<key_t, value_t>;
     using storage_t = array_t<kv_pair_t, tp_size>;
 
-    constexpr static_unordered_bi_map_st(const span_t<kv_pair_t, tp_size> a_span)
-    /*pre(contract::validate_storage(a_span))*/
-    : m_storage {} {
-      std::ranges::copy(a_span, m_storage.begin());
+    constexpr static_unordered_bi_map_st(const span_t<kv_pair_t, tp_size> a_span) pre(contract::validate_storage(a_span));
+    constexpr static_unordered_bi_map_st(const initializer_list_t<kv_pair_t> a_initializer_list = {}) : m_storage {} {
+      std::ranges::copy(a_initializer_list, m_storage.begin());
     }
-
-    //template <typename tp>
-    [[nodiscard]] constexpr auto operator[](/*this tp&& a_this, */ const auto a_value)
-      -> decltype(auto) /*pre(m_storage.size() != 0)*/
+    template <typename tp>
+    [[nodiscard]] constexpr auto operator[](this tp&& a_this, const auto a_value) -> decltype(auto)
       requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>;
 
     storage_t m_storage;
@@ -41,22 +36,28 @@ export namespace mwc {
 
   // implementation
   template <typename tp_key, typename tp_value, size_t tp_size>
-  [[nodiscard]] constexpr auto static_unordered_bi_map_st<tp_key, tp_value, tp_size>::operator[](
-    /*this auto&& a_this,*/
-    const auto a_value) -> decltype(auto)
+  constexpr static_unordered_bi_map_st<tp_key, tp_value, tp_size>::static_unordered_bi_map_st(
+    const span_t<kv_pair_t, tp_size> a_span)
+  : m_storage {} {
+    std::ranges::copy(a_span, m_storage.begin());
+  }
+  template <typename tp_key, typename tp_value, size_t tp_size>
+  [[nodiscard]] constexpr auto
+  static_unordered_bi_map_st<tp_key, tp_value, tp_size>::operator[](this auto&& a_this, const auto a_value) -> decltype(auto)
     requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t> {
     if constexpr (std::is_same_v<decltype(a_value), const_key_t>) {
-      for (const auto& kv_pair : /*a_this.*/ m_storage)
+      for (const auto& kv_pair : a_this.m_storage)
         if (kv_pair.first == a_value)
           return kv_pair.second;
     }
 
     if constexpr (std::is_same_v<decltype(a_value), const_value_t>) {
-      for (const auto& kv_pair : /*a_this.*/ m_storage)
+      for (const auto& kv_pair : a_this.m_storage)
         if (kv_pair.second == a_value)
           return kv_pair.first;
     }
 
-    //contract_assert(false);
+    contract_assert(false);
+    std::unreachable();
   }
 }
