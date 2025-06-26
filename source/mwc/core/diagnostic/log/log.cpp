@@ -1,10 +1,10 @@
 #include "mwc/core/diagnostic/log/log.hpp"
 
 namespace mwc::diagnostic::log {
-  constexpr auto sink_st::operator==(const sink_st& a_other) const -> bool {
+  constexpr auto sink_st::operator==(const sink_st& a_other) const -> bool_t {
     return m_sink_ptr == a_other.m_sink_ptr;
   }
-  constexpr auto sink_st::operator==(const sink_c auto a_sink) const -> bool {
+  constexpr auto sink_st::operator==(const sink_c auto a_sink) const -> bool_t {
     return m_sink_ptr == a_sink;
   }
   auto sink_st::print(const string_view_t a_message) const -> void {
@@ -17,7 +17,7 @@ namespace mwc::diagnostic::log {
   log_ct::log_ct(const span_t<sink_st> a_sinks, const configuration_st& a_cfg)
   : m_storage {a_sinks.begin(), a_sinks.end()},
     m_configuration {a_cfg} {}
-  auto log_ct::configuration(this auto&& a_this) -> configuration_st& {
+  auto log_ct::configuration(this auto&& a_this) -> decltype(auto) {
     return a_this.m_configuration;
   }
   auto log_ct::insert_sink(const sink_st& a_sink) -> void {
@@ -84,7 +84,7 @@ namespace mwc::diagnostic::log {
         // note: add support for stacktrace printing once clang implements <stacktrace>
 
         // message
-        buffer.append("\n").append(a_message);
+        buffer.append("\n\t").append(a_message);
         sink.print(buffer);
       }
     }

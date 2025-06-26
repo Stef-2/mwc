@@ -8,7 +8,7 @@ export namespace mwc {
   namespace diagnostic {
     // default logging enabled
     consteval auto logging_subsystem_switch() {
-      return bool {MWC_LOG};
+      return bool_t {MWC_LOG};
     }
 
     consteval auto logging_subsystem_directory() {

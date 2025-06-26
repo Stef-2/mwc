@@ -56,8 +56,8 @@ namespace mwc {
                           optional_t<event_severity_et> a_event_severity = configuration_st::default_severity_level,
                           optional_t<configuration_st> a_cfg = configuration_st::default_configuration()) pre(a_sink != nullptr)
           pre(a_event_severity != event_severity_et::end);
-        constexpr auto operator==(const sink_st& a_other) const -> bool;
-        constexpr auto operator==(const sink_c auto a_sink) const -> bool pre(a_sink != nullptr);
+        constexpr auto operator==(const sink_st& a_other) const -> bool_t;
+        constexpr auto operator==(const sink_c auto a_sink) const -> bool_t pre(a_sink != nullptr);
         auto print(const string_view_t a_string) const -> void;
 
         obs_ptr_t<void> m_sink_ptr;
@@ -79,7 +79,7 @@ namespace mwc {
 
         template <typename tp_this>
         auto storage(this tp_this&& a_this) -> decltype(auto);
-        auto configuration(this auto&& a_this) -> configuration_st&;
+        auto configuration(this auto&& a_this) -> decltype(auto);
         auto insert_sink(const sink_st& a_sink) -> void pre(a_sink.m_sink_ptr != nullptr);
         auto remove_sink(const sink_st& a_sink) -> void pre(not m_storage.empty());
         auto information(const string_view_t a_message,

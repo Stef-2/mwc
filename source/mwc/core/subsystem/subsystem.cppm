@@ -19,13 +19,13 @@ export namespace mwc {
 
     virtual auto initialize() -> void = 0;
     virtual auto finalize() -> void = 0;
-    auto depends_on(const subsystem_st& a_subsystem) -> bool;
+    auto depends_on(const subsystem_st& a_subsystem) -> bool_t;
 
     static inline auto subsystem_registry = vector_t<obs_ptr_t<subsystem_st>> {};
 
     vector_t<obs_ptr_t<subsystem_st>> m_dependencies;
     string_view_t m_name;
-    bool m_initialized;
+    bool_t m_initialized;
   };
 
   auto initialize_subsystems() -> void;

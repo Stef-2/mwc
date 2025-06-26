@@ -61,7 +61,7 @@ namespace mwc {
     for (value_index_t i = {}, key_count = {}; i < tp_value_count; ++i) {
       const auto& current = input_array[i];
 
-      const auto key_exists = [this, &current]() -> bool {
+      const auto key_exists = [this, &current]() -> bool_t {
         for (const auto& key : m_keys)
           if (key.m_key == current.first)
             return true;

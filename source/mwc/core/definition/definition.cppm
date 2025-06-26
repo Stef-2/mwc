@@ -32,6 +32,10 @@ export namespace mwc {
   using string_t = std::basic_string<char_t>;
   using string_view_t = std::basic_string_view<char_t>;
 
+  // utility types
+  using bool_t = bool;
+  using nullptr_t = std::nullptr_t;
+
   // path types
   using filepath_t = std::filesystem::path;
 

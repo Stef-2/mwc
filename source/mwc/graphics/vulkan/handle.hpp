@@ -1,0 +1,46 @@
+#pragma once
+
+import mwc_definition;
+
+import vulkan_hpp;
+
+import std;
+
+namespace mwc {
+  namespace graphics {
+    namespace vulkan {
+      template <typename tp_vulkan_handle>
+      class handle_ct {
+        public:
+        using handle_t = tp_vulkan_handle;
+
+        handle_ct(nullptr_t a_nullptr = nullptr);
+        handle_ct(tp_vulkan_handle&& a_handle) pre(*a_handle);
+        handle_ct(const handle_ct&) = delete("move only type");
+        auto operator=(const handle_ct&) -> handle_ct& = delete("move only type");
+
+        template <typename tp_this>
+        auto operator*(this tp_this&& a_this) -> decltype(auto);
+        template <typename tp_this>
+        auto operator->(this tp_this&& a_this) -> decltype(auto);
+
+        private:
+        handle_t m_vulkan_handle;
+      };
+
+      // implementation
+      template <typename tp_vulkan_handle>
+      handle_ct<tp_vulkan_handle>::handle_ct(nullptr_t a_nullptr) : m_vulkan_handle(std::forward<nullptr_t>(a_nullptr)) {}
+      template <typename tp_vulkan_handle>
+      handle_ct<tp_vulkan_handle>::handle_ct(tp_vulkan_handle&& a_handle) : m_vulkan_handle(std::move(a_handle)) {}
+      template <typename tp_vulkan_handle>
+      auto handle_ct<tp_vulkan_handle>::operator*(this auto&& a_this) -> decltype(auto) {
+        return a_this.m_vulkan_handle;
+      }
+      template <typename tp_vulkan_handle>
+      auto handle_ct<tp_vulkan_handle>::operator->(this auto&& a_this) -> decltype(auto) {
+        return &a_this.m_vulkan_handle;
+      }
+    }
+  }
+}

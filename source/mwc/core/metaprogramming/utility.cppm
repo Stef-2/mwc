@@ -8,11 +8,11 @@ import std;
 
 export namespace mwc {
   template <typename tp_specialization, template <typename...> typename tp>
-  constexpr inline bool specialization_of_v = std::false_type {};
+  constexpr inline bool_t specialization_of_v = std::false_type {};
 
   // assert that [tp_specialization] is a specialization of [tp]
   template <template <typename...> typename tp_specialization, typename... tp>
-  constexpr inline bool
+  constexpr inline bool_t
     specialization_of_v<tp_specialization<tp...>, tp_specialization> =
       std::true_type {};
 

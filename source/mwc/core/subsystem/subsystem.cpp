@@ -14,7 +14,7 @@ namespace mwc {
   subsystem_st::~subsystem_st() {
     std::erase(subsystem_registry, this);
   }
-  auto subsystem_st::depends_on(const subsystem_st& a_subsystem) -> bool {
+  auto subsystem_st::depends_on(const subsystem_st& a_subsystem) -> bool_t {
     auto dependency_found = false;
     auto search_for_dependency = [&dependency_found, &a_subsystem](this auto&& a_this,
                                                                    const span_t<subsystem_st*> a_dependencies) -> void {

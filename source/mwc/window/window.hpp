@@ -18,7 +18,7 @@ namespace mwc {
       resolution_st m_resolution;
       string_view_t m_title;
       vkfw::WindowHints m_window_hints;
-      bool m_full_screen;
+      bool_t m_full_screen;
     };
 
     window_ct(const configuration_st& a_configuration = configuration_st::default_configuration())
@@ -31,18 +31,19 @@ namespace mwc {
     auto title(const string_view_t a_title) -> void pre(contract::validate_storage(a_title));
     auto resolution() const -> resolution_st;
     auto aspect_ratio() const -> resolution_st::aspect_ratio_t;
-    auto full_screen() const -> bool;
-    auto full_screen(bool a_full_screen) -> void;
+    auto full_screen() const -> bool_t;
+    auto full_screen(bool_t a_full_screen) -> void;
     auto vkfw_monitor() const -> const vkfw::Monitor&;
     auto vkfw_window() const -> const vkfw::UniqueWindow&;
     template <typename tp_this>
-    auto configuration(this tp_this&& a_this) -> configuration_st&;
+    auto configuration(this tp_this&& a_this) -> decltype(auto);
 
     private:
     vkfw::Monitor m_monitor;
     vkfw::UniqueWindow m_window;
     configuration_st m_configuration;
   };
+
   // implementation
   constexpr auto window_ct::configuration_st::default_configuration() -> const configuration_st {
     return {{resolution_et::e_default_windowed},
@@ -58,7 +59,7 @@ namespace mwc {
             false};
   }
   template <typename tp_this>
-  auto window_ct::configuration(this tp_this&& a_this) -> configuration_st& {
+  auto window_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
     return a_this.m_configuration;
   }
 }

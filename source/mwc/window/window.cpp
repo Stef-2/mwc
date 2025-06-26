@@ -17,8 +17,8 @@ namespace mwc {
     })},
     m_window {std::invoke([&a_configuration, this] {
       const auto extent = a_configuration.m_full_screen ? "fullscreen" : "non fullscreen";
-      information(std::format("creating {0} window with resolution {1}px x{2}px", extent, a_configuration.m_resolution.m_width,
-                              a_configuration.m_resolution.m_height));
+      information(std::format("creating a {0} window with resolution {1}px x{2}px", extent,
+                              a_configuration.m_resolution.m_width, a_configuration.m_resolution.m_height));
       return vkfw::createWindowUnique(a_configuration.m_resolution.m_width, a_configuration.m_resolution.m_height,
                                       a_configuration.m_title.data(), a_configuration.m_window_hints,
                                       a_configuration.m_full_screen ? m_monitor : nullptr)
@@ -40,10 +40,10 @@ namespace mwc {
   auto window_ct::aspect_ratio() const -> resolution_st::aspect_ratio_t {
     return m_configuration.m_resolution.aspect_ratio();
   }
-  auto window_ct::full_screen() const -> bool {
+  auto window_ct::full_screen() const -> bool_t {
     return m_configuration.m_full_screen;
   }
-  auto window_ct::full_screen(bool a_full_screen) -> void {
+  auto window_ct::full_screen(bool_t a_full_screen) -> void {
     if (m_configuration.m_full_screen != a_full_screen) {
       const auto [work_area_offset_x, work_area_offset_y, work_area_size_x, work_area_size_y] = m_monitor.getWorkarea().value;
       const auto result = m_window->setMonitor(a_full_screen ? m_monitor : nullptr, work_area_offset_x, work_area_offset_y,

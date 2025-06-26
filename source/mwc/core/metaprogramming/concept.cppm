@@ -2,6 +2,8 @@ module;
 
 export module mwc_concept;
 
+import mwc_definition;
+
 import std;
 
 export namespace mwc {
@@ -26,7 +28,7 @@ export namespace mwc {
                                     };
     // concept modeling boolean or boolean convertible types
     template <typename tp>
-    concept boolean_c = std::is_same_v<tp, bool> or std::is_convertible_v<tp, bool>;
+    concept bool_tean_c = std::is_same_v<tp, bool_t> or std::is_convertible_v<tp, bool_t>;
 
     // concept modeling a predicate that asserts that [tp] must be one of the [tps]
     template <typename tp, typename... tps>

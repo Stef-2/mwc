@@ -9,7 +9,7 @@ import std;
 
 export namespace mwc {
   namespace contract {
-    constexpr bool validate_storage(const concepts::contiguous_storage_c auto& a_storage) {
+    constexpr bool_t validate_storage(const concepts::contiguous_storage_c auto& a_storage) {
       return a_storage.data() != nullptr and a_storage.size() > 0 and a_storage.size() < std::numeric_limits<size_t>::max();
     }
   }

@@ -2,7 +2,6 @@
 
 namespace mwc {
   namespace filesystem {
-
     auto file_subsystem_st::initialize() -> void {
       // discover and assign core directories
       constexpr auto core_directory_count = 3;
@@ -49,7 +48,8 @@ namespace mwc {
       buffer.reserve(directory_track_count * average_output_line_length);
       for (auto i = 0; const auto& [directory, path] : directory_map.m_storage) {
         contract_assert(std::filesystem::exists(path) and std::filesystem::is_directory(path));
-        std::format_to(std::back_inserter(buffer), "\n[{0}] {1}: {2}", i, directory_type_string(directory), path.string());
+        std::format_to(std::back_inserter(buffer), "\n[{0}] {1} directory: {2}", i, directory_type_string(directory),
+                       path.string());
         ++i;
       }
       information(std::format("discovered the following project directories:{0}", buffer));
