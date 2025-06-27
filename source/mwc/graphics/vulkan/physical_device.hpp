@@ -3,8 +3,6 @@
 #include "mwc/graphics/vulkan/handle.hpp"
 #include "mwc/graphics/vulkan/instance.hpp"
 
-#include "vulkan/vulkan_core.h"
-
 import mwc_definition;
 import mwc_static_string;
 import mwc_empty_type;
@@ -23,28 +21,6 @@ namespace mwc {
         using features_t = tp_features;
         static constexpr inline auto name = tp_name;
       };
-
-      template <typename... tp>
-      consteval auto build_tuple() {
-        tuple_t<vk::PhysicalDeviceProperties2> tup;
-        tuple_t<tp...> tup2;
-        /*using w = decltype(std::apply(
-          [&tup](auto... x) {
-            //static_assert(std::is_same_v<decltype(x), void>);
-            if constexpr ((not std::is_same_v<decltype(x)..., empty_st>))
-              return std::tuple_cat(decltype(tup) {}, std::tuple<decltype(x)...> {});
-            else
-              return;
-          },
-          tup2));*/
-        using w =
-          decltype(std::tuple_cat(tup, std::conditional_t<not std::is_same_v<tp, empty_st>, std::tuple<tp>, std::tuple<>> {}...));
-        static_assert(std::is_same_v<w, void>);
-        return w {};
-      }
-      using wtf_t = decltype(build_tuple<float, int, empty_st, char>());
-      static_assert(not std::is_same_v<wtf_t, void>);
-
       template <auto... tp>
       class physical_device_template_ct : public handle_ct<vk::raii::PhysicalDevice> {
         public:
@@ -52,11 +28,25 @@ namespace mwc {
           static constexpr auto default_configuration() -> configuration_st;
         };
         struct properties_st {
-          tuple_t<vk::PhysicalDeviceProperties2, typename decltype(tp)::properties_t...> m_properties;
+          // generate the properties tuple type from the passed template parameters
+          // prepend vk::PhysicalDeviceProperties2 and filter out any empty_st types
+          using properties_tuple_t =
+            decltype(std::tuple_cat(tuple_t<vk::PhysicalDeviceProperties2> {},
+                                    std::conditional_t<(not std::is_same_v<typename decltype(tp)::properties_t, empty_st>),
+                                                       std::tuple<typename decltype(tp)::properties_t>,
+                                                       std::tuple<>> {}...));
+          properties_tuple_t m_properties;
         };
 
         struct features_st {
-          tuple_t<vk::PhysicalDeviceProperties2, typename decltype(tp)::features_t...> m_features;
+          // generate the features tuple type from the passed template parameters
+          // prepend vk::PhysicalDeviceFeatures2 and filter out any empty_st types
+          using features_tuple_t =
+            decltype(std::tuple_cat(tuple_t<vk::PhysicalDeviceFeatures2> {},
+                                    std::conditional_t<(not std::is_same_v<typename decltype(tp)::features_t, empty_st>),
+                                                       std::tuple<typename decltype(tp)::features_t>,
+                                                       std::tuple<>> {}...));
+          features_tuple_t m_features;
         };
 
         physical_device_template_ct(const instance_ct& a_instance,
@@ -68,23 +58,24 @@ namespace mwc {
         configuration_st m_configuration;
       };
 
+      constexpr auto name = string_view_t {vk::KHRSwapchainExtensionName};
       // required logical device extensions
-      constexpr auto swapchain = logical_device_extension_st<empty_st, empty_st, VK_KHR_SWAPCHAIN_EXTENSION_NAME> {};
-      constexpr auto buffer_device_address = logical_device_extension_st<empty_st,
-                                                                         VkPhysicalDeviceBufferDeviceAddressFeaturesKHR,
-                                                                         VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME> {};
+      constexpr auto swapchain = logical_device_extension_st<empty_st, empty_st, {vk::KHRSwapchainExtensionName}> {};
+      constexpr auto buffer_device_address =
+        logical_device_extension_st<empty_st, vk::PhysicalDeviceBufferDeviceAddressFeatures, {vk::KHRBufferDeviceAddressExtensionName}> {};
       constexpr auto memory_budget =
-        logical_device_extension_st<vk::PhysicalDeviceMemoryBudgetPropertiesEXT, empty_st, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME> {};
+        logical_device_extension_st<vk::PhysicalDeviceMemoryBudgetPropertiesEXT, empty_st, {vk::EXTMemoryBudgetExtensionName}> {};
       constexpr auto memory_priority =
-        logical_device_extension_st<empty_st, vk::PhysicalDeviceMemoryPriorityFeaturesEXT, VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME> {};
+        logical_device_extension_st<empty_st, vk::PhysicalDeviceMemoryPriorityFeaturesEXT, {vk::EXTMemoryPriorityExtensionName}> {};
       constexpr auto dynamic_rendering =
-        logical_device_extension_st<empty_st, vk::PhysicalDeviceDynamicRenderingFeaturesKHR, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME> {};
+        logical_device_extension_st<empty_st, vk::PhysicalDeviceDynamicRenderingFeaturesKHR, {vk::KHRDynamicRenderingExtensionName}> {};
       constexpr auto shader_object = logical_device_extension_st<vk::PhysicalDeviceShaderObjectPropertiesEXT,
                                                                  vk::PhysicalDeviceShaderObjectFeaturesEXT,
-                                                                 VK_EXT_SHADER_OBJECT_EXTENSION_NAME> {};
+                                                                 {vk::EXTShaderObjectExtensionName}> {};
 
+      // physical device specialization
       using physical_device_ct =
-        physical_device_template_ct<swapchain, memory_budget, memory_priority, dynamic_rendering, shader_object>;
+        physical_device_template_ct<swapchain, buffer_device_address /*, memory_budget*/, memory_priority, dynamic_rendering, shader_object>;
 
       // implementation
       template <>

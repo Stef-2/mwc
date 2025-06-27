@@ -35,10 +35,20 @@ namespace mwc {
         })},
         m_properties {[this]<typename>() {
           const auto& vulkan_handle = static_cast<const vk::raii::PhysicalDevice&>(**this);
-          const auto& [... elements] = m_properties.m_properties;
-          vk::StructureChain<decltype(elements...[2])> asd;
-          return std::make_tuple(
-            vulkan_handle.getProperties2<vk::PhysicalDeviceProperties2, vk::PhysicalDeviceShaderObjectPropertiesEXT>());
+          auto [... elements] = this->m_properties.m_properties;
+          //vk::StructureChain<decltype(elements)...> asd;
+          //static_assert(sizeof...(elements) == 66);
+          //static_assert(std::tuple_size_v<decltype(m_properties.m_properties)> == 23);
+          tuple_t<vk::PhysicalDeviceProperties2, vk::PhysicalDevicePushDescriptorPropertiesKHR> tuptest;
+          //static_assert(std::is_same_v<decltype(m_properties.m_properties), decltype(tuptest)>);
+          auto [... tt] = tuptest;
+          //static_assert(not std::is_same_v<decltype(elements...[0]), decltype(tt...[0])>);
+          vk::StructureChain<decltype(tt)...> sc;
+          vk::StructureChain<decltype(elements)...> sc3;
+          auto [... omfg] = vulkan_handle.getProperties2<decltype(tt)...>();
+          //auto wtf = decltype(m_properties.m_properties) {};
+          //static_assert(std::is_same_v<void, decltype(omfg)>, "OMFG");
+          return decltype(m_properties.m_properties) {};
         }.template operator()<int>()},
         m_features {},
         m_configuration {a_configuration} {}

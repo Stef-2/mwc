@@ -13,7 +13,9 @@ export namespace mwc {
     constexpr static_string_st(const char_t (&a_string)[tp_count + 1]) : m_data {} {
       std::copy_n(a_string, tp_count + 1, std::data(m_data));
     }
-
+    constexpr static_string_st(const string_view_t a_string_view) : m_data {} {
+      std::copy_n(a_string_view.data(), tp_count + 1, std::data(m_data));
+    }
     [[nodiscard]] constexpr operator string_view_t() const {
       return {std::data(m_data), tp_count};
     }
