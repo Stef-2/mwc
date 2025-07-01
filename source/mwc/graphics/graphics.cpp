@@ -9,6 +9,7 @@ namespace mwc {
       m_context {a_engine_version},
       m_instance {m_context},
       m_physical_device {m_instance},
+      m_surface {m_window, m_instance, m_physical_device},
       m_configuration {a_configuration} {}
   }
 }

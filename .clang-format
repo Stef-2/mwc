@@ -3,6 +3,7 @@ ColumnLimit: 128
 AccessModifierOffset: 0
 UseTab: Never
 Standard: Latest
+SortIncludes: false
 SpacesInLineCommentPrefix:
   Minimum: 1
   Maximum: 1

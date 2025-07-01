@@ -6,6 +6,7 @@
 
 import mwc_definition;
 import mwc_project_name_string;
+import mwc_contract_assertion;
 
 import vulkan_hpp;
 
@@ -24,7 +25,11 @@ namespace mwc {
         };
 
         instance_ct(const context_st& a_context,
-                    const configuration_st& a_configuration = configuration_st::default_configuration());
+                    const configuration_st& a_configuration = configuration_st::default_configuration())
+          pre(not a_configuration.m_required_layers.empty() ? contract::validate_storage(a_configuration.m_required_layers) : true)
+            pre(not a_configuration.m_required_extensions.empty()
+                  ? contract::validate_storage(a_configuration.m_required_extensions)
+                  : true);
 
         private:
         configuration_st m_configuration;
@@ -32,9 +37,10 @@ namespace mwc {
 
       // implementation
       constexpr auto instance_ct::configuration_st::default_configuration() -> configuration_st {
-        static constexpr auto required_extensions = array_t {"VK_KHR_surface"};
+        static constexpr auto required_extensions =
+          array_t {vk::KHRGetSurfaceCapabilities2ExtensionName, vk::EXTSurfaceMaintenance1ExtensionName};
 
-        return configuration_st {{}, {required_extensions}};
+        return configuration_st {{}, required_extensions};
       }
     }
   }

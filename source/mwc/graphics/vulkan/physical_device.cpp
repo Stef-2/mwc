@@ -5,8 +5,7 @@
 namespace mwc {
   namespace graphics {
     namespace vulkan {
-      template <>
-      physical_device_ct::physical_device_template_ct(const instance_ct& a_instance, const configuration_st& a_configuration)
+      physical_device_ct::physical_device_ct(const instance_ct& a_instance, const configuration_st& a_configuration)
       : handle_ct {std::invoke([&a_instance] {
           information("enumerating available physical devices");
           const auto physical_devices = a_instance->enumeratePhysicalDevices();
@@ -33,24 +32,21 @@ namespace mwc {
                                   string_t {semantic_version_st {physical_device_properties.apiVersion}}));
           return physical_devices[physical_device_index];
         })},
-        m_properties {[this]<typename>() {
-          const auto& vulkan_handle = static_cast<const vk::raii::PhysicalDevice&>(**this);
-          auto [... elements] = this->m_properties.m_properties;
-          //vk::StructureChain<decltype(elements)...> asd;
-          //static_assert(sizeof...(elements) == 66);
-          //static_assert(std::tuple_size_v<decltype(m_properties.m_properties)> == 23);
-          tuple_t<vk::PhysicalDeviceProperties2, vk::PhysicalDevicePushDescriptorPropertiesKHR> tuptest;
-          //static_assert(std::is_same_v<decltype(m_properties.m_properties), decltype(tuptest)>);
-          auto [... tt] = tuptest;
-          //static_assert(not std::is_same_v<decltype(elements...[0]), decltype(tt...[0])>);
-          vk::StructureChain<decltype(tt)...> sc;
-          vk::StructureChain<decltype(elements)...> sc3;
-          auto [... omfg] = vulkan_handle.getProperties2<decltype(tt)...>();
-          //auto wtf = decltype(m_properties.m_properties) {};
-          //static_assert(std::is_same_v<void, decltype(omfg)>, "OMFG");
-          return decltype(m_properties.m_properties) {};
-        }.template operator()<int>()},
-        m_features {},
+        m_properties {std::invoke([this](this auto&& a_this) -> properties_st {
+          // structure chain type deduction
+          [[maybe_unused]] auto& [... default_properties_pack] = m_properties.m_default_properties_chain;
+          [[maybe_unused]] auto& [... memory_properties_pack] = m_properties.m_memory_properties_chain;
+
+          return properties_st {(*this)->getProperties2<decltype(default_properties_pack)...>(),
+                                (*this)->getMemoryProperties2<decltype(memory_properties_pack)...>(),
+                                (*this)->getQueueFamilyProperties2<properties_st::queue_family_chain_t>()};
+        })},
+        m_features {std::invoke([this](this auto&& a_this) -> features_st {
+          // structure chain type deduction
+          [[maybe_unused]] auto& [... default_features_pack] = m_features.m_default_features_chain;
+
+          return features_st {(*this)->getFeatures2<decltype(default_features_pack)...>()};
+        })},
         m_configuration {a_configuration} {}
     }
   }

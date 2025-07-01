@@ -1,11 +1,13 @@
 #include "mwc/graphics/vulkan/instance.hpp"
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 
+import vkfw;
+
 namespace mwc {
   namespace graphics {
     namespace vulkan {
       instance_ct::instance_ct(const context_st& a_context, const configuration_st& a_configuration)
-      : handle_ct {std::invoke([&a_context, &a_configuration] {
+      : handle_ct {std::invoke([&a_context, &a_configuration] -> handle_ct::handle_t {
           auto buffer = string_t {};
 
           std::format_to(std::back_inserter(buffer),
@@ -18,10 +20,18 @@ namespace mwc {
               std::format_to(std::back_inserter(buffer), "\n[{0}] {1}", i, layer);
           }
 
-          if (not a_configuration.m_required_extensions.empty()) {
-            std::format_to(std::back_inserter(buffer), "\nrequired extensions:");
-            for (auto i = 0; const auto& extension : a_configuration.m_required_extensions)
-              std::format_to(std::back_inserter(buffer), "\n[{0}] {1}", i, extension);
+          // combine the requested extensions with the ones required by the window system integration
+          const auto wsi_extensions = vkfw::getRequiredInstanceExtensions();
+          auto combined_extensions = vector_t<const char_t*> {};
+          combined_extensions.reserve(wsi_extensions.size() + a_configuration.m_required_extensions.size());
+          std::format_to(std::back_inserter(buffer), "\nrequired extensions:");
+          for (const auto& wsi_extenison : wsi_extensions) {
+            std::format_to(std::back_inserter(buffer), "\n[{0}] {1}", combined_extensions.size(), wsi_extenison);
+            combined_extensions.emplace_back(wsi_extenison);
+          }
+          for (const auto& extension : a_configuration.m_required_extensions) {
+            std::format_to(std::back_inserter(buffer), "\n[{0}] {1}", combined_extensions.size(), extension);
+            combined_extensions.emplace_back(extension);
           }
 
           information(buffer);
@@ -30,12 +40,10 @@ namespace mwc {
           const auto& vulkan_api_version = a_context.m_vulkan_api_version.m_version;
           const auto application_info = vk::ApplicationInfo {project_name_string().data(), engine_version,
                                                              project_name_string().data(), engine_version, vulkan_api_version};
-          const auto instance_create_info =
-            vk::InstanceCreateInfo {vk::InstanceCreateFlags {}, &application_info, a_configuration.m_required_layers,
-                                    a_configuration.m_required_extensions};
+          const auto instance_create_info = vk::InstanceCreateInfo {vk::InstanceCreateFlags {}, &application_info,
+                                                                    a_configuration.m_required_layers, combined_extensions};
           return vk::raii::Instance {a_context.m_context, instance_create_info};
         })} {}
-
     }
   }
 }
