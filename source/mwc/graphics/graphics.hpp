@@ -1,10 +1,12 @@
 #pragma once
 
+#include "mwc/window/window.hpp"
 #include "mwc/graphics/vulkan/context.hpp"
 #include "mwc/graphics/vulkan/instance.hpp"
 #include "mwc/graphics/vulkan/physical_device.hpp"
 #include "mwc/graphics/vulkan/surface.hpp"
-#include "mwc/window/window.hpp"
+#include "mwc/graphics/vulkan/queue_families.hpp"
+#include "mwc/graphics/vulkan/logical_device.hpp"
 
 import mwc_definition;
 
@@ -28,6 +30,8 @@ namespace mwc {
       vulkan::instance_ct m_instance;
       vulkan::physical_device_ct m_physical_device;
       vulkan::surface_ct m_surface;
+      vulkan::queue_families_ct m_queue_families;
+      vulkan::logical_device_ct m_logical_device;
       configuration_st m_configuration;
     };
 

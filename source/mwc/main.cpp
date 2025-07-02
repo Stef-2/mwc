@@ -1,4 +1,3 @@
-#include "mwc/core/diagnostic/log/subsystem.hpp"
 #include "mwc/mwc.hpp"
 
 import mwc_subsystem;

@@ -14,7 +14,7 @@ namespace mwc {
         public:
         using handle_t = tp_vulkan_handle;
 
-        handle_ct(nullptr_t a_nullptr = nullptr);
+        handle_ct(const nullptr_t a_nullptr = nullptr);
         handle_ct(handle_t&& a_handle) /* pre(*a_handle)*/;
         handle_ct(const handle_ct&) = delete("move only type");
         auto operator=(const handle_ct&) -> handle_ct& = delete("move only type");
@@ -35,7 +35,8 @@ namespace mwc {
 
       // implementation
       template <typename tp_vulkan_handle>
-      handle_ct<tp_vulkan_handle>::handle_ct(nullptr_t a_nullptr) : m_vulkan_handle(std::forward<nullptr_t>(a_nullptr)) {}
+      handle_ct<tp_vulkan_handle>::handle_ct(const nullptr_t a_nullptr)
+      : m_vulkan_handle(std::forward<const nullptr_t>(a_nullptr)) {}
       template <typename tp_vulkan_handle>
       handle_ct<tp_vulkan_handle>::handle_ct(tp_vulkan_handle&& a_handle) : m_vulkan_handle(std::move(a_handle)) {}
       template <typename tp_vulkan_handle>

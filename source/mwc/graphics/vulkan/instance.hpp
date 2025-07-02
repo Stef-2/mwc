@@ -40,7 +40,7 @@ namespace mwc {
         static constexpr auto required_extensions =
           array_t {vk::KHRGetSurfaceCapabilities2ExtensionName, vk::EXTSurfaceMaintenance1ExtensionName};
 
-        return configuration_st {{}, required_extensions};
+        return configuration_st {.m_required_layers = {}, .m_required_extensions = required_extensions};
       }
     }
   }

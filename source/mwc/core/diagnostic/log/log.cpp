@@ -84,7 +84,7 @@ namespace mwc::diagnostic::log {
         // note: add support for stacktrace printing once clang implements <stacktrace>
 
         // message
-        buffer.append("\n\t").append(a_message);
+        buffer.append("\n").append(a_message);
         sink.print(buffer);
       }
     }

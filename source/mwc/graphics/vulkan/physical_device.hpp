@@ -45,6 +45,13 @@ namespace mwc {
         physical_device_ct(const instance_ct& a_instance,
                            const configuration_st& a_configuration = configuration_st::default_configuration());
 
+        template <typename tp>
+        auto properties(this tp&& a_this) -> decltype(auto);
+        template <typename tp>
+        auto features(this tp&& a_this) -> decltype(auto);
+        template <typename tp>
+        auto configuration(this tp&& a_this) -> decltype(auto);
+
         private:
         properties_st m_properties;
         features_st m_features;
@@ -54,6 +61,18 @@ namespace mwc {
       // implementation
       constexpr auto physical_device_ct::configuration_st::default_configuration() -> physical_device_ct::configuration_st {
         return configuration_st {};
+      }
+      template <typename tp>
+      auto physical_device_ct::properties(this tp&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_properties);
+      }
+      template <typename tp>
+      auto physical_device_ct::features(this tp&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_features);
+      }
+      template <typename tp>
+      auto physical_device_ct::configuration(this tp&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }

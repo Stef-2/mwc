@@ -33,6 +33,18 @@ namespace mwc {
             std::format_to(std::back_inserter(buffer), "\n[{0}] {1}", combined_extensions.size(), extension);
             combined_extensions.emplace_back(extension);
           }
+          // assert that the instance supports all of the required extensions
+          const auto available_extensions = vk::enumerateInstanceExtensionProperties();
+          for (const auto& required_extension : combined_extensions) {
+            auto required_extensions_supported = false;
+            for (const auto& available_extension : available_extensions)
+              if (std::strcmp(available_extension.extensionName, required_extension) == 0) {
+                required_extensions_supported = true;
+                break;
+              }
+            if (not required_extensions_supported)
+              error(std::format("required instance extension: [{0}] is not available", required_extension));
+          }
 
           information(buffer);
 
