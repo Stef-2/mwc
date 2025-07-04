@@ -87,8 +87,8 @@ namespace mwc {
                                   a_configuration.m_required_extensions,
                                   {/* features field is deprecated */},
                                   std::addressof(device_features.m_default_features_chain.get<vk::PhysicalDeviceFeatures2>())};
-
-          return handle_t {a_physical_device.unique_handle(), logical_device_create_info};
+          const auto logical_device = a_physical_device->createDevice(logical_device_create_info).value();
+          return handle_t {a_physical_device->createDevice(logical_device_create_info).value()};
         })},
         m_configuration {a_configuration} {}
     }

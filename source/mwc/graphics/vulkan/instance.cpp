@@ -34,7 +34,7 @@ namespace mwc {
             combined_extensions.emplace_back(extension);
           }
           // assert that the instance supports all of the required extensions
-          const auto available_extensions = vk::enumerateInstanceExtensionProperties();
+          const auto [_, available_extensions] = vk::enumerateInstanceExtensionProperties();
           for (const auto& required_extension : combined_extensions) {
             auto required_extensions_supported = false;
             for (const auto& available_extension : available_extensions)
@@ -54,7 +54,8 @@ namespace mwc {
                                                              project_name_string().data(), engine_version, vulkan_api_version};
           const auto instance_create_info = vk::InstanceCreateInfo {vk::InstanceCreateFlags {}, &application_info,
                                                                     a_configuration.m_required_layers, combined_extensions};
-          return vk::raii::Instance {a_context.m_context, instance_create_info};
+          const auto [result, instance] = vk::createInstance(instance_create_info);
+          return vk::raii::Instance {a_context.m_context, instance};
         })} {}
     }
   }

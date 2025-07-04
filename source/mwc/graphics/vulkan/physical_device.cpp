@@ -8,7 +8,7 @@ namespace mwc {
       physical_device_ct::physical_device_ct(const instance_ct& a_instance, const configuration_st& a_configuration)
       : handle_ct {std::invoke([&a_instance] {
           information("enumerating available physical devices");
-          const auto physical_devices = a_instance->enumeratePhysicalDevices();
+          const auto physical_devices = a_instance->enumeratePhysicalDevices().value();
           contract_assert(not physical_devices.empty());
 
           // attempt to find and select a discrete gpu

@@ -36,27 +36,50 @@ if (${MWC_LOG})
 endif ()
 
 # vulkan library
-add_library(vulkan)
-find_package(VulkanHeaders CONFIG REQUIRED)
-get_target_property(VULKAN_INCLUDE_DIR Vulkan::Headers INTERFACE_INCLUDE_DIRECTORIES)
-target_compile_definitions(vulkan PRIVATE
+add_library(VulkanHppModule)
+find_package(Vulkan REQUIRED)
+target_compile_definitions(VulkanHppModule PUBLIC
         VULKAN_HPP_NO_EXCEPTIONS
         VULKAN_HPP_ASSERT=contract_assert
         VULKAN_HPP_ASSERT_ON_RESULT=VULKAN_HPP_ASSERT
 )
-target_sources(vulkan PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${VULKAN_INCLUDE_DIR} FILES ${VULKAN_INCLUDE_DIR}/vulkan/vulkan.cppm)
+target_sources(VulkanHppModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${Vulkan_INCLUDE_DIR} FILES ${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm)
+target_compile_features(VulkanHppModule PUBLIC cxx_std_26)
+target_link_libraries(VulkanHppModule PUBLIC Vulkan::Vulkan)
 
 # vkfw library
-set(VKFW_BUILD_CXX_MODULE 1)
+add_library(vkfw_module)
 FetchContent_Declare(vkfw GIT_REPOSITORY https://github.com/Cvelth/vkfw GIT_TAG main)
 FetchContent_MakeAvailable(vkfw)
-target_compile_definitions(vkfw INTERFACE
+target_include_directories(vkfw_module PRIVATE ${vkfw_SOURCE_DIR}/include)
+target_sources(vkfw_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${vkfw_SOURCE_DIR} FILES ${vkfw_SOURCE_DIR}/include/vkfw/vkfw.cppm)
+target_compile_features(vkfw_module PUBLIC cxx_std_26)
+target_compile_definitions(vkfw_module PRIVATE
+        VKFW_ENABLE_VULKAN_HPP_MODULE
         VKFW_NO_EXCEPTIONS
         VKFW_NO_STRUCT_CONSTRUCTORS
         VKFW_ASSERT=contract_assert
         VKFW_ASSERT_ON_RESULT=VKFW_ASSERT
         assert=VKFW_ASSERT
 )
+target_link_libraries(vkfw_module PRIVATE VulkanHppModule)
+
+# vma library
+add_library(vma_module)
+FetchContent_Declare(vma GIT_REPOSITORY https://github.com/YaaZ/VulkanMemoryAllocator-Hpp)
+FetchContent_MakeAvailable(vma)
+target_include_directories(vma_module PRIVATE ${vma_SOURCE_DIR}/include)
+target_sources(vma_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${vma_SOURCE_DIR} FILES ${vma_SOURCE_DIR}/src/vk_mem_alloc.cppm)
+target_compile_features(vma_module PUBLIC cxx_std_26)
+target_compile_definitions(vma_module PRIVATE
+        VULKAN_HPP_STD_MODULE=std
+        VMA_ENABLE_VULKAN_HPP_MODULE
+        VULKAN_HPP_NO_EXCEPTIONS
+        VMA_ASSERT=contract_assert
+        VMA_ASSERT_ON_RESULT=VKFW_ASSERT
+        assert=VMA_ASSERT
+)
+target_link_libraries(vma_module PRIVATE VulkanHppModule)
 
 # project executable
 add_executable(${PROJECT_NAME})
@@ -76,8 +99,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 # project libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC
-        vulkan
-        vkfw-module
-)
-target_link_options(${PROJECT_NAME} PUBLIC
+        VulkanHppModule
+        glfw
+        vkfw_module
+        vma_module
 )
