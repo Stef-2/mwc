@@ -33,6 +33,11 @@ namespace mwc {
         surface_ct(const window_ct& a_window, const instance_ct& a_instance, const physical_device_ct& a_physical_device,
                    const configuration_st& a_configuration = configuration_st::default_configuration());
 
+        auto extent() const -> const extent_t&;
+        auto capabilities() const -> const capabilities_st&;
+        template <typename tp_this>
+        auto configuration(this tp_this&& a_this) -> decltype(auto);
+
         private:
         extent_t m_extent;
         capabilities_st m_capabilities;
@@ -43,6 +48,10 @@ namespace mwc {
       constexpr auto surface_ct::configuration_st::default_configuration() -> configuration_st {
         return configuration_st {vk::SurfaceFormat2KHR {{vk::Format::eB8G8R8A8Srgb, vk::ColorSpaceKHR::eSrgbNonlinear}},
                                  vk::PresentModeKHR::eImmediate};
+      }
+      template <typename tp_this>
+      auto surface_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }

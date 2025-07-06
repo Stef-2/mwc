@@ -40,6 +40,7 @@ add_library(VulkanHppModule)
 find_package(Vulkan REQUIRED)
 target_compile_definitions(VulkanHppModule PUBLIC
         VULKAN_HPP_NO_EXCEPTIONS
+        VULKAN_HPP_RAII_NO_EXCEPTIONS
         VULKAN_HPP_ASSERT=contract_assert
         VULKAN_HPP_ASSERT_ON_RESULT=VULKAN_HPP_ASSERT
 )

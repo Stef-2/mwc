@@ -17,7 +17,7 @@ namespace mwc {
     })},
     m_window {std::invoke([&a_configuration, this] {
       const auto extent = a_configuration.m_full_screen ? "fullscreen" : "non fullscreen";
-      information(std::format("creating a {0} window with resolution {1}px x{2}px", extent,
+      information(std::format("initializing {0} window with resolution {1}px x{2}px", extent,
                               a_configuration.m_resolution.m_width, a_configuration.m_resolution.m_height));
       return vkfw::createWindowUnique(a_configuration.m_resolution.m_width, a_configuration.m_resolution.m_height,
                                       a_configuration.m_title.data(), a_configuration.m_window_hints,

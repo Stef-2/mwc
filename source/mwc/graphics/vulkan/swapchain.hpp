@@ -1,0 +1,112 @@
+#pragma once
+
+#include "mwc/graphics/vulkan/handle.hpp"
+#include "mwc/graphics/vulkan/physical_device.hpp"
+#include "mwc/graphics/vulkan/logical_device.hpp"
+#include "mwc/graphics/vulkan/surface.hpp"
+#include "mwc/graphics/vulkan/queue_families.hpp"
+#include "mwc/graphics/vulkan/memory_allocator.hpp"
+#include "mwc/graphics/vulkan/image.hpp"
+
+import mwc_definition;
+
+import vulkan_hpp;
+
+import std;
+
+namespace mwc {
+  namespace graphics {
+    namespace vulkan {
+      class swapchain_ct : public handle_ct<vk::raii::SwapchainKHR> {
+        public:
+        using image_index_t = decltype(std::declval<handle_t>().acquireNextImage({}).second);
+        using image_timeout_t = uint64_t;
+
+        struct configuration_st {
+          static constexpr auto default_configuration() -> configuration_st;
+
+          struct attachment_operations_configuration_st {
+            vk::AttachmentLoadOp m_load_operation;
+            vk::AttachmentStoreOp m_store_operation;
+          };
+
+          struct color_attachment_configuration_st {
+            attachment_operations_configuration_st m_attachment_operations;
+            vk::ImageLayout m_layout;
+            vk::ClearColorValue m_clear_color;
+          };
+
+          struct depth_stencil_attachment_configuration_st {
+            attachment_operations_configuration_st m_attachment_operations;
+            vk::Format m_format;
+            vk::ImageLayout m_layout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+            vk::ClearDepthStencilValue m_clear_value;
+          };
+
+          color_attachment_configuration_st m_color_attachment_configuration;
+          depth_stencil_attachment_configuration_st m_depth_stencil_attachment_configuration;
+
+          image_index_t m_image_count;
+          vk::SharingMode m_sharing_mode = vk::SharingMode::eExclusive;
+          vk::SurfaceTransformFlagBitsKHR m_transform = vk::SurfaceTransformFlagBitsKHR::eIdentity;
+          vk::CompositeAlphaFlagBitsKHR m_alpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
+
+          image_timeout_t m_next_image_timeout = std::numeric_limits<image_timeout_t>::max();
+        };
+
+        swapchain_ct(const physical_device_ct& a_physical_device,
+                     const surface_ct& a_surface,
+                     const queue_families_ct& a_queue_families,
+                     const logical_device_ct& a_logical_device,
+                     const memory_allocator_ct& a_memory_allocator,
+                     const configuration_st& a_configuration = configuration_st::default_configuration());
+
+        private:
+        struct internal_frame_synchronization_data_st {
+          vk::raii::Fence m_render_finished_fence;
+          vk::raii::Semaphore m_image_acquired_semaphore;
+          vk::raii::Semaphore m_render_finished_semaphore;
+        };
+        struct internal_image_data_st {
+          internal_frame_synchronization_data_st m_frame_synchronization_data;
+          vk::raii::ImageView m_image_view;
+        };
+
+        const surface_ct& m_surface;
+
+        vector_t<internal_image_data_st> m_image_data;
+
+        // depth-stencil buffer
+        image_ct m_depth_stencil_buffer;
+        vk::raii::ImageView m_depth_stencil_view;
+
+        // dynamic rendering attachments
+        vk::RenderingAttachmentInfo m_color_attachment;
+        vk::RenderingAttachmentInfo m_depth_stencil_attachment;
+
+        configuration_st m_configuration;
+      };
+
+      // implementation
+      constexpr auto swapchain_ct::configuration_st::default_configuration() -> configuration_st {
+
+        return configuration_st {
+          .m_color_attachment_configuration = {.m_attachment_operations = {.m_load_operation = vk::AttachmentLoadOp::eClear,
+                                                                           .m_store_operation = vk::AttachmentStoreOp::eStore},
+                                               .m_layout = vk::ImageLayout::eAttachmentOptimal,
+                                               .m_clear_color = vk::ClearColorValue {float32_t {1.0}, 1.0, 1.0, 1.0}},
+          .m_depth_stencil_attachment_configuration = {.m_attachment_operations = {.m_load_operation = vk::AttachmentLoadOp::eClear,
+                                                                                   .m_store_operation =
+                                                                                     vk::AttachmentStoreOp::eDontCare},
+                                                       .m_format = vk::Format::eD24UnormS8Uint,
+                                                       .m_layout = vk::ImageLayout::eAttachmentOptimal,
+                                                       .m_clear_value = vk::ClearDepthStencilValue {1.0, 1u}},
+          .m_image_count = 2,
+          .m_sharing_mode = vk::SharingMode::eExclusive,
+          .m_transform = vk::SurfaceTransformFlagBitsKHR::eIdentity,
+          .m_alpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,
+          .m_next_image_timeout = std::numeric_limits<image_timeout_t>::max()};
+      }
+    }
+  }
+}

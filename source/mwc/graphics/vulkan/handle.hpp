@@ -45,7 +45,7 @@ namespace mwc {
       }
       template <typename tp_vulkan_handle>
       auto handle_ct<tp_vulkan_handle>::operator->(this auto&& a_this) -> decltype(auto) {
-        return &std::forward_like<decltype(a_this)>(a_this.m_vulkan_handle);
+        return std::addressof(std::forward_like<decltype(a_this)>(a_this.m_vulkan_handle));
       }
       template <typename tp_vulkan_handle>
       auto handle_ct<tp_vulkan_handle>::unique_handle(this auto&& a_this) -> decltype(auto) {

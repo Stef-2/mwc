@@ -19,7 +19,7 @@ namespace mwc {
       surface_ct::surface_ct(const window_ct& a_window, const instance_ct& a_instance,
                              const physical_device_ct& a_physical_device, const configuration_st& a_configuration)
       : handle_ct {std::invoke([&a_window, &a_instance] -> handle_ct::handle_t {
-          information(std::format("generating vulkan surface for window titled: {0}", a_window.title()));
+          information(std::format("initializing vulkan surface for window titled: {0}", a_window.title()));
           const auto surface = vkfw::createWindowSurface(a_instance.native_handle(), *a_window.vkfw_window());
 
           return handle_ct::handle_t {a_instance.unique_handle(), surface};
@@ -72,6 +72,12 @@ namespace mwc {
 
           return configuration;
         })} {}
+      auto surface_ct::extent() const -> const extent_t& {
+        return m_extent;
+      }
+      auto surface_ct::capabilities() const -> const capabilities_st& {
+        return m_capabilities;
+      }
     }
   }
 }

@@ -7,6 +7,8 @@
 #include "mwc/graphics/vulkan/surface.hpp"
 #include "mwc/graphics/vulkan/queue_families.hpp"
 #include "mwc/graphics/vulkan/logical_device.hpp"
+#include "mwc/graphics/vulkan/memory_allocator.hpp"
+#include "mwc/graphics/vulkan/swapchain.hpp"
 
 import mwc_definition;
 
@@ -32,6 +34,8 @@ namespace mwc {
       vulkan::surface_ct m_surface;
       vulkan::queue_families_ct m_queue_families;
       vulkan::logical_device_ct m_logical_device;
+      vulkan::memory_allocator_ct m_memory_allocator;
+      vulkan::swapchain_ct m_swapchain;
       configuration_st m_configuration;
     };
 

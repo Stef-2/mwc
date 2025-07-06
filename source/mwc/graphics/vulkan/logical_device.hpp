@@ -24,6 +24,9 @@ namespace mwc {
         logical_device_ct(const physical_device_ct& a_physical_device, const queue_families_ct& a_queue_families,
                           const configuration_st& a_configuration = configuration_st::default_configuration());
 
+        template <typename tp_this>
+        auto configuration(this tp_this&& a_this) -> decltype(auto);
+
         private:
         configuration_st m_configuration;
       };
@@ -36,6 +39,10 @@ namespace mwc {
           vk::KHRMaintenance7ExtensionName};
 
         return configuration_st {.m_required_extensions = required_extensions};
+      }
+      template <typename tp_this>
+      auto logical_device_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }

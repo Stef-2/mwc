@@ -11,7 +11,7 @@ namespace mwc {
           auto buffer = string_t {};
 
           std::format_to(std::back_inserter(buffer),
-                         "creating a vulkan instance:\nrequired version: {0}",
+                         "initializing vulkan instance:\nrequired version: {0}",
                          string_t {a_context.m_vulkan_api_version});
 
           if (not a_configuration.m_required_layers.empty()) {
