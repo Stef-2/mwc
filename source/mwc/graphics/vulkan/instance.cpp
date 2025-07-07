@@ -55,6 +55,7 @@ namespace mwc {
           const auto instance_create_info = vk::InstanceCreateInfo {vk::InstanceCreateFlags {}, &application_info,
                                                                     a_configuration.m_required_layers, combined_extensions};
           const auto [result, instance] = vk::createInstance(instance_create_info);
+
           return vk::raii::Instance {a_context.m_context, instance};
         })} {}
     }

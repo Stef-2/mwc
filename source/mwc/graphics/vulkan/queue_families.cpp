@@ -16,7 +16,7 @@ namespace mwc {
           return properties_st {a_physical_device->getQueueFamilyProperties2<properties_st::properties_chain_t>()};
         })},
         m_configuration {a_configuration} {
-        for (auto i = family_st::index_t {0}; const auto& queue_family_property : m_properties.m_family_properties) {
+        for (auto i = family_st::index_t {0}; const auto& queue_family_property : m_properties.m_properties) {
           const auto& queue_flags = queue_family_property.get<vk::QueueFamilyProperties2>().queueFamilyProperties.queueFlags;
           if (queue_flags bitand vk::QueueFlagBits::eGraphics)
             m_graphics.m_index = i;

@@ -14,6 +14,7 @@ namespace mwc {
       m_logical_device {m_physical_device, m_queue_families},
       m_memory_allocator {m_context, m_instance, m_physical_device, m_logical_device},
       m_swapchain {m_physical_device, m_surface, m_queue_families, m_logical_device, m_memory_allocator},
+      m_graphics_queue {m_logical_device, m_queue_families},
       m_configuration {a_configuration} {}
   }
 }

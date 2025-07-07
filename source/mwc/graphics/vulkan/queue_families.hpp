@@ -36,7 +36,7 @@ namespace mwc {
         struct properties_st {
           using properties_chain_t = vk::StructureChain<vk::QueueFamilyProperties2>;
 
-          vector_t<properties_chain_t> m_family_properties;
+          vector_t<properties_chain_t> m_properties;
         };
 
         queue_families_ct(const physical_device_ct& a_physical_device, const surface_ct& a_surface,
@@ -44,6 +44,8 @@ namespace mwc {
         queue_families_ct(const queue_families_ct&) = delete("move only type");
         auto operator=(const queue_families_ct&) -> queue_families_ct& = delete("move only type");
 
+        template <typename tp_this>
+        auto properties(this tp_this&& a_this) -> decltype(auto);
         template <typename tp_this>
         auto graphics(this tp_this&& a_this) -> decltype(auto);
         template <typename tp_this>
@@ -78,6 +80,10 @@ namespace mwc {
                                  .m_present = default_queue_family_priority,
                                  .m_compute = default_queue_family_priority,
                                  .m_transfer = default_queue_family_priority};
+      }
+      template <typename tp_this>
+      auto queue_families_ct::properties(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_properties);
       }
       template <typename tp_this>
       auto queue_families_ct::graphics(this tp_this&& a_this) -> decltype(auto) {
