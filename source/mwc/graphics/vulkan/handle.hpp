@@ -29,7 +29,7 @@ namespace mwc {
         template <typename tp_this>
         auto native_handle(this tp_this&& a_this) -> decltype(auto) pre(*a_this.m_vulkan_handle);
 
-        auto id() const -> uintptr_t;
+        auto handle_id() const -> uintptr_t;
 
         protected:
         handle_t m_vulkan_handle;
@@ -58,7 +58,7 @@ namespace mwc {
         return std::forward_like<decltype(a_this)>(*a_this.m_vulkan_handle);
       }
       template <typename tp_vulkan_handle>
-      auto handle_ct<tp_vulkan_handle>::id() const -> uintptr_t {
+      auto handle_ct<tp_vulkan_handle>::handle_id() const -> uintptr_t {
         return reinterpret_cast<uintptr_t>(static_cast<handle_t::CType>(*m_vulkan_handle));
       }
     }

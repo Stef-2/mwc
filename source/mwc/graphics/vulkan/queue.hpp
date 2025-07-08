@@ -32,10 +32,11 @@ namespace mwc {
         queue_ct(const logical_device_ct& a_logical_device, const queue_families_ct& a_queue_families,
                  const configuration_st& a_configuration = configuration_st::default_configuration());
 
+        auto command_pool() const -> const command_pool_ct&;
+        auto command_buffers() const -> const span_t<const vk::raii::CommandBuffer>;
+        auto queue_state() const -> queue_state_et;
         auto submit() -> void;
         auto submit_and_wait() -> void;
-
-        auto queue_state() const -> queue_state_et;
 
         protected:
         //auto clear() -> void;

@@ -46,14 +46,14 @@ namespace mwc {
           // bit to begin the iteration from
           constexpr auto allocator_begin_bit = std::to_underlying(vma::AllocatorCreateFlagBits::eExternallySynchronized) + 1;
 
-          auto buffer = string_t {"initializing vulkan memory allocator:\nutilizing extensions:"};
+          auto buffer = string_t {"initializing vulkan memory allocator:" SUB "utilizing extensions:"};
           for (auto i = decltype(allocator_flag_mask) {0}, e = allocator_begin_bit; e < allocator_flag_mask; e = e << 1) {
             // extract individual extension bits and convert them to their respective device extensions
             const auto bit_flag = vma::AllocatorCreateFlagBits {e};
             const auto extension_string = vma_extension_map(bit_flag);
             if (vk::isPromotedExtension(extension_string) or
                 std::ranges::contains(a_logical_device.configuration().m_required_extensions, extension_string)) {
-              std::format_to(std::back_inserter(buffer), "\n[{0}] {1}", i++, extension_string);
+              std::format_to(std::back_inserter(buffer), "" SUB "[{0}] {1}", i++, extension_string);
               allocator_extensions |= bit_flag;
             }
           }

@@ -1,5 +1,7 @@
 #pragma once
 
+#define SUB "\n\t↳"
+
 #include "mwc/core/chrono/subsystem.hpp"
 #include "mwc/core/diagnostic/log/log.hpp"
 

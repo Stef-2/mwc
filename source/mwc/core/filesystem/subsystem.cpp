@@ -21,7 +21,8 @@ namespace mwc {
       // current filesystem space usage
       const auto filesystem_space = std::filesystem::space(directory_map[directory_et::e_root]);
       constexpr auto bytes_in_gibibyte = 1024 * 1024 * 1024;
-      information(std::format("filesystem disk space usage:\ncapacity: {0} GiB\nfree: {1} GiB\navailable: {2} GiB",
+      information(std::format("filesystem disk space usage:" SUB "capacity: {0} GiB" SUB "free: {1} GiB" SUB
+                              "available: {2} GiB",
                               filesystem_space.capacity / bytes_in_gibibyte, filesystem_space.free / bytes_in_gibibyte,
                               filesystem_space.available / bytes_in_gibibyte));
 
@@ -48,7 +49,7 @@ namespace mwc {
       buffer.reserve(directory_track_count * average_output_line_length);
       for (auto i = 0; const auto& [directory, path] : directory_map.m_storage) {
         contract_assert(std::filesystem::exists(path) and std::filesystem::is_directory(path));
-        std::format_to(std::back_inserter(buffer), "\n[{0}] {1} directory: {2}", i, directory_type_string(directory),
+        std::format_to(std::back_inserter(buffer), "" SUB "[{0}] {1} directory: {2}", i, directory_type_string(directory),
                        path.string());
         ++i;
       }

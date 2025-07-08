@@ -11,26 +11,26 @@ namespace mwc {
           auto buffer = string_t {};
 
           std::format_to(std::back_inserter(buffer),
-                         "initializing vulkan instance:\nrequired version: {0}",
+                         "initializing vulkan instance:" SUB "required version: {0}",
                          string_t {a_context.m_vulkan_api_version});
 
           if (not a_configuration.m_required_layers.empty()) {
-            std::format_to(std::back_inserter(buffer), "\nrequired layers:");
+            std::format_to(std::back_inserter(buffer), "" SUB "required layers:");
             for (auto i = 0; const auto& layer : a_configuration.m_required_layers)
-              std::format_to(std::back_inserter(buffer), "\n[{0}] {1}", i, layer);
+              std::format_to(std::back_inserter(buffer), "" SUB "[{0}] {1}", i, layer);
           }
 
           // combine the requested extensions with the ones required by the window system integration
           const auto wsi_extensions = vkfw::getRequiredInstanceExtensions();
           auto combined_extensions = vector_t<const char_t*> {};
           combined_extensions.reserve(wsi_extensions.size() + a_configuration.m_required_extensions.size());
-          std::format_to(std::back_inserter(buffer), "\nrequired extensions:");
+          std::format_to(std::back_inserter(buffer), "" SUB "required extensions:");
           for (const auto& wsi_extenison : wsi_extensions) {
-            std::format_to(std::back_inserter(buffer), "\n[{0}] {1}", combined_extensions.size(), wsi_extenison);
+            std::format_to(std::back_inserter(buffer), "" SUB "[{0}] {1}", combined_extensions.size(), wsi_extenison);
             combined_extensions.emplace_back(wsi_extenison);
           }
           for (const auto& extension : a_configuration.m_required_extensions) {
-            std::format_to(std::back_inserter(buffer), "\n[{0}] {1}", combined_extensions.size(), extension);
+            std::format_to(std::back_inserter(buffer), "" SUB "[{0}] {1}", combined_extensions.size(), extension);
             combined_extensions.emplace_back(extension);
           }
           // assert that the instance supports all of the required extensions

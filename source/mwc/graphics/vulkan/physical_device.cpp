@@ -27,7 +27,7 @@ namespace mwc {
 
           const auto device_name =
             string_view_t {physical_device_properties.deviceName, std::strlen(physical_device_properties.deviceName)};
-          information(std::format("selecting physical device {0}\nvulkan api version: {1}",
+          information(std::format("selecting physical device {0}" SUB "vulkan api version: {1}",
                                   device_name,
                                   string_t {semantic_version_st {physical_device_properties.apiVersion}}));
           return physical_devices[physical_device_index];

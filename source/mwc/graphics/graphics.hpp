@@ -8,6 +8,7 @@
 #include "mwc/graphics/vulkan/queue_families.hpp"
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/graphics/vulkan/memory_allocator.hpp"
+#include "mwc/graphics/vulkan/frame_synchronizer.hpp"
 #include "mwc/graphics/vulkan/swapchain.hpp"
 #include "mwc/graphics/vulkan/queue.hpp"
 
@@ -23,9 +24,14 @@ namespace mwc {
       public:
       struct configuration_st {
         static constexpr auto default_configuration() -> const configuration_st;
+
+        uint32_t m_frames_in_flight;
       };
+
       graphics_ct(const window_ct& a_window, const semantic_version_st& a_engine_version,
                   const configuration_st& a_configuration = configuration_st::default_configuration());
+
+      auto render() -> void;
 
       private:
       const window_ct& m_window;
@@ -37,13 +43,14 @@ namespace mwc {
       vulkan::logical_device_ct m_logical_device;
       vulkan::memory_allocator_ct m_memory_allocator;
       vulkan::swapchain_ct m_swapchain;
+      vulkan::frame_synchornizer_st<> m_frame_synchornizer;
       vulkan::queue_ct m_graphics_queue;
       configuration_st m_configuration;
     };
 
     // implementation
     constexpr auto graphics_ct::configuration_st::default_configuration() -> const configuration_st {
-      return configuration_st {};
+      return configuration_st {.m_frames_in_flight = 2};
     }
   }
 }

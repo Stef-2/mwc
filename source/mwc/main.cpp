@@ -9,8 +9,10 @@ import std;
 int main() {
   mwc::initialize_subsystems();
   mwc::mwc_ct mwc {};
+
   while (true)
-    ;
+    mwc.m_graphics.render();
+
   mwc::finalize_subsystems();
   return 0;
 }

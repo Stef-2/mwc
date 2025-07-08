@@ -49,8 +49,9 @@ namespace mwc {
           // if not, use the first available one
           if (not std::ranges::contains(available_formats, a_configuration.m_surface_format)) {
             const auto& first_avilable_format = available_formats.front();
-            warning(std::format("generated vulkan surface does not support the requested surface format:\nformat: {0}\ncolor "
-                                "space: {1}\nselecting:\nformat: {2}\ncolor space: {3}",
+            warning(std::format("generated vulkan surface does not support the requested surface format:" SUB "format: {0}" SUB
+                                "color "
+                                "space: {1}" SUB "selecting:" SUB "format: {2}" SUB "color space: {3}",
                                 vk::to_string(a_configuration.m_surface_format.surfaceFormat.format),
                                 vk::to_string(a_configuration.m_surface_format.surfaceFormat.colorSpace),
                                 vk::to_string(first_avilable_format.surfaceFormat.format),
@@ -63,8 +64,8 @@ namespace mwc {
           const auto selected_present_mode =
             select_surface_present_mode(a_physical_device, *this, a_configuration.m_present_mode);
           if (selected_present_mode != a_configuration.m_present_mode) {
-            warning(std::format("generated vulkan surface does not support the requested surface present mode:\n"
-                                "{0}\nselecting:\n{1}",
+            warning(std::format("generated vulkan surface does not support the requested surface present mode:" SUB ""
+                                "{0}" SUB "selecting:" SUB "{1}",
                                 vk::to_string(a_configuration.m_present_mode),
                                 vk::to_string(selected_present_mode)));
           }

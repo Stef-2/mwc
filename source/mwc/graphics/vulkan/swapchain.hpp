@@ -22,6 +22,8 @@ namespace mwc {
         using image_index_t = decltype(std::declval<handle_t>().acquireNextImage({}).second);
         using image_timeout_t = uint64_t;
 
+        enum class layout_state_et { e_rendering, e_presentation };
+
         struct configuration_st {
           static constexpr auto default_configuration() -> configuration_st;
 
@@ -39,7 +41,7 @@ namespace mwc {
           struct depth_stencil_attachment_configuration_st {
             attachment_operations_configuration_st m_attachment_operations;
             vk::Format m_format;
-            vk::ImageLayout m_layout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+            vk::ImageLayout m_layout;
             vk::ClearDepthStencilValue m_clear_value;
           };
 
@@ -47,11 +49,17 @@ namespace mwc {
           depth_stencil_attachment_configuration_st m_depth_stencil_attachment_configuration;
 
           image_index_t m_image_count;
-          vk::SharingMode m_sharing_mode = vk::SharingMode::eExclusive;
-          vk::SurfaceTransformFlagBitsKHR m_transform = vk::SurfaceTransformFlagBitsKHR::eIdentity;
-          vk::CompositeAlphaFlagBitsKHR m_alpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
+          vk::SharingMode m_sharing_mode;
+          vk::SurfaceTransformFlagBitsKHR m_transform;
+          vk::CompositeAlphaFlagBitsKHR m_alpha;
 
-          image_timeout_t m_next_image_timeout = std::numeric_limits<image_timeout_t>::max();
+          image_timeout_t m_image_acquisition_timeout;
+        };
+
+        struct acquired_image_data_st {
+          vk::Result m_result;
+          image_index_t m_image_index;
+          vk::RenderingInfo m_rendering_information;
         };
 
         swapchain_ct(const physical_device_ct& a_physical_device,
@@ -61,20 +69,18 @@ namespace mwc {
                      const memory_allocator_ct& a_memory_allocator,
                      const configuration_st& a_configuration = configuration_st::default_configuration());
 
-        private:
-        struct internal_frame_synchronization_data_st {
-          vk::raii::Fence m_render_finished_fence;
-          vk::raii::Semaphore m_image_acquired_semaphore;
-          vk::raii::Semaphore m_render_finished_semaphore;
-        };
-        struct internal_image_data_st {
-          internal_frame_synchronization_data_st m_frame_synchronization_data;
-          vk::raii::ImageView m_image_view;
-        };
+        template <layout_state_et tp_state>
+        auto transition_layout(const vk::raii::CommandBuffer& a_command_buffer) const -> void;
+        auto acquire_next_image(const vk::raii::CommandBuffer& a_command_buffer,
+                                const vk::Semaphore a_semaphore_to_signal,
+                                const optional_t<const vk::Fence>
+                                  a_fence_to_signal) -> acquired_image_data_st;
 
+        private:
         const surface_ct& m_surface;
 
-        vector_t<internal_image_data_st> m_image_data;
+        vector_t<vk::raii::ImageView> m_image_views;
+        image_index_t m_current_image_index;
 
         // depth-stencil buffer
         image_ct m_depth_stencil_buffer;
@@ -105,7 +111,46 @@ namespace mwc {
           .m_sharing_mode = vk::SharingMode::eExclusive,
           .m_transform = vk::SurfaceTransformFlagBitsKHR::eIdentity,
           .m_alpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,
-          .m_next_image_timeout = std::numeric_limits<image_timeout_t>::max()};
+          .m_image_acquisition_timeout = std::numeric_limits<image_timeout_t>::max()};
+      }
+      template <swapchain_ct::layout_state_et tp_state>
+      auto swapchain_ct::transition_layout(const vk::raii::CommandBuffer& a_command_buffer) const -> void {
+        constexpr auto queue_ownership = uint32_t {0};
+
+        constexpr auto undefined_layout = vk::ImageLayout::eUndefined;
+        constexpr auto present_layout = vk::ImageLayout::ePresentSrcKHR;
+        constexpr auto color_layout = vk::ImageLayout::eColorAttachmentOptimal;
+        constexpr auto depth_stencil_layout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+
+        constexpr auto pipeline_stage = (tp_state == layout_state_et::e_rendering) ? vk::PipelineStageFlagBits2::eTopOfPipe
+                                                                                   : vk::PipelineStageFlagBits2::eBottomOfPipe;
+
+        constexpr auto color_transition_to_rendering =
+          (tp_state == layout_state_et::e_rendering) ? undefined_layout : color_layout;
+        constexpr auto depth_stencil_transition_to_rendering =
+          (tp_state == layout_state_et::e_rendering) ? undefined_layout : depth_stencil_layout;
+
+        constexpr auto color_transition_to_presentation =
+          (tp_state == layout_state_et::e_presentation) ? present_layout : color_layout;
+        constexpr auto depth_stencil_transition_to_presentation =
+          (tp_state == layout_state_et::e_presentation) ? present_layout : depth_stencil_layout;
+
+        const auto barriers = array_t<vk::ImageMemoryBarrier2, 2> {
+          vk::ImageMemoryBarrier2 {pipeline_stage, vk::AccessFlags2 {}, vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+                                   vk::AccessFlags2 {}, color_transition_to_rendering, color_transition_to_presentation,
+                                   queue_ownership, queue_ownership, this->unique_handle().getImages()[m_current_image_index],
+                                   vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}},
+          vk::ImageMemoryBarrier2 {
+          pipeline_stage, vk::AccessFlags2 {},
+          vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests, vk::AccessFlags2 {},
+          depth_stencil_transition_to_rendering, depth_stencil_transition_to_presentation, queue_ownership, queue_ownership,
+          **m_depth_stencil_buffer,
+          vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eDepth bitor vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1}}};
+
+        const auto dependency_info =
+          vk::DependencyInfo {vk::DependencyFlags {}, /*vk::MemoryBarrier2*/ {}, /*vk::BufferMemoryBarrier2*/ {}, barriers};
+
+        a_command_buffer.pipelineBarrier2(dependency_info);
       }
     }
   }
