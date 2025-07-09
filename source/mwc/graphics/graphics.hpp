@@ -43,7 +43,7 @@ namespace mwc {
       vulkan::logical_device_ct m_logical_device;
       vulkan::memory_allocator_ct m_memory_allocator;
       vulkan::swapchain_ct m_swapchain;
-      vulkan::frame_synchornizer_st<> m_frame_synchornizer;
+      vulkan::frame_synchornizer_st<> m_frame_synchronizer;
       vulkan::queue_ct m_graphics_queue;
       configuration_st m_configuration;
     };

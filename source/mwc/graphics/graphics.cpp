@@ -1,4 +1,5 @@
 #include "mwc/graphics/graphics.hpp"
+#include "mwc/graphics/vulkan/debug.hpp"
 
 namespace mwc {
   namespace graphics {
@@ -13,7 +14,7 @@ namespace mwc {
       m_logical_device {m_physical_device, m_queue_families},
       m_memory_allocator {m_context, m_instance, m_physical_device, m_logical_device},
       m_swapchain {m_physical_device, m_surface, m_queue_families, m_logical_device, m_memory_allocator},
-      m_frame_synchornizer {m_logical_device, decltype(m_frame_synchornizer)::configuration_st {.m_frame_count = 2}},
+      m_frame_synchronizer {m_logical_device, decltype(m_frame_synchronizer)::configuration_st {.m_frame_count = 4}},
       m_graphics_queue {m_logical_device, m_queue_families},
       m_configuration {a_configuration} {}
 
@@ -22,31 +23,46 @@ namespace mwc {
       const auto& cmd = m_graphics_queue.command_buffers().front();
       cmd.begin(vk::CommandBufferBeginInfo {vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 
-      auto image_acquired_fence =
-        m_logical_device->createFence(vk::FenceCreateInfo {/*vk::FenceCreateFlagBits::eSignaled*/}).value();
-      const auto [_, image_idx] = m_swapchain.unique_handle().acquireNextImage(1000, {}, *image_acquired_fence);
+      auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
 
-      m_logical_device->waitForFences(*image_acquired_fence, true, 0);
+      vulkan::debug_name(cmd, "fuck u");
 
-      m_logical_device->resetFences(*image_acquired_fence);
+      //auto image_acquired_semaphore = frame_data.m_image_acquired_semaphore;
+      //auto image_acquired_semaphore = m_logical_device->createSemaphore(vk::SemaphoreCreateInfo {}).value();
+      /*auto image_acquired_fence =
+        m_logical_device->createFence(vk::FenceCreateInfo {}).value();*/
+      //const auto [_, image_idx] = m_swapchain.unique_handle().acquireNextImage(1000, {}, *image_acquired_fence);
+      const auto [result, image_idx, /*image_acquired_semaphore,*/ render_info] =
+        m_swapchain.acquire_next_image(cmd, *frame_data.m_image_acquired_semaphore);
+      //m_logical_device->waitForFences(*image_acquired_fence, true, 0);
+      //m_logical_device->resetFences(*image_acquired_fence);
 
       const auto image = m_swapchain.unique_handle().getImages()[image_idx];
+      //std::print("size: {0}\n", m_swapchain.m_image_data.size());
       auto subrsrc = vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1};
-      cmd.clearColorImage(image, vk::ImageLayout::eGeneral,
-                          vk::ClearColorValue {(float)std::sin(std::rand()), 0.0f, 0.0f, 1.0f}, subrsrc);
+      cmd.clearColorImage(image, vk::ImageLayout::eColorAttachmentOptimal,
+                          vk::ClearColorValue {/*(float)std::sin(std::rand())*/ 0.5f, 0.3f, 0.4f, 1.0f}, subrsrc);
+      //std::cout << "frame idx: " << m_frame_synchronizer.m_frame_index << '\n';
+      m_swapchain.transition_layout<vulkan::swapchain_ct::layout_state_et::e_presentation>(cmd);
 
       cmd.end();
 
-      auto render_fence = m_logical_device->createFence(vk::FenceCreateInfo {/*vk::FenceCreateFlagBits::eSignaled*/}).value();
+      //auto render_fence = m_logical_device->createFence(vk::FenceCreateInfo {/*vk::FenceCreateFlagBits::eSignaled*/}).value();
+      auto wait_semaphores =
+        vk::SemaphoreSubmitInfo {*frame_data.m_image_acquired_semaphore, 0, vk::PipelineStageFlagBits2::eTopOfPipe};
       vk::CommandBufferSubmitInfo submit_info {*cmd};
-      m_graphics_queue->submit2(vk::SubmitInfo2 {{}, {}, submit_info}, *render_fence);
+      auto signal_semaphores =
+        vk::SemaphoreSubmitInfo {*frame_data.m_render_complete_semaphore, 0, vk::PipelineStageFlagBits2::eBottomOfPipe};
+      m_graphics_queue->submit2(vk::SubmitInfo2 {vk::SubmitFlags {}, wait_semaphores, submit_info, signal_semaphores});
 
-      m_logical_device->waitForFences(*render_fence, true, 0);
+      //m_logical_device->waitForFences(*render_fence, true, 0);
 
-      m_logical_device->resetFences(*render_fence);
-      auto present_info = vk::PresentInfoKHR {{}, m_swapchain.native_handle(), image_idx};
+      //m_logical_device->resetFences(*render_fence);
+      auto present_info = vk::PresentInfoKHR {*frame_data.m_render_complete_semaphore, m_swapchain.native_handle(), image_idx};
       m_graphics_queue->presentKHR(present_info);
       m_logical_device->waitIdle();
+
+      m_frame_synchronizer.m_frame_index = (m_frame_synchronizer.m_frame_index + 1) % 4;
     }
   }
 }

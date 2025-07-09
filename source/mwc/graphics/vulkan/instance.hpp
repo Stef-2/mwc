@@ -37,8 +37,8 @@ namespace mwc {
 
       // implementation
       constexpr auto instance_ct::configuration_st::default_configuration() -> configuration_st {
-        static constexpr auto required_extensions =
-          array_t {vk::KHRGetSurfaceCapabilities2ExtensionName, vk::EXTSurfaceMaintenance1ExtensionName};
+        static constexpr auto required_extensions = array_t {
+          vk::EXTDebugUtilsExtensionName, vk::KHRGetSurfaceCapabilities2ExtensionName, vk::EXTSurfaceMaintenance1ExtensionName};
 
         return configuration_st {.m_required_layers = {}, .m_required_extensions = required_extensions};
       }

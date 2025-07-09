@@ -1,6 +1,8 @@
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 
+#include "vulkan/vulkan_hpp_macros.hpp"
+
 namespace {
   auto generate_device_queue_information(const mwc::graphics::vulkan::queue_families_ct& a_queue_families) {
     static constexpr auto queue_count = mwc::graphics::vulkan::queue_families_ct::queue_family_count_t {1};
@@ -93,8 +95,13 @@ namespace mwc {
                                   a_configuration.m_required_extensions,
                                   {/* features field is deprecated */},
                                   std::addressof(device_features.m_default_features_chain.get<vk::PhysicalDeviceFeatures2>())};
-          const auto logical_device = a_physical_device->createDevice(logical_device_create_info).value();
-          return handle_t {a_physical_device->createDevice(logical_device_create_info).value()};
+          auto expected = a_physical_device->createDevice(logical_device_create_info);
+          contract_assert(expected);
+
+          // initialize vulkan dynamic dispatcher with device level function pointers
+          VULKAN_HPP_DEFAULT_DISPATCHER.init(*expected.value());
+
+          return handle_t {std::move(expected.value())};
         })},
         m_configuration {a_configuration} {}
     }

@@ -1,13 +1,15 @@
 #include "mwc/graphics/vulkan/instance.hpp"
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 
+#include "vulkan/vulkan_hpp_macros.hpp"
+
 import vkfw;
 
 namespace mwc {
   namespace graphics {
     namespace vulkan {
       instance_ct::instance_ct(const context_st& a_context, const configuration_st& a_configuration)
-      : handle_ct {std::invoke([&a_context, &a_configuration] -> handle_ct::handle_t {
+      : handle_ct {std::invoke([&a_context, &a_configuration] -> handle_t {
           auto buffer = string_t {};
 
           std::format_to(std::back_inserter(buffer),
@@ -55,6 +57,8 @@ namespace mwc {
           const auto instance_create_info = vk::InstanceCreateInfo {vk::InstanceCreateFlags {}, &application_info,
                                                                     a_configuration.m_required_layers, combined_extensions};
           const auto [result, instance] = vk::createInstance(instance_create_info);
+          // initialize vulkan dynamic dispatcher with instance level function pointers
+          VULKAN_HPP_DEFAULT_DISPATCHER.init(instance);
 
           return vk::raii::Instance {a_context.m_context, instance};
         })} {}

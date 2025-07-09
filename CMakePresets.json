@@ -7,7 +7,7 @@
       "binaryDir": "${sourceDir}/build/${presetName}",
       "generator": "Ninja",
       "environment": {
-        "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1 -gdwarf-5"
+        "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1 -gdwarf-5 -glldb"
       },
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": true

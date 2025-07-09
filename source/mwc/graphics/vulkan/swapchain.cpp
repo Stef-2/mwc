@@ -55,23 +55,24 @@ namespace mwc {
           return std::move(expected.value());
         })},
         m_surface {a_surface},
-        m_image_views {std::invoke([this, &a_surface, &a_logical_device] -> decltype(m_image_views) {
+        m_image_data {std::invoke([this, &a_surface, &a_logical_device] -> decltype(m_image_data) {
           const auto images = this->unique_handle().getImages();
 
-          auto result = decltype(m_image_views) {};
+          auto result = decltype(m_image_data) {};
           result.reserve(images.size());
-          m_image_views.reserve(images.size());
+          m_image_data.reserve(images.size());
 
           // for each image in the swapchain, create image views
           for (const auto& image : images) {
-            auto expected = a_logical_device->createImageView(
+            auto image_view_expected = a_logical_device->createImageView(
               vk::ImageViewCreateInfo {vk::ImageViewCreateFlags {}, image, vk::ImageViewType::e2D,
                                        a_surface.configuration().m_surface_format.surfaceFormat.format, vk::ComponentMapping {},
                                        vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eColor, 0, vk::RemainingMipLevels, 0,
                                                                   vk::RemainingArrayLayers}});
-            contract_assert(expected);
+            /*auto semaphore_expected = a_logical_device->createSemaphore(vk::SemaphoreCreateInfo {vk::SemaphoreCreateFlags {}});
+            contract_assert(image_view_expected and semaphore_expected);*/
 
-            result.emplace_back(std::move(expected.value()));
+            result.emplace_back(std::move(image_view_expected.value()) /*, std::move(semaphore_expected.value())*/);
           }
 
           return result;
@@ -111,19 +112,20 @@ namespace mwc {
         a_configuration.m_depth_stencil_attachment_configuration.m_attachment_operations.m_store_operation,
         a_configuration.m_depth_stencil_attachment_configuration.m_clear_value} {}
       auto swapchain_ct::acquire_next_image(const vk::raii::CommandBuffer& a_command_buffer,
-                                            const vk::Semaphore a_semaphore_to_signal,
+                                            const vk::Semaphore& a_semaphore_to_signal,
                                             const optional_t<const vk::Fence>
                                               a_fence_to_signal) -> acquired_image_data_st {
+        //const auto semaphore = *m_image_data[(m_current_image_index + 1) % m_image_data.size()].m_image_acquired_semaphore;
         const auto [result, image_index] = unique_handle().acquireNextImage(
           m_configuration.m_image_acquisition_timeout, a_semaphore_to_signal, a_fence_to_signal.value_or(nullptr));
 
         m_current_image_index = image_index;
-        m_color_attachment.imageView = *m_image_views[m_current_image_index];
+        m_color_attachment.imageView = *m_image_data[m_current_image_index].m_image_view;
 
         transition_layout<layout_state_et::e_rendering>(a_command_buffer);
 
         return acquired_image_data_st {
-          result, m_current_image_index,
+          result, m_current_image_index, /*a_semaphore_to_signal,*/
           vk::RenderingInfo {vk::RenderingFlagBits {}, vk::Rect2D {vk::Offset2D {0, 0}, m_surface.extent()},
                              /*layerCount_*/ 1,
                              /*viewMask_*/ 0, m_color_attachment, &m_depth_stencil_attachment, &m_depth_stencil_attachment}

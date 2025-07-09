@@ -41,6 +41,7 @@ find_package(Vulkan REQUIRED)
 target_compile_definitions(VulkanHppModule PUBLIC
         VULKAN_HPP_NO_EXCEPTIONS
         VULKAN_HPP_RAII_NO_EXCEPTIONS
+        VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
         VULKAN_HPP_ASSERT=contract_assert
         VULKAN_HPP_ASSERT_ON_RESULT=VULKAN_HPP_ASSERT
 )
