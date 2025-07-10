@@ -14,18 +14,18 @@ namespace mwc {
       m_logical_device {m_physical_device, m_queue_families},
       m_memory_allocator {m_context, m_instance, m_physical_device, m_logical_device},
       m_swapchain {m_physical_device, m_surface, m_queue_families, m_logical_device, m_memory_allocator},
-      m_frame_synchronizer {m_logical_device, decltype(m_frame_synchronizer)::configuration_st {.m_frame_count = 4}},
-      m_graphics_queue {m_logical_device, m_queue_families},
+      m_command_pool {m_logical_device, m_queue_families},
+      m_frame_synchronizer {m_logical_device, m_command_pool,
+                            decltype(m_frame_synchronizer)::configuration_st {.m_frame_count = 4}},
+      m_graphics_queue {m_logical_device},
       m_configuration {a_configuration} {}
 
     auto graphics_ct::render() -> void {
-      m_graphics_queue.command_pool()->reset(vk::CommandPoolResetFlagBits {});
-      const auto& cmd = m_graphics_queue.command_buffers().front();
-      cmd.begin(vk::CommandBufferBeginInfo {vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-
+      //m_graphics_queue.command_pool()->reset(vk::CommandPoolResetFlagBits {});
       auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
 
-      vulkan::debug_name(cmd, "fuck u");
+      const auto& cmd = frame_data.m_command_buffer;
+      cmd.begin(vk::CommandBufferBeginInfo {vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 
       //auto image_acquired_semaphore = frame_data.m_image_acquired_semaphore;
       //auto image_acquired_semaphore = m_logical_device->createSemaphore(vk::SemaphoreCreateInfo {}).value();
@@ -60,9 +60,15 @@ namespace mwc {
       //m_logical_device->resetFences(*render_fence);
       auto present_info = vk::PresentInfoKHR {*frame_data.m_render_complete_semaphore, m_swapchain.native_handle(), image_idx};
       m_graphics_queue->presentKHR(present_info);
-      m_logical_device->waitIdle();
+      //m_logical_device->waitIdle();
+      if (m_frame_synchronizer.m_frame_count > 0 and
+          m_frame_synchronizer.m_frame_index % m_frame_synchronizer.m_frame_count == 0) {
+        m_graphics_queue->waitIdle();
+        m_command_pool->reset(vk::CommandPoolResetFlagBits {});
+      }
 
-      m_frame_synchronizer.m_frame_index = (m_frame_synchronizer.m_frame_index + 1) % 4;
+      m_frame_synchronizer.m_frame_count++;
+      m_frame_synchronizer.m_frame_index = (m_frame_synchronizer.m_frame_index + 1) % m_frame_synchronizer.frame_count();
     }
   }
 }

@@ -55,12 +55,12 @@ namespace mwc {
           return std::move(expected.value());
         })},
         m_surface {a_surface},
-        m_image_data {std::invoke([this, &a_surface, &a_logical_device] -> decltype(m_image_data) {
+        m_image_views {std::invoke([this, &a_surface, &a_logical_device] -> decltype(m_image_views) {
           const auto images = this->unique_handle().getImages();
 
-          auto result = decltype(m_image_data) {};
+          auto result = decltype(m_image_views) {};
           result.reserve(images.size());
-          m_image_data.reserve(images.size());
+          m_image_views.reserve(images.size());
 
           // for each image in the swapchain, create image views
           for (const auto& image : images) {
@@ -69,10 +69,8 @@ namespace mwc {
                                        a_surface.configuration().m_surface_format.surfaceFormat.format, vk::ComponentMapping {},
                                        vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eColor, 0, vk::RemainingMipLevels, 0,
                                                                   vk::RemainingArrayLayers}});
-            /*auto semaphore_expected = a_logical_device->createSemaphore(vk::SemaphoreCreateInfo {vk::SemaphoreCreateFlags {}});
-            contract_assert(image_view_expected and semaphore_expected);*/
 
-            result.emplace_back(std::move(image_view_expected.value()) /*, std::move(semaphore_expected.value())*/);
+            result.emplace_back(std::move(image_view_expected.value()));
           }
 
           return result;
@@ -110,7 +108,9 @@ namespace mwc {
         vk::ImageLayout {/*a_resolveImageLayout_configuration*/},
         a_configuration.m_depth_stencil_attachment_configuration.m_attachment_operations.m_load_operation,
         a_configuration.m_depth_stencil_attachment_configuration.m_attachment_operations.m_store_operation,
-        a_configuration.m_depth_stencil_attachment_configuration.m_clear_value} {}
+        a_configuration.m_depth_stencil_attachment_configuration.m_clear_value} {
+        m_depth_stencil_buffer.debug_name("depth stencil buffer");
+      }
       auto swapchain_ct::acquire_next_image(const vk::raii::CommandBuffer& a_command_buffer,
                                             const vk::Semaphore& a_semaphore_to_signal,
                                             const optional_t<const vk::Fence>
@@ -120,7 +120,7 @@ namespace mwc {
           m_configuration.m_image_acquisition_timeout, a_semaphore_to_signal, a_fence_to_signal.value_or(nullptr));
 
         m_current_image_index = image_index;
-        m_color_attachment.imageView = *m_image_data[m_current_image_index].m_image_view;
+        m_color_attachment.imageView = *m_image_views[m_current_image_index];
 
         transition_layout<layout_state_et::e_rendering>(a_command_buffer);
 

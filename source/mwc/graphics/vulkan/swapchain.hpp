@@ -59,7 +59,6 @@ namespace mwc {
         struct acquired_image_data_st {
           vk::Result m_result;
           image_index_t m_image_index;
-          //vk::Semaphore m_image_acquired_semaphore;
           vk::RenderingInfo m_rendering_information;
         };
 
@@ -76,14 +75,9 @@ namespace mwc {
                                 const optional_t<const vk::Fence> a_fence_to_signal = std::nullopt) -> acquired_image_data_st;
 
         //private:
-        struct image_data_st {
-          vk::raii::ImageView m_image_view;
-          //vk::raii::Semaphore m_image_acquired_semaphore;
-        };
-
         const surface_ct& m_surface;
 
-        vector_t<image_data_st> m_image_data;
+        vector_t<vk::raii::ImageView> m_image_views;
         image_index_t m_current_image_index;
 
         // depth-stencil buffer

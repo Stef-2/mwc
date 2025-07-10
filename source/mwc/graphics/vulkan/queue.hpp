@@ -22,18 +22,14 @@ namespace mwc {
         struct configuration_st {
           static constexpr auto default_configuration() -> configuration_st;
 
-          command_pool_ct::configuration_st m_command_pool_configuration;
-          command_buffer_count_t m_command_buffer_count;
-          fence_timeout_t m_fence_timeout;
+          queue_families_ct::family_st::index_t m_family_index;
         };
 
         enum class queue_state_et { e_initial, e_recording, e_executing };
 
-        queue_ct(const logical_device_ct& a_logical_device, const queue_families_ct& a_queue_families,
+        queue_ct(const logical_device_ct& a_logical_device,
                  const configuration_st& a_configuration = configuration_st::default_configuration());
 
-        auto command_pool() const -> const command_pool_ct&;
-        auto command_buffers() const -> const span_t<const vk::raii::CommandBuffer>;
         auto queue_state() const -> queue_state_et;
         auto submit() -> void;
         auto submit_and_wait() -> void;
@@ -43,18 +39,13 @@ namespace mwc {
 
         const logical_device_ct& m_logical_device;
 
-        command_pool_ct m_command_pool;
-        vector_t<vk::raii::CommandBuffer> m_command_buffers;
         queue_state_et m_queue_state;
-        vk::raii::Fence m_submit_fence;
         configuration_st m_configuration;
       };
 
       // implementation
       constexpr auto queue_ct::configuration_st::default_configuration() -> configuration_st {
-        return configuration_st {.m_command_pool_configuration = command_pool_ct::configuration_st::default_configuration(),
-                                 .m_command_buffer_count = 1,
-                                 .m_fence_timeout = std::numeric_limits<fence_timeout_t>::max()};
+        return configuration_st {.m_family_index = 0};
       }
     }
   }
