@@ -1,6 +1,8 @@
 #include "mwc/graphics/graphics.hpp"
 #include "mwc/graphics/vulkan/debug.hpp"
 
+import mwc_memory_conversion;
+
 namespace mwc {
   namespace graphics {
     graphics_ct::graphics_ct(const window_ct& a_window, const semantic_version_st& a_engine_version,
@@ -18,6 +20,22 @@ namespace mwc {
       m_frame_synchronizer {m_logical_device, m_command_pool,
                             decltype(m_frame_synchronizer)::configuration_st {.m_frame_count = 4}},
       m_graphics_queue {m_logical_device},
+      m_common_buffer {
+      m_logical_device, m_memory_allocator,
+      vulkan::suballocated_memory_mapped_buffer_ct::configuration_st {
+      .m_memory_mapped_buffer_configuration =
+        vulkan::memory_mapped_buffer_ct::configuration_st {
+        .m_buffer_create_info = vk::BufferCreateInfo {vk::BufferCreateFlags {}, vk::DeviceSize {byte_count<std::mega>(256)},
+                                                      vk::BufferUsageFlagBits::eTransferSrc, vk::SharingMode::eExclusive,
+                                                      /*pQueueFamilyIndices*/ 0},
+        .m_allocation_create_info =
+          vma::AllocationCreateInfo {vma::AllocationCreateFlags {vma::AllocationCreateFlagBits::eMapped bitor
+                                                                 vma::AllocationCreateFlagBits::eHostAccessRandom},
+                                     vma::MemoryUsage::eAuto, vk::MemoryPropertyFlags {vk::MemoryPropertyFlagBits::eHostVisible},
+                                     vk::MemoryPropertyFlags {vk::MemoryPropertyFlagBits::eDeviceLocal}}},
+      .m_virtual_allocator_configuration =
+        virtual_allocator_ct::configuration_st {.m_virtual_block_create_flags = vma::VirtualBlockCreateFlags {}}}},
+      m_dynamic_rendering_state {m_surface},
       m_configuration {a_configuration} {}
 
     auto graphics_ct::render() -> void {

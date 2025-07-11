@@ -12,7 +12,7 @@ namespace mwc {
   virtual_allocator_ct::~virtual_allocator_ct() {
     m_virtual_memory_block.destroy();
   }
-  auto virtual_allocator_ct::acquire_suballocation(const memory_size_t a_virtual_suballocation_size,
+  auto virtual_allocator_ct::request_suballocation(const memory_size_t a_virtual_suballocation_size,
                                                    const allocation_configuration_st& a_configuration) -> memory_offset_t {
     const auto virtual_allocation_create_info = vma::VirtualAllocationCreateInfo {
       a_virtual_suballocation_size, a_configuration.m_alignment, a_configuration.m_virtual_allocation_create_flags};
@@ -26,8 +26,11 @@ namespace mwc {
 
     return offset;
   }
-  auto virtual_allocator_ct::free_suballocation(const memory_offset_t a_virtual_memory_offset) -> void {
+  auto virtual_allocator_ct::release_suballocation(const memory_offset_t a_virtual_memory_offset) -> void {
     m_virtual_memory_block.virtualFree(m_virtual_allocation_map[a_virtual_memory_offset]);
     m_virtual_allocation_map.erase(a_virtual_memory_offset);
+  }
+  auto virtual_allocator_ct::clear_virtual_memory_block() const -> void {
+    m_virtual_memory_block.clearVirtualBlock();
   }
 }

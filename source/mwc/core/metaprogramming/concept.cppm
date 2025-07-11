@@ -28,7 +28,11 @@ export namespace mwc {
                                     };
     // concept modeling boolean or boolean convertible types
     template <typename tp>
-    concept bool_tean_c = std::is_same_v<tp, bool_t> or std::is_convertible_v<tp, bool_t>;
+    concept boolean_c = std::is_same_v<tp, bool_t> or std::is_convertible_v<tp, bool_t>;
+
+    // concept modeling standard ratios
+    template <typename tp>
+    concept ratio_c = requires(tp) { std::ratio_multiply<tp, std::mega>(); };
 
     // concept modeling a predicate that asserts that [tp] must be one of the [tps]
     template <typename tp, typename... tps>

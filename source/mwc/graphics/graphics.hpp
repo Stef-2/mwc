@@ -12,6 +12,8 @@
 #include "mwc/graphics/vulkan/command_pool.hpp"
 #include "mwc/graphics/vulkan/frame_synchronizer.hpp"
 #include "mwc/graphics/vulkan/queue.hpp"
+#include "mwc/graphics/vulkan/suballocated_memory_mapped_buffer.hpp"
+#include "mwc/graphics/vulkan/dynamic_rendering_state.hpp"
 
 import mwc_definition;
 
@@ -47,6 +49,8 @@ namespace mwc {
       vulkan::command_pool_ct m_command_pool;
       vulkan::frame_synchornizer_st<> m_frame_synchronizer;
       vulkan::queue_ct m_graphics_queue;
+      vulkan::suballocated_memory_mapped_buffer_ct m_common_buffer;
+      vulkan::dynamic_rendering_state_ct m_dynamic_rendering_state;
       configuration_st m_configuration;
     };
 
