@@ -79,7 +79,6 @@ namespace mwc {
 
         template <typename tp_this>
         auto storage(this tp_this&& a_this) -> decltype(auto);
-        auto configuration(this auto&& a_this) -> decltype(auto);
         auto insert_sink(const sink_st& a_sink) -> void pre(a_sink.m_sink_ptr != nullptr);
         auto remove_sink(const sink_st& a_sink) -> void pre(not m_storage.empty());
         auto information(const string_view_t a_message,

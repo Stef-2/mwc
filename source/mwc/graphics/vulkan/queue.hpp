@@ -30,9 +30,11 @@ namespace mwc {
         queue_ct(const logical_device_ct& a_logical_device,
                  const configuration_st& a_configuration = configuration_st::default_configuration());
 
-        auto queue_state() const -> queue_state_et;
         auto submit() -> void;
         auto submit_and_wait() -> void;
+        [[nodiscard]] auto queue_state() const -> queue_state_et;
+        template <typename tp_this>
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 
         protected:
         //auto clear() -> void;
@@ -46,6 +48,10 @@ namespace mwc {
       // implementation
       constexpr auto queue_ct::configuration_st::default_configuration() -> configuration_st {
         return configuration_st {.m_family_index = 0};
+      }
+      template <typename tp_this>
+      auto queue_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }

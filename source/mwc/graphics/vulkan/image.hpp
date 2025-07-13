@@ -26,6 +26,13 @@ namespace mwc {
         image_ct(const logical_device_ct& a_logical_device, const memory_allocator_ct& a_memory_allocator,
                  const configuration_st& a_configuration = configuration_st::default_configuration());
 
+        template <typename tp_this>
+        [[nodiscard]] auto allocation_info(this tp_this&& a_this) -> decltype(auto);
+        template <typename tp_this>
+        [[nodiscard]] auto allocation(this tp_this&& a_this) -> vma::Allocation;
+        template <typename tp_this>
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
+
         private:
         vma::AllocationInfo m_allocation_info;
         vma::Allocation m_allocation;
@@ -40,6 +47,18 @@ namespace mwc {
                                   vk::ImageUsageFlagBits::eSampled, vk::SharingMode::eExclusive},
           .m_allocation_create_info = {vma::AllocationCreateFlags {}, vma::MemoryUsage::eAutoPreferDevice,
                                        vk::MemoryPropertyFlagBits::eDeviceLocal, vk::MemoryPropertyFlagBits::eDeviceLocal}};
+      }
+      template <typename tp_this>
+      auto image_ct::allocation_info(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_allocation_info);
+      }
+      template <typename tp_this>
+      auto image_ct::allocation(this tp_this&& a_this) -> vma::Allocation {
+        return std::forward_like<decltype(a_this)>(a_this.m_allocation);
+      }
+      template <typename tp_this>
+      auto image_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }

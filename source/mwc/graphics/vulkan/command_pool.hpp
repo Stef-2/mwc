@@ -25,7 +25,9 @@ namespace mwc {
         command_pool_ct(const logical_device_ct& a_logical_device, const queue_families_ct& a_queue_families,
                         const configuration_st& a_configuration = configuration_st::default_configuration());
 
-        auto queue_family_index() const -> queue_families_ct::family_st::index_t;
+        [[nodiscard]] auto queue_family_index() const -> queue_families_ct::family_st::index_t;
+        template <typename tp_this>
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 
         private:
         queue_families_ct::family_st::index_t m_queue_family_index;
@@ -36,6 +38,10 @@ namespace mwc {
       constexpr auto command_pool_ct::configuration_st::default_configuration() -> configuration_st {
         return configuration_st {.m_command_pool_create_flags = {vk::CommandPoolCreateFlagBits::eResetCommandBuffer},
                                  .m_queue_flags = vk::QueueFlagBits::eGraphics};
+      }
+      template <typename tp_this>
+      auto command_pool_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }

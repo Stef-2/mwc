@@ -35,6 +35,10 @@ namespace mwc {
         template <typename tp>
         auto release_suballocation(const suballocation_t<tp>& a_suballocation) -> void;
 
+        [[nodiscard]] auto virtual_allocator() const -> const virtual_allocator_ct&;
+        template <typename tp_this>
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
+
         private:
         virtual_allocator_ct m_virtual_allocator;
         configuration_st m_configuration;
@@ -65,6 +69,10 @@ namespace mwc {
           std::bit_cast<byte_t*>(a_suballocation.data()) - static_cast<byte_t*>(mapped_data_pointer());
 
         m_virtual_allocator.release_suballocation(suballocation_offset);
+      }
+      template <typename tp_this>
+      auto suballocated_memory_mapped_buffer_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }

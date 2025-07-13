@@ -2,17 +2,20 @@
 
 import mwc_subsystem;
 
-import vkfw;
-
 import std;
+
+import vkfw;
 
 int main() {
   mwc::initialize_subsystems();
   mwc::mwc_ct mwc {};
 
-  while (true)
+  while (true) {
+    vkfw::pollEvents();
     mwc.m_graphics.render();
+  }
 
   mwc::finalize_subsystems();
+
   return 0;
 }

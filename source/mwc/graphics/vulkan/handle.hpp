@@ -28,11 +28,11 @@ namespace mwc {
         template <typename tp_this>
         auto operator->(this tp_this&& a_this) -> decltype(auto) pre(*a_this.m_vulkan_handle);
         template <typename tp_this>
-        auto unique_handle(this tp_this&& a_this) -> decltype(auto) pre(*a_this.m_vulkan_handle);
+        [[nodiscard]] auto unique_handle(this tp_this&& a_this) -> decltype(auto) pre(*a_this.m_vulkan_handle);
         template <typename tp_this>
-        auto native_handle(this tp_this&& a_this) -> decltype(auto) pre(*a_this.m_vulkan_handle);
+        [[nodiscard]] auto native_handle(this tp_this&& a_this) -> decltype(auto) pre(*a_this.m_vulkan_handle);
 
-        auto handle_id() const -> uintptr_t;
+        [[nodiscard]] auto handle_id() const -> uintptr_t;
         auto debug_name(const string_view_t a_string_view) const -> void;
 
         protected:

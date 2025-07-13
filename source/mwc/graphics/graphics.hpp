@@ -9,11 +9,13 @@
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/graphics/vulkan/memory_allocator.hpp"
 #include "mwc/graphics/vulkan/swapchain.hpp"
+#include "mwc/graphics/vulkan/pipeline_layout.hpp"
 #include "mwc/graphics/vulkan/command_pool.hpp"
 #include "mwc/graphics/vulkan/frame_synchronizer.hpp"
 #include "mwc/graphics/vulkan/queue.hpp"
 #include "mwc/graphics/vulkan/suballocated_memory_mapped_buffer.hpp"
 #include "mwc/graphics/vulkan/dynamic_rendering_state.hpp"
+#include "mwc/graphics/user_interface/dear_imgui.hpp"
 
 import mwc_definition;
 
@@ -46,11 +48,14 @@ namespace mwc {
       vulkan::logical_device_ct m_logical_device;
       vulkan::memory_allocator_ct m_memory_allocator;
       vulkan::swapchain_ct m_swapchain;
+      vulkan::pipeline_layout_ct m_pipeline_layout;
       vulkan::command_pool_ct m_command_pool;
       vulkan::frame_synchornizer_st<> m_frame_synchronizer;
       vulkan::queue_ct m_graphics_queue;
+      vulkan::queue_ct m_transfer_queue;
       vulkan::suballocated_memory_mapped_buffer_ct m_common_buffer;
       vulkan::dynamic_rendering_state_ct m_dynamic_rendering_state;
+      dear_imgui_ct m_dear_imgui;
       configuration_st m_configuration;
     };
 

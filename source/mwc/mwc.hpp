@@ -30,6 +30,7 @@ namespace mwc {
 
   // implementation
   constexpr auto mwc_ct::configuration_st::default_configuration() -> const configuration_st {
-    return configuration_st {{0, 3, 2}, window_ct::configuration_st::default_configuration()};
+    return configuration_st {.m_version = semantic_version_st {0, 3, 3},
+                             .m_window_configuration = window_ct::configuration_st::default_configuration()};
   }
 }

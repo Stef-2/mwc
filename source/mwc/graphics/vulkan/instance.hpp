@@ -31,6 +31,9 @@ namespace mwc {
                   ? contract::validate_storage(a_configuration.m_required_extensions)
                   : true);
 
+        template <typename tp_this>
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
+
         private:
         configuration_st m_configuration;
       };
@@ -41,6 +44,10 @@ namespace mwc {
           vk::EXTDebugUtilsExtensionName, vk::KHRGetSurfaceCapabilities2ExtensionName, vk::EXTSurfaceMaintenance1ExtensionName};
 
         return configuration_st {.m_required_layers = {}, .m_required_extensions = required_extensions};
+      }
+      template <typename tp_this>
+      auto instance_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }

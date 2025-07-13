@@ -108,8 +108,10 @@ namespace mwc {
         vk::ImageLayout {/*a_resolveImageLayout_configuration*/},
         a_configuration.m_depth_stencil_attachment_configuration.m_attachment_operations.m_load_operation,
         a_configuration.m_depth_stencil_attachment_configuration.m_attachment_operations.m_store_operation,
-        a_configuration.m_depth_stencil_attachment_configuration.m_clear_value} {
+        a_configuration.m_depth_stencil_attachment_configuration.m_clear_value},
+        m_configuration {a_configuration} {
         m_depth_stencil_buffer.debug_name("depth stencil buffer");
+        m_configuration.m_image_count = clamp_image_count(a_configuration.m_image_count, a_surface);
       }
       auto swapchain_ct::acquire_next_image(const vk::raii::CommandBuffer& a_command_buffer,
                                             const vk::Semaphore& a_semaphore_to_signal,
@@ -131,6 +133,24 @@ namespace mwc {
                              /*viewMask_*/ 0, m_color_attachment, &m_depth_stencil_attachment, &m_depth_stencil_attachment}
 
         };
+      }
+      auto swapchain_ct::image_count() const -> image_index_t {
+        return m_image_views.size();
+      }
+      auto swapchain_ct::surface() const -> const surface_ct& {
+        return m_surface;
+      }
+      auto swapchain_ct::image_views() const -> const span_t<const vk::raii::ImageView> {
+        return m_image_views;
+      }
+      auto swapchain_ct::current_image_index() const -> image_index_t {
+        return m_current_image_index;
+      }
+      auto swapchain_ct::depth_stencil_buffer() const -> const image_ct& {
+        return m_depth_stencil_buffer;
+      }
+      auto swapchain_ct::depth_stencil_view() const -> const vk::raii::ImageView& {
+        return m_depth_stencil_view;
       }
     }
   }

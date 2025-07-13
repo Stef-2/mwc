@@ -21,7 +21,9 @@ namespace mwc {
           static constexpr auto default_configuration() -> configuration_st;
         };
         struct properties_st {
-          using default_chain_t = vk::StructureChain<vk::PhysicalDeviceProperties2, vk::PhysicalDeviceShaderObjectPropertiesEXT>;
+          using default_chain_t = vk::StructureChain<vk::PhysicalDeviceProperties2,
+                                                     vk::PhysicalDeviceShaderObjectPropertiesEXT,
+                                                     vk::PhysicalDeviceDescriptorIndexingProperties>;
           using memory_chain_t =
             vk::StructureChain<vk::PhysicalDeviceMemoryProperties2, vk::PhysicalDeviceMemoryBudgetPropertiesEXT>;
           using queue_family_chain_t =
@@ -46,11 +48,11 @@ namespace mwc {
                            const configuration_st& a_configuration = configuration_st::default_configuration());
 
         template <typename tp>
-        auto properties(this tp&& a_this) -> decltype(auto);
+        [[nodiscard]] auto properties(this tp&& a_this) -> decltype(auto);
         template <typename tp>
-        auto features(this tp&& a_this) -> decltype(auto);
-        template <typename tp>
-        auto configuration(this tp&& a_this) -> decltype(auto);
+        [[nodiscard]] auto features(this tp&& a_this) -> decltype(auto);
+        template <typename tp_this>
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 
         private:
         properties_st m_properties;
@@ -70,8 +72,8 @@ namespace mwc {
       auto physical_device_ct::features(this tp&& a_this) -> decltype(auto) {
         return std::forward_like<decltype(a_this)>(a_this.m_features);
       }
-      template <typename tp>
-      auto physical_device_ct::configuration(this tp&& a_this) -> decltype(auto) {
+      template <typename tp_this>
+      auto physical_device_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
         return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }

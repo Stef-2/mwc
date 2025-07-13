@@ -26,8 +26,7 @@ namespace mwc {
         template <typename tp_this>
         [[nodiscard]] auto allocation_info(this tp_this&& a_this) -> decltype(auto);
         template <typename tp_this>
-        [[nodiscard]] auto allocation(this tp_this&& a_this) -> decltype(auto);
-
+        [[nodiscard]] auto allocation(this tp_this&& a_this) -> vma::Allocation;
         [[nodiscard]] auto device_address_requested() const -> bool_t;
         [[nodiscard]] auto address() const -> vk::DeviceAddress pre(device_address_requested())
           post(r : r != vk::DeviceAddress {0});
@@ -39,7 +38,6 @@ namespace mwc {
         const logical_device_ct& m_logical_device;
         const memory_allocator_ct& m_memory_allocator;
 
-        vk::DeviceSize m_buffer_size;
         vk::DeviceAddress m_device_address;
         vma::AllocationInfo m_allocation_info;
         vma::Allocation m_allocation;
@@ -61,7 +59,7 @@ namespace mwc {
         return std::forward_like<decltype(a_this)>(a_this.m_allocation_info);
       }
       template <typename tp_this>
-      auto buffer_ct::allocation(this tp_this&& a_this) -> decltype(auto) {
+      auto buffer_ct::allocation(this tp_this&& a_this) -> vma::Allocation {
         return std::forward_like<decltype(a_this)>(a_this.m_allocation);
       }
       template <typename tp_this>

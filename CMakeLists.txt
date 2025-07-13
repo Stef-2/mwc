@@ -60,6 +60,7 @@ target_compile_definitions(vkfw_module PRIVATE
         VKFW_ENABLE_VULKAN_HPP_MODULE
         VKFW_NO_EXCEPTIONS
         VKFW_NO_STRUCT_CONSTRUCTORS
+        VKFW_ENABLE_STD_MODULE
         VKFW_ASSERT=contract_assert
         VKFW_ASSERT_ON_RESULT=VKFW_ASSERT
         assert=VKFW_ASSERT
@@ -105,4 +106,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         glfw
         vkfw_module
         vma_module
+        imgui
 )

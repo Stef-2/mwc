@@ -45,19 +45,21 @@ namespace mwc {
         auto operator=(const queue_families_ct&) -> queue_families_ct& = delete("move only type");
 
         template <typename tp_this>
-        auto properties(this tp_this&& a_this) -> decltype(auto);
+        [[nodiscard]] auto graphics(this tp_this&& a_this) -> decltype(auto);
         template <typename tp_this>
-        auto graphics(this tp_this&& a_this) -> decltype(auto);
+        [[nodiscard]] auto present(this tp_this&& a_this) -> decltype(auto);
         template <typename tp_this>
-        auto present(this tp_this&& a_this) -> decltype(auto);
+        [[nodiscard]] auto compute(this tp_this&& a_this) -> decltype(auto);
         template <typename tp_this>
-        auto compute(this tp_this&& a_this) -> decltype(auto);
+        [[nodiscard]] auto transfer(this tp_this&& a_this) -> decltype(auto);
         template <typename tp_this>
-        auto transfer(this tp_this&& a_this) -> decltype(auto);
+        [[nodiscard]] auto properties(this tp_this&& a_this) -> decltype(auto);
+        template <typename tp_this>
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 
-        auto supports_combined_graphics_and_present_family() const -> bool_t;
-        auto supports_dedicated_compute_family() const -> bool_t;
-        auto supports_dedicated_transfer_family() const -> bool_t;
+        [[nodiscard]] auto supports_combined_graphics_and_present_family() const -> bool_t;
+        [[nodiscard]] auto supports_dedicated_compute_family() const -> bool_t;
+        [[nodiscard]] auto supports_dedicated_transfer_family() const -> bool_t;
 
         private:
         family_st m_graphics;
@@ -100,6 +102,10 @@ namespace mwc {
       template <typename tp_this>
       auto queue_families_ct::transfer(this tp_this&& a_this) -> decltype(auto) {
         return std::forward_like<decltype(a_this)>(a_this.m_transfer);
+      }
+      template <typename tp_this>
+      auto queue_families_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }

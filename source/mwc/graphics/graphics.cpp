@@ -1,6 +1,9 @@
 #include "mwc/graphics/graphics.hpp"
 #include "mwc/graphics/vulkan/debug.hpp"
 
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
+
 import mwc_memory_conversion;
 
 namespace mwc {
@@ -16,10 +19,14 @@ namespace mwc {
       m_logical_device {m_physical_device, m_queue_families},
       m_memory_allocator {m_context, m_instance, m_physical_device, m_logical_device},
       m_swapchain {m_physical_device, m_surface, m_queue_families, m_logical_device, m_memory_allocator},
+      m_pipeline_layout {m_physical_device, m_logical_device},
       m_command_pool {m_logical_device, m_queue_families},
       m_frame_synchronizer {m_logical_device, m_command_pool,
                             decltype(m_frame_synchronizer)::configuration_st {.m_frame_count = 4}},
-      m_graphics_queue {m_logical_device},
+      m_graphics_queue {m_logical_device,
+                        vulkan::queue_ct::configuration_st {.m_family_index = m_queue_families.graphics().m_index}},
+      m_transfer_queue {m_logical_device,
+                        vulkan::queue_ct::configuration_st {.m_family_index = m_queue_families.transfer().m_index}},
       m_common_buffer {
       m_logical_device, m_memory_allocator,
       vulkan::suballocated_memory_mapped_buffer_ct::configuration_st {
@@ -36,9 +43,16 @@ namespace mwc {
       .m_virtual_allocator_configuration =
         virtual_allocator_ct::configuration_st {.m_virtual_block_create_flags = vma::VirtualBlockCreateFlags {}}}},
       m_dynamic_rendering_state {m_surface},
+      m_dear_imgui {a_window,         m_context,  m_instance, m_physical_device, m_logical_device, m_queue_families.graphics(),
+                    m_graphics_queue, m_swapchain},
       m_configuration {a_configuration} {}
 
     auto graphics_ct::render() -> void {
+      //imgui
+      ImGui_ImplVulkan_NewFrame();
+      ImGui_ImplGlfw_NewFrame();
+      ImGui::NewFrame();
+
       //m_graphics_queue.command_pool()->reset(vk::CommandPoolResetFlagBits {});
       auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
 
@@ -62,6 +76,12 @@ namespace mwc {
                           vk::ClearColorValue {/*(float)std::sin(std::rand())*/ 0.5f, 0.3f, 0.4f, 1.0f}, subrsrc);
       //std::cout << "frame idx: " << m_frame_synchronizer.m_frame_index << '\n';
       m_swapchain.transition_layout<vulkan::swapchain_ct::layout_state_et::e_presentation>(cmd);
+
+      bool wtf = false;
+      ImGui::ShowDemoWindow(&wtf);
+
+      ImGui::Render();
+      ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *cmd);
 
       cmd.end();
 

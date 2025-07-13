@@ -38,6 +38,12 @@ namespace mwc {
         a_command_buffer.setColorWriteMaskEXT(m_configuration.m_color_blend_configuration.m_first_attachment_index,
                                               m_configuration.m_color_blend_configuration.m_color_write_mask);
       }
+      auto dynamic_rendering_state_ct::viewport() const -> vk::Viewport {
+        return m_viewport;
+      }
+      auto dynamic_rendering_state_ct::scissor() const -> vk::Rect2D {
+        return m_scissor;
+      }
     }
   }
 }

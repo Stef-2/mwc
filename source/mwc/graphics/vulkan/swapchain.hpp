@@ -74,6 +74,15 @@ namespace mwc {
         auto acquire_next_image(const vk::raii::CommandBuffer& a_command_buffer, const vk::Semaphore& a_semaphore_to_signal,
                                 const optional_t<const vk::Fence> a_fence_to_signal = std::nullopt) -> acquired_image_data_st;
 
+        auto surface() const -> const surface_ct&;
+        auto image_views() const -> const span_t<const vk::raii::ImageView>;
+        auto current_image_index() const -> image_index_t;
+        auto depth_stencil_buffer() const -> const image_ct&;
+        auto depth_stencil_view() const -> const vk::raii::ImageView&;
+        auto image_count() const -> image_index_t;
+        template <typename tp_this>
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
+
         //private:
         const surface_ct& m_surface;
 
@@ -149,6 +158,10 @@ namespace mwc {
           vk::DependencyInfo {vk::DependencyFlags {}, /*vk::MemoryBarrier2*/ {}, /*vk::BufferMemoryBarrier2*/ {}, barriers};
 
         a_command_buffer.pipelineBarrier2(dependency_info);
+      }
+      template <typename tp_this>
+      auto swapchain_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }

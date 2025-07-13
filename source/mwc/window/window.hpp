@@ -35,8 +35,6 @@ namespace mwc {
     auto full_screen(bool_t a_full_screen) -> void;
     auto vkfw_monitor() const -> const vkfw::Monitor&;
     auto vkfw_window() const -> const vkfw::UniqueWindow&;
-    template <typename tp_this>
-    auto configuration(this tp_this&& a_this) -> decltype(auto);
 
     private:
     vkfw::Monitor m_monitor;
@@ -57,9 +55,5 @@ namespace mwc {
              .srgbCapable = true,
              .clientAPI = vkfw::ClientAPI::eNone},
             false};
-  }
-  template <typename tp_this>
-  auto window_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
-    return a_this.m_configuration;
   }
 }

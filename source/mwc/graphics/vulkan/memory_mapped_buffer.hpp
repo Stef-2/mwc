@@ -16,7 +16,7 @@ namespace mwc {
 
         using buffer_ct::buffer_ct;
 
-        auto mapped_data_pointer() const -> memory_mapped_ptr_t post(r : r != memory_mapped_ptr_t {nullptr});
+        [[nodiscard]] auto mapped_data_pointer() const -> memory_mapped_ptr_t post(r : r != memory_mapped_ptr_t {nullptr});
         auto map() -> void;
         auto unmap() -> void;
 

@@ -25,7 +25,7 @@ namespace mwc {
                           const configuration_st& a_configuration = configuration_st::default_configuration());
 
         template <typename tp_this>
-        auto configuration(this tp_this&& a_this) -> decltype(auto);
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 
         private:
         configuration_st m_configuration;

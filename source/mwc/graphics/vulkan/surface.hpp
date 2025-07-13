@@ -33,10 +33,10 @@ namespace mwc {
         surface_ct(const window_ct& a_window, const instance_ct& a_instance, const physical_device_ct& a_physical_device,
                    const configuration_st& a_configuration = configuration_st::default_configuration());
 
-        auto extent() const -> const extent_t&;
-        auto capabilities() const -> const capabilities_st&;
+        [[nodiscard]] auto extent() const -> const extent_t&;
+        [[nodiscard]] auto capabilities() const -> const capabilities_st&;
         template <typename tp_this>
-        auto configuration(this tp_this&& a_this) -> decltype(auto);
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 
         private:
         extent_t m_extent;

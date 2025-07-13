@@ -48,6 +48,10 @@ namespace mwc {
                                    const configuration_st& a_configuration = configuration_st::default_configuration());
 
         auto bind(const vk::raii::CommandBuffer& a_command_buffer) const -> void;
+        [[nodiscard]] auto viewport() const -> vk::Viewport;
+        [[nodiscard]] auto scissor() const -> vk::Rect2D;
+        template <typename tp_this>
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 
         private:
         vk::Viewport m_viewport;
@@ -86,6 +90,10 @@ namespace mwc {
           .m_color_write_mask = array_t<vk::ColorComponentFlags, attachment_count> {
           vk::ColorComponentFlags {vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG |
                                    vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA}}};
+      }
+      template <typename tp_this>
+      auto dynamic_rendering_state_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }

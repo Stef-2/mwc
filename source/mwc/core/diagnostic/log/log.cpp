@@ -17,9 +17,6 @@ namespace mwc::diagnostic::log {
   log_ct::log_ct(const span_t<sink_st> a_sinks, const configuration_st& a_cfg)
   : m_storage {a_sinks.begin(), a_sinks.end()},
     m_configuration {a_cfg} {}
-  auto log_ct::configuration(this auto&& a_this) -> decltype(auto) {
-    return a_this.m_configuration;
-  }
   auto log_ct::insert_sink(const sink_st& a_sink) -> void {
     m_storage.emplace_back(a_sink);
   }

@@ -24,8 +24,10 @@ namespace mwc {
                             const configuration_st& a_configuration = configuration_st::default_configuration());
         ~memory_allocator_ct();
 
-        auto statistics() const -> const vma::TotalStatistics;
-        auto budget() const -> const vector_t<vma::Budget>;
+        [[nodiscard]] auto statistics() const -> const vma::TotalStatistics;
+        [[nodiscard]] auto budget() const -> const vector_t<vma::Budget>;
+        template <typename tp_this>
+        [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 
         private:
         configuration_st m_configuration;
@@ -35,6 +37,10 @@ namespace mwc {
       constexpr auto memory_allocator_ct::configuration_st::default_configuration() -> configuration_st {
 
         return configuration_st {};
+      }
+      template <typename tp_this>
+      auto memory_allocator_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_configuration);
       }
     }
   }
