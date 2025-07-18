@@ -7,6 +7,7 @@ import mwc_definition;
 import mwc_subsystem;
 import mwc_directory;
 import mwc_enum_range;
+import mwc_contract_assertion;
 import mwc_project_name_string;
 
 import std;
@@ -23,6 +24,9 @@ namespace mwc {
 
       static inline static_unordered_bi_map_st<directory_et, filepath_t, directory_track_count> directory_map;
     };
+
+    auto directory(const directory_et a_directory) -> filepath_t pre(a_directory != directory_et::end);
+    auto directory(const string_view_t a_directory) -> filepath_t pre(contract::validate_storage(a_directory));
 
     namespace global {
       inline auto file_subsystem = file_subsystem_st {{&diagnostic::log::global::logging_subsystem}, "file subsystem"};

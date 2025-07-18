@@ -84,6 +84,19 @@ target_compile_definitions(vma_module PRIVATE
 )
 target_link_libraries(vma_module PRIVATE VulkanHppModule)
 
+# fastgltf library
+add_library(fast_gltf_module)
+FetchContent_Declare(fastgltf GIT_REPOSITORY https://github.com/spnda/fastgltf GIT_TAG main)
+FetchContent_MakeAvailable(fastgltf)
+target_include_directories(fast_gltf_module PRIVATE ${fastgltf_SOURCE_DIR}/include)
+target_sources(fast_gltf_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${fastgltf_SOURCE_DIR} FILES ${fastgltf_SOURCE_DIR}/src/fastgltf.ixx)
+target_compile_features(fast_gltf_module PUBLIC cxx_std_26)
+target_compile_definitions(fast_gltf_module PRIVATE
+        FASTGLTF_COMPILE_AS_CPP20
+        FASTGLTF_USE_STD_MODULE
+)
+target_link_libraries(fast_gltf_module PRIVATE fastgltf)
+
 # project executable
 add_executable(${PROJECT_NAME})
 # project include directories
@@ -107,4 +120,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         vkfw_module
         vma_module
         imgui
+        fast_gltf_module
 )

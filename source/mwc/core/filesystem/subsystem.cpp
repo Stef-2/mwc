@@ -1,5 +1,7 @@
 #include "mwc/core/filesystem/subsystem.hpp"
 
+import mwc_memory_conversion;
+
 namespace mwc {
   namespace filesystem {
     auto file_subsystem_st::initialize() -> void {
@@ -20,7 +22,7 @@ namespace mwc {
 
       // current filesystem space usage
       const auto filesystem_space = std::filesystem::space(directory_map[directory_et::e_root]);
-      constexpr auto bytes_in_gibibyte = 1024 * 1024 * 1024;
+      constexpr auto bytes_in_gibibyte = byte_count<mwc::gibi>(1);
       information(std::format("filesystem disk space usage:" SUB "capacity: {0} GiB" SUB "free: {1} GiB" SUB
                               "available: {2} GiB",
                               filesystem_space.capacity / bytes_in_gibibyte, filesystem_space.free / bytes_in_gibibyte,
@@ -59,6 +61,16 @@ namespace mwc {
     }
     auto file_subsystem_st::finalize() -> void {
       m_initialized = false;
+    }
+    auto directory(const directory_et a_directory) -> filepath_t {
+      return file_subsystem_st::directory_map[a_directory];
+    }
+    auto directory(const string_view_t a_directory) -> filepath_t {
+      for (const auto& directory_iterator : directory(directory_et::e_root))
+        if (directory_iterator.filename() == a_directory)
+          return directory_iterator;
+
+      contract_assert(false);
     }
   }
 }

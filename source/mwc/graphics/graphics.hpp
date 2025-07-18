@@ -38,6 +38,9 @@ namespace mwc {
 
       auto render() -> void;
 
+      template <typename tp_this>
+      [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
+
       private:
       const window_ct& m_window;
       vulkan::context_st m_context;
@@ -62,6 +65,10 @@ namespace mwc {
     // implementation
     constexpr auto graphics_ct::configuration_st::default_configuration() -> const configuration_st {
       return configuration_st {.m_frames_in_flight = 2};
+    }
+    template <typename tp_this>
+    auto graphics_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+      return std::forward_like<decltype(a_this)>(a_this.m_configuration);
     }
   }
 }

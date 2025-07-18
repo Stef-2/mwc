@@ -1,3 +1,5 @@
+#pragma once
+
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 
 import vkfw;

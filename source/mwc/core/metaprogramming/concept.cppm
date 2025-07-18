@@ -38,6 +38,10 @@ export namespace mwc {
     template <typename tp, typename... tps>
     concept any_of_c = std::disjunction_v<std::is_same<tp, tps>...>;
 
+    // concept modeling a valid arithmetic type and its element count
+    template <typename tp, size_t tp_count>
+    concept arithmetic_size_c = std::is_arithmetic_v<tp> and tp_count > 0 and tp_count != std::dynamic_extent;
+
     // concept modeling a predicate that asserts that [tp] must be the same as [tps]
     template <typename tp, typename... tps>
     concept all_of_c = std::conjunction_v<std::is_same<tp, tps>...>;

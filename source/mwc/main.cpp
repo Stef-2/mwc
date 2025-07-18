@@ -1,4 +1,6 @@
 #include "mwc/mwc.hpp"
+#include "mwc/core/filesystem/subsystem.hpp"
+#include "mwc/input/subsystem.hpp"
 
 import mwc_subsystem;
 
