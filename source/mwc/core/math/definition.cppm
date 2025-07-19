@@ -19,8 +19,7 @@ export namespace mwc {
       requires concepts::arithmetic_size_c<tp, tp_row_count> and concepts::arithmetic_size_c<tp, tp_column_count>
     using matrix_t = Eigen::Matrix<tp, tp_row_count, tp_column_count>;
 
-    template <typename tp>
-      requires std::is_arithmetic_v<tp>
+    template <std::floating_point tp>
     using quaternion_t = Eigen::Quaternion<tp>;
   }
 }
