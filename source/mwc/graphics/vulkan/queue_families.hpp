@@ -4,6 +4,7 @@
 #include "mwc/graphics/vulkan/surface.hpp"
 
 import mwc_definition;
+import mwc_type_mobility;
 
 import vulkan_hpp;
 
@@ -12,7 +13,7 @@ import std;
 namespace mwc {
   namespace graphics {
     namespace vulkan {
-      class queue_families_ct {
+      class queue_families_ct : public irreproducible_st {
         public:
         using queue_family_count_t = uint32_t;
 
@@ -41,8 +42,6 @@ namespace mwc {
 
         queue_families_ct(const physical_device_ct& a_physical_device, const surface_ct& a_surface,
                           const configuration_st& a_configuration = configuration_st::default_configuration());
-        queue_families_ct(const queue_families_ct&) = delete("move only type");
-        auto operator=(const queue_families_ct&) -> queue_families_ct& = delete("move only type");
 
         template <typename tp_this>
         [[nodiscard]] auto graphics(this tp_this&& a_this) -> decltype(auto);

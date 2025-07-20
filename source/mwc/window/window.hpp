@@ -4,6 +4,7 @@ import mwc_definition;
 import mwc_resolution;
 import mwc_contract_assertion;
 import mwc_project_name_string;
+import mwc_type_mobility;
 
 import vulkan_hpp;
 import vkfw;
@@ -11,7 +12,7 @@ import vkfw;
 import std;
 
 namespace mwc {
-  class window_ct {
+  class window_ct : public irreproducible_st {
     public:
     struct configuration_st {
       static constexpr auto default_configuration() -> const configuration_st;
@@ -24,8 +25,6 @@ namespace mwc {
     window_ct(const configuration_st& a_configuration = configuration_st::default_configuration())
       pre(a_configuration.m_resolution.m_width != 0 and a_configuration.m_resolution.m_height != 0)
         pre(contract::validate_storage(a_configuration.m_title));
-    window_ct(const window_ct&) = delete("move only type");
-    auto operator=(const window_ct&) -> window_ct& = delete("move only type");
 
     auto title() const -> string_view_t;
     auto title(const string_view_t a_title) -> void pre(contract::validate_storage(a_title));

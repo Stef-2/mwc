@@ -43,6 +43,7 @@ export namespace mwc {
   // utility types
   using bool_t = bool;
   using nullptr_t = std::nullptr_t;
+  using any_t = std::any;
 
   // path types
   using filepath_t = std::filesystem::path;

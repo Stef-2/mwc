@@ -8,6 +8,7 @@ import mwc_set_bit;
 import mwc_bit_mask;
 import mwc_chrono;
 import mwc_enum_bitwise_operators;
+import mwc_type_mobility;
 import mwc_observer_ptr;
 
 import std;
@@ -67,13 +68,11 @@ namespace mwc {
       };
 
       // logging subsystem
-      class log_ct {
+      class log_ct : public irreproducible_st {
         public:
         using storage_t = vector_t<sink_st>;
 
         log_ct(const span_t<sink_st> a_sinks = {}, const configuration_st& a_cfg = configuration_st::default_configuration());
-        log_ct(const log_ct&) = delete("move only type");
-        auto operator=(const log_ct&) -> log_ct& = delete("move only type");
         log_ct(log_ct&&) noexcept = default;
         auto operator=(log_ct&&) noexcept -> log_ct& = default;
 

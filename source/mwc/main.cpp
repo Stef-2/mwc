@@ -1,31 +1,35 @@
 #include "mwc/mwc.hpp"
 #include "mwc/core/filesystem/subsystem.hpp"
-
+#include "mwc/ecs/archetype.hpp"
 import mwc_subsystem;
-import mwc_consteval_counter;
+import mwc_ecs_definition;
 
 import std;
 
 import vkfw;
 
-template <typename tp>
-struct test {
-  static constexpr auto id = mwc::ExtractThenUpdateCurrentState<0>();
+struct test2 : mwc::ecs::component_t<test2> {
+  int i;
+};
+struct test3 : mwc::ecs::component_t<test3> {
+  float f;
 };
 
-struct test2 : test<test2> {};
-struct test3 : test<test3> {};
-
 int main() {
-  constexpr auto x = test2::id;
-  constexpr auto y = test3::id;
+  constexpr auto x = test2::identity;
+  constexpr auto y = test3::identity;
   std::cout << x << " " << y << std::endl;
+
+  mwc::ecs::archetype_ct<test2, test3> arch;
+  const auto& cv = std::get<0>(arch.m_components);
+  std::cout << "cap: " << cv.capacity() << '\n';
+
   return 0;
   mwc::initialize_subsystems();
   mwc::mwc_ct mwc {};
 
   while (true) {
-    vkfw::pollEvents();
+    std::ignore = vkfw::pollEvents();
     mwc.m_graphics.render();
   }
 

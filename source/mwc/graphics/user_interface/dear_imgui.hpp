@@ -12,6 +12,7 @@
 #include "imgui.h"
 
 import mwc_definition;
+import mwc_type_mobility;
 
 import vulkan_hpp;
 
@@ -19,9 +20,9 @@ import std;
 
 namespace mwc {
   namespace graphics {
-    class dear_imgui_ct{
+    class dear_imgui_ct {
       public:
-      struct configuration_st {
+      struct configuration_st : public irreproducible_st {
         static constexpr auto default_configuration() -> configuration_st;
 
         vk::SampleCountFlagBits m_sample_count;
@@ -38,8 +39,6 @@ namespace mwc {
                     const vulkan::swapchain_ct& a_swapchain,
                     const configuration_st& a_configuration = configuration_st::default_configuration());
 
-      dear_imgui_ct(const dear_imgui_ct&) = delete("move only type");
-      auto operator=(const dear_imgui_ct&) -> dear_imgui_ct& = delete("move only type");
       dear_imgui_ct(dear_imgui_ct&&) noexcept = default;
       auto operator=(dear_imgui_ct&&) noexcept -> dear_imgui_ct& = default;
 

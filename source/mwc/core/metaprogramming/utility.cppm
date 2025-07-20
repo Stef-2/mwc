@@ -12,11 +12,9 @@ export namespace mwc {
 
   // assert that [tp_specialization] is a specialization of [tp]
   template <template <typename...> typename tp_specialization, typename... tp>
-  constexpr inline bool_t
-    specialization_of_v<tp_specialization<tp...>, tp_specialization> =
-      std::true_type {};
+  constexpr inline bool_t specialization_of_v<tp_specialization<tp...>, tp_specialization> = std::true_type {};
 
-  // compile time assertion that the number of [tp] template parameters is within [tp_min] and [tp_max]
+  // constant evaluated assertion that the number of [tp] template parameters is within [tp_min] and [tp_max]
   template <size_t tp_min, size_t tp_max, typename... tps>
   consteval auto within_bounds() {
     constexpr auto check = sizeof...(tps) >= tp_min and sizeof...(tps) <= tp_max;
@@ -24,7 +22,7 @@ export namespace mwc {
     return check;
   }
 
-  // compile time for-loop
+  // constant evaluated for-loop
   template <size_t tp_i, size_t tp_n, typename tp_functor>
   consteval auto static_for_loop(const tp_functor& a_functor) {
     static_assert(tp_i <= tp_n);

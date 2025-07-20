@@ -1,13 +1,14 @@
 #pragma once
 
 import mwc_definition;
+import mwc_type_mobility;
 
 import vk_mem_alloc_hpp;
 
 import std;
 
 namespace mwc {
-  class virtual_allocator_ct {
+  class virtual_allocator_ct : public irreproducible_st {
     public:
     using memory_offset_t = size_t;
     using memory_size_t = size_t;
@@ -31,8 +32,6 @@ namespace mwc {
     virtual_allocator_ct(const memory_size_t a_virtual_memory_block_size,
                          const configuration_st& a_configuration = configuration_st::default_configuration())
       pre(a_virtual_memory_block_size > 0);
-    virtual_allocator_ct(const virtual_allocator_ct&) = delete("move only type");
-    auto operator=(const virtual_allocator_ct&) -> virtual_allocator_ct& = delete("move only type");
     ~virtual_allocator_ct();
 
     [[nodiscard]] auto request_suballocation(
