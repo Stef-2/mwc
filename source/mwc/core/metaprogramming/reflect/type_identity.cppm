@@ -3,7 +3,7 @@ module;
 export module mwc_type_identity;
 
 import mwc_definition;
-import mwc_stateful;
+import mwc_ctti;
 import mwc_compiler;
 
 import std;
