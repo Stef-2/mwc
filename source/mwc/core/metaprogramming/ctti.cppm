@@ -4,107 +4,114 @@ export module mwc_ctti;
 
 import std;
 
-export namespace mwc {
-  // constant evaluated, observable and modifiable state
-  // type identified version
-  template <typename, auto>
-  struct type_identified_declaration_st {
-    friend consteval auto function(type_identified_declaration_st, auto...);
-  };
-
-  template <typename tp_identity, auto tp_state>
-  struct type_identified_definition_st {
-    friend consteval auto function(type_identified_declaration_st<tp_identity, tp_state>, auto...) {}
-  };
-
-  template <typename tp_identity, auto tp_modifier, auto tp_state = 0, auto = [] {}>
-  [[nodiscard]] consteval auto modify_state() -> decltype(tp_state) {
-    if constexpr (requires { function(type_identified_declaration_st<tp_identity, tp_state> {}); })
-      return modify_state<tp_identity, tp_modifier, tp_modifier(tp_state)>();
-    else
-      std::ignore = type_identified_definition_st<tp_identity, tp_state> {};
-    return tp_state;
-  }
-
-  template <typename tp_identity, auto tp_state = 0, auto = [] {}>
-  [[nodiscard]] consteval auto observe_state() -> decltype(tp_state) {
-    if constexpr (requires { function(type_identified_declaration_st<tp_identity, tp_state> {}); })
-      return observe_state<tp_identity, tp_state + 1>();
-    else
-      return tp_state;
-  }
-
-  // non type identified version
-  template <auto, auto>
-  struct non_type_identified_declaration_st {
-    friend consteval auto function(non_type_identified_declaration_st, auto...);
-  };
-
-  template <auto tp_identity, auto tp_state>
-  struct non_type_identified_definition_st {
-    friend consteval auto function(non_type_identified_declaration_st<tp_identity, tp_state>, auto...) {}
-  };
-
-  template <auto tp_identity, auto tp_modifier, auto tp_state = 0, auto = [] {}>
-  [[nodiscard]] consteval auto modify_state() -> decltype(tp_state) {
-    if constexpr (requires { function(non_type_identified_declaration_st<tp_identity, tp_state> {}); })
-      return modify_state<tp_identity, tp_modifier, tp_modifier(tp_state)>();
-    else
-      non_type_identified_definition_st<tp_identity, tp_state> {};
-    return tp_state;
-  }
-
-  template <auto tp_identity, auto tp_state = 0, auto = [] {}>
-  [[nodiscard]] consteval auto observe_state() -> decltype(tp_state) {
-    if constexpr (requires { function(non_type_identified_declaration_st<tp_identity, tp_state> {}); })
-      return observe_state<tp_identity, tp_state + 1>();
-    else
-      return tp_state;
-  }
-
-  // ================================================
-  template <class...>
-  struct type_list {};
-  template <class...>
-  struct type_list2 {};
-
-  namespace detail {
-    template <template <class...> class tp_list, auto>
-    struct nth {
-      auto friend get(nth);
+// internal
+namespace mwc {
+  namespace ctti {
+    // utility requird for constant evaluated, observable and modifiable state
+    // type identified version
+    template <typename, auto>
+    struct type_identified_declaration_st {
+      friend consteval auto state_function(type_identified_declaration_st, auto...);
     };
-    template <template <class...> class tp_list, auto N, class T>
-    struct set {
-      auto friend get(nth<tp_list, N>) {
-        return T {};
+    template <typename tp_identity, auto tp_state>
+    struct type_identified_definition_st {
+      friend consteval auto state_function(type_identified_declaration_st<tp_identity, tp_state>, auto...) {}
+    };
+    // non type identified version
+    template <auto, auto>
+    struct non_type_identified_declaration_st {
+      friend consteval auto state_function(non_type_identified_declaration_st, auto...);
+    };
+    template <auto tp_identity, auto tp_state>
+    struct non_type_identified_definition_st {
+      friend consteval auto state_function(non_type_identified_declaration_st<tp_identity, tp_state>, auto...) {}
+    };
+
+    // utility required for constant evaulated, observable and modifiable type lists
+    template <template <typename...> typename tp_list, auto>
+    struct element_st {
+      auto friend observe(element_st);
+    };
+    template <template <typename...> typename tp_list, auto tp_state, typename tp>
+    struct modify_st {
+      auto friend observe(element_st<tp_list, tp_state>) {
+        return tp {};
       }
     };
-    template <template <class...> class TList, class T, class... Ts>
-    auto append(TList<Ts...>) -> TList<Ts..., T>;
-  } // namespace detail
-
-  template <template <class...> class tp_list, class T, auto N = 0, auto unique = [] {}>
-  consteval auto append() {
-    if constexpr (requires { get(detail::nth<tp_list, N> {}); })
-      append<tp_list, T, N + 1, unique>();
-    else if constexpr (N == 0)
-      void(detail::set<tp_list, N, tp_list<T>> {});
-    else
-      void(detail::set<tp_list, N, decltype(detail::append<tp_list, T>(get(detail::nth<tp_list, N - 1> {})))> {});
+    template <template <typename...> typename tp_list, typename tp, typename... tps>
+    auto type_list_push_back(tp_list<tps...>) -> tp_list<tps..., tp>;
   }
+}
 
-  template <template <class...> class tp_list, auto unique = [] {}, auto N = 0>
-  consteval auto get_list() {
-    if constexpr (requires { get(detail::nth<tp_list, N> {}); })
-      return get_list<tp_list, unique, N + 1>();
-    else if constexpr (N == 0)
-      return tp_list {};
-    else
-      return get(detail::nth<tp_list, N - 1> {});
+export namespace mwc {
+  namespace ctti {
+    // constant evaluated, observable and modifiable state
+    // type identified version
+    template <typename tp_identity, auto tp_modifier, auto tp_state = 0, auto = [] {}>
+    [[nodiscard]] consteval auto modify_state() -> decltype(tp_state) {
+      if constexpr (requires { state_function(type_identified_declaration_st<tp_identity, tp_state> {}); })
+        return modify_state<tp_identity, tp_modifier, tp_modifier(tp_state)>();
+      else
+        std::ignore = type_identified_definition_st<tp_identity, tp_state> {};
+      return tp_state;
+    }
+    template <typename tp_identity, auto tp_state = 0, auto = [] {}>
+    [[nodiscard]] consteval auto observe_state() -> decltype(tp_state) {
+      if constexpr (requires { state_function(type_identified_declaration_st<tp_identity, tp_state> {}); })
+        return observe_state<tp_identity, tp_state + 1>();
+      else
+        return tp_state;
+    }
+    // non type identified version
+    template <auto tp_identity, auto tp_modifier, auto tp_state = 0, auto = [] {}>
+    [[nodiscard]] consteval auto modify_state() -> decltype(tp_state) {
+      if constexpr (requires { state_function(non_type_identified_declaration_st<tp_identity, tp_state> {}); })
+        return modify_state<tp_identity, tp_modifier, tp_modifier(tp_state)>();
+      else
+        non_type_identified_definition_st<tp_identity, tp_state> {};
+      return tp_state;
+    }
+    template <auto tp_identity, auto tp_state = 0, auto = [] {}>
+    [[nodiscard]] consteval auto observe_state() -> decltype(tp_state) {
+      if constexpr (requires { state_function(non_type_identified_declaration_st<tp_identity, tp_state> {}); })
+        return observe_state<tp_identity, tp_state + 1>();
+      else
+        return tp_state;
+    }
+
+    // constant evaulated, observable and modifiable type lists
+    template <typename...>
+    struct type_list {};
+    template <typename...>
+    struct type_list2 {};
+
+    template <template <typename...> typename tp_list, typename tp, auto tp_state = 0, auto tp_unique = [] {}>
+    consteval auto type_list_push_back() {
+      if constexpr (requires { observe(element_st<tp_list, tp_state> {}); })
+        type_list_push_back<tp_list, tp, tp_state + 1, tp_unique>();
+      else if constexpr (tp_state == 0)
+        void(modify_st<tp_list, tp_state, tp_list<tp>> {});
+      else
+        void(
+          modify_st<tp_list, tp_state, decltype(type_list_push_back<tp_list, tp>(observe(element_st<tp_list, tp_state - 1> {})))> {});
+    }
+    template <template <typename...> typename tp_list, auto tp_state = 0, auto tp_unique = [] {}>
+    consteval auto observe_type_list() {
+      if constexpr (requires { observe(element_st<tp_list, tp_state> {}); })
+        return observe_type_list<tp_list, tp_state + 1, tp_unique>();
+      else if constexpr (tp_state == 0)
+        return tp_list {};
+      else
+        return observe(element_st<tp_list, tp_state - 1> {});
+    }
+    template <template <typename...> typename tp_list, auto tp_state = 0>
+    consteval auto get() {
+      return observe(element_st<tp_list, tp_state> {});
+    }
+
+    using x = decltype(type_list_push_back<type_list, int>());
+    using x = decltype(type_list_push_back<type_list, float>());
+    using y = decltype(type_list_push_back<type_list2, char>());
+    static_assert(not std::is_same_v<decltype(observe_type_list<type_list>()), decltype(observe_type_list<type_list2>())>);
   }
-
-  using x = decltype(append<type_list, int>());
-  using x = decltype(append<type_list, float>());
-  using y = decltype(append<type_list2, char>());
-  static_assert(std::is_same_v<decltype(get_list<type_list>()), decltype(get_list<type_list2>())>);
 }
