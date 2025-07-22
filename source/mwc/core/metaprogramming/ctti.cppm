@@ -108,10 +108,5 @@ export namespace mwc {
     consteval auto get() {
       return observe(element_st<tp_list, tp_state> {});
     }
-
-    using x = decltype(type_list_push_back<type_list, int>());
-    using x = decltype(type_list_push_back<type_list, float>());
-    using y = decltype(type_list_push_back<type_list2, char>());
-    static_assert(not std::is_same_v<decltype(observe_type_list<type_list>()), decltype(observe_type_list<type_list2>())>);
   }
 }

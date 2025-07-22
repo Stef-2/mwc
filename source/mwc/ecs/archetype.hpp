@@ -5,7 +5,6 @@ import mwc_ecs_definition;
 import mwc_type_mobility;
 import mwc_hash;
 import mwc_observer_ptr;
-import mwc_static_string;
 import mwc_ecs_component;
 
 import std;
@@ -18,9 +17,9 @@ namespace mwc {
       auto combined_hash = archetype_hash_t {0};
 
       const auto lambda = [&combined_hash]<component_c tp>() {
-        constexpr char identity_string[sizeof(component_index_t)] = {tp::identity};
-
-        combined_hash += hash<static_string_st {identity_string}>();
+        // convert the component type identities to a string format, suitable for hashing
+        constexpr auto identity_string = std::bit_cast<array_t<char, sizeof(tp::identity)>>(tp::identity);
+        combined_hash += polynomial_rolling_hash(string_view_t {identity_string.data(), identity_string.size()});
       };
 
       (lambda.template operator()<tps>(), ...);
@@ -29,35 +28,50 @@ namespace mwc {
     }
 
     struct archetype_base_st {
+      using data_column_t = entity_t;
+      using component_ptr_span_t = span_t<const void*>;
+      using entity_storage_t = vector_t<entity_t>;
+      using entity_span_t = span_t<const entity_t>;
+
       virtual ~archetype_base_st() = default;
 
+      [[nodiscard]] virtual constexpr auto component_count() -> component_index_t = 0;
+      [[nodiscard]] virtual constexpr auto component_indices() -> span_t<const component_index_t> = 0;
       [[nodiscard]] virtual constexpr auto hash() const -> archetype_hash_t = 0;
+      virtual auto component_column_data_pointers(const data_column_t a_component_column) const -> component_ptr_span_t = 0;
+      virtual auto remove_component_column(const data_column_t a_component_column) -> void = 0;
+
+      entity_storage_t m_entities;
     };
 
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
     class archetype_ct : public archetype_base_st, public irreproducible_st {
       public:
-      using entity_storage_t = vector_t<entity_t>;
       using component_storage_t = tuple_t<vector_t<tp_components>...>;
+
+      static constexpr auto archetype_indices = array_t<component_index_t, sizeof...(tp_components)> {tp_components::identity...};
 
       struct configuration_st {
         static constexpr auto default_configuration() -> configuration_st;
 
-        size_t m_component_storage_capacity;
+        size_t m_initial_storage_capacity;
       };
 
       archetype_ct(const configuration_st& a_configuration = configuration_st::default_configuration());
 
+      [[nodiscard]] constexpr auto component_count() -> component_index_t override final;
+      [[nodiscard]] constexpr auto component_indices() -> span_t<const component_index_t> override final;
       [[nodiscard]] constexpr auto hash() const -> archetype_hash_t override final;
-      auto insert_entity(const entity_t a_entity, tp_components&&... a_components)
-        -> void pre(not std::ranges::contains(m_entities, a_entity));
+      //[[nodiscard]] constexpr auto entities() const -> const entity_span_t override final;
+      auto insert_component_column(tp_components&&... a_components) -> void;
+      auto remove_component_column(const data_column_t a_component_column) -> void override final;
+      auto component_column_data_pointers(const data_column_t a_component_column) const -> component_ptr_span_t override final;
 
       template <typename tp_this>
       [[nodiscard]] constexpr auto configuration(this tp_this&& a_this) -> decltype(auto);
 
       //private:
-      entity_storage_t m_entities;
       component_storage_t m_components;
       configuration_st m_configuration;
     };
@@ -66,7 +80,7 @@ namespace mwc {
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
     constexpr auto archetype_ct<tp_components...>::configuration_st::default_configuration() -> configuration_st {
-      return configuration_st {.m_component_storage_capacity = 32};
+      return configuration_st {.m_initial_storage_capacity = 32};
     }
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
@@ -77,25 +91,54 @@ namespace mwc {
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
     archetype_ct<tp_components...>::archetype_ct(const configuration_st& a_configuration)
-    : m_entities {},
-      m_components {},
+    : m_components {},
       m_configuration {a_configuration} {
-      m_entities.reserve(m_configuration.m_component_storage_capacity);
+      m_entities.reserve(m_configuration.m_initial_storage_capacity);
       auto& [... components] = m_components;
-      (components.reserve(m_configuration.m_component_storage_capacity), ...);
+      (components.reserve(m_configuration.m_initial_storage_capacity), ...);
+    }
+    template <component_c... tp_components>
+      requires(sizeof...(tp_components) > 0)
+    constexpr auto archetype_ct<tp_components...>::component_count() -> component_index_t {
+      return sizeof...(tp_components);
+    }
+    template <component_c... tp_components>
+      requires(sizeof...(tp_components) > 0)
+    constexpr auto archetype_ct<tp_components...>::component_indices() -> span_t<const component_index_t> {
+      return {archetype_indices};
     }
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
     constexpr auto archetype_ct<tp_components...>::hash() const -> archetype_hash_t {
       return archetype_hash<tp_components...>();
     }
+    /*template <component_c... tp_components>
+      requires(sizeof...(tp_components) > 0)
+    constexpr auto archetype_ct<tp_components...>::entities() const -> const entity_span_t {
+      return std::get<vector_t<entity_t>>(m_data);
+    }*/
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
-    auto archetype_ct<tp_components...>::insert_entity(const entity_t a_entity, tp_components&&... a_components) -> void {
-      m_entities.emplace_back(a_entity);
-
+    auto archetype_ct<tp_components...>::insert_component_column(tp_components&&... a_components) -> void {
       auto& [... components] = m_components;
-      (components.emplace_back(std::forward<tp_components>(a_components)), ...);
+
+      (components.emplace_back((std::forward<tp_components>(a_components))), ...);
+    }
+    template <component_c... tp_components>
+      requires(sizeof...(tp_components) > 0)
+    auto archetype_ct<tp_components...>::remove_component_column(const data_column_t a_component_column) -> void {
+      auto& [... components] = m_components;
+
+      m_entities.erase(m_entities.begin() + a_component_column);
+      (components.erase(components.begin() + a_component_column), ...);
+    }
+    template <component_c... tp_components>
+      requires(sizeof...(tp_components) > 0)
+    auto archetype_ct<tp_components...>::component_column_data_pointers(const data_column_t a_component_column) const
+      -> component_ptr_span_t {
+      auto& [... components] = m_components;
+
+      return {} /*{(static_cast<const void*>(&components[a_component_column]), ...)}*/;
     }
   }
 }
