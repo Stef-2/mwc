@@ -24,9 +24,52 @@ namespace mwc {
       static inline auto archetypes = archetype_storage_t {};
     };
 
-    template <component_c... tp_components>
-      requires(sizeof...(tp_components) > 0)
+    template <component_c tp_component_x, component_c tp_component_y>
+    consteval auto sort_components() {
+      if constexpr (tp_component_x::identity > tp_component_y::identity)
+        return pair_t<tp_component_x, tp_component_y> {};
+      else
+        return pair_t<tp_component_y, tp_component_x> {};
+    }
+    template <bool b, component_c tp_x, component_c... tps>
+    consteval auto sorted() -> bool {
+      if constexpr (b and sizeof...(tps) == 0)
+        return true;
+      if constexpr (b == false or sizeof...(tps) > 0) {
+        if constexpr (tp_x::identity > tps...[0] ::identity)
+          return sorted<true, tps...>();
+      } else
+        return false;
+    }
+    template <typename tp_tuple, component_c tp_x, component_c tp_y, component_c... tps>
+    consteval auto sort() {
+      if constexpr (sizeof...(tps) == 0) {
+        using result_t = decltype(std::tuple_cat(tp_tuple {}, sort_components<tp_x, tp_y>()));
+        auto [... result] = result_t {};
+        if (not sorted<true, decltype(result)...>())
+          sort<tuple_t<>, tp_x, tp_y, tps...>();
+        else
+          return result_t {};
+      }
+
+      /*if constexpr (sizeof...(tps) == 1)
+        return std::tuple_cat(tp_tuple {}, sort_components<tp_x, tp_y>());*/
+
+      if constexpr (sizeof...(tps) >= 1) {
+        using t = decltype(sort_components<tp_x, tp_y>());
+        using combined_t = decltype(std::tuple_cat(tp_tuple {}, tuple_t<decltype(t::first)> {}));
+        using rest_t = decltype(std::tuple_cat(tuple_t<decltype(t::second)> {}, tuple_t<tps...> {}));
+        auto [... rest] = rest_t {};
+        //static_assert((std::is_same_v<decltype(rest...[1]), void>));
+        //static_assert(sizeof...(rest) == 4);
+        return sort<combined_t, decltype(rest)...>();
+      } /*else
+        return tp_tuple {};*/
+    }
+    template </*component_c tp_component, */ component_c... tp_components>
     auto generate_archetype() -> void {
+      using t = decltype(sort<tuple_t<>, tp_components...>());
+      static_assert(std::is_same_v<t, char>);
       ecs_subsystem_st::archetypes.emplace_back(std::make_unique<archetype_ct<tp_components...>>());
     }
     template <component_c... tp_components>
@@ -81,7 +124,7 @@ namespace mwc {
     }
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
-    auto entity_insert_components(const entity_t a_entity, tp_components&&... a_components) {
+    auto entity_insert_components(const entity_t a_entity, tp_components&&... a_components) -> void {
       constexpr auto inserted_archetype_hash = archetype_hash<tp_components...>();
 
       // determing the entities current archetype, combine its hash with the new one
@@ -100,13 +143,26 @@ namespace mwc {
           (lambda.template operator()<tp_components>(), ...);
 
           // attempt to find an archetype with the combined component hash
-          const auto archetype_iterator = std::ranges::find_if(
-            ecs_subsystem_st::archetypes, [combined_hash](const ecs_subsystem_st::archetype_base_ptr_t& a_archetype_base) {
-              return a_archetype_base->hash() == combined_hash;
-            });
-          if (archetype_iterator != ecs_subsystem_st::archetypes.end()) {
-            ;
-            ;
+          const auto target_archetype =
+            std::ranges::find_if(ecs_subsystem_st::archetypes,
+                                 [combined_hash](const ecs_subsystem_st::archetype_base_ptr_t& a_archetype_base) {
+                                   return a_archetype_base->hash() == combined_hash;
+                                 });
+          if (target_archetype != ecs_subsystem_st::archetypes.end()) {
+            const auto current_component_indices = current_archetype.get()->component_indices();
+            const auto target_component_indices = target_archetype->get()->component_indices();
+            contract_assert(current_component_indices.size() == target_component_indices.size());
+
+            const auto current_component_pointers =
+              current_archetype.get()->component_column_data_pointers(current_archetype.get()->m_entities.size());
+            const auto target_component_pointers =
+              target_archetype->get()->component_column_data_pointers(target_archetype->get()->m_entities.size() + 1);
+            contract_assert(current_component_pointers.size() == target_component_pointers.size());
+
+            // transfer the entity
+            target_archetype->get()->m_entities.emplace_back(*entity_iterator);
+            current_archetype.get()->m_entities.erase(entity_iterator);
+            //for (auto i = entity_t{0}; i < )
           }
         }
       }

@@ -29,7 +29,7 @@ namespace mwc {
 
     struct archetype_base_st {
       using data_column_t = entity_t;
-      using component_ptr_span_t = span_t<const void*>;
+      using component_ptr_vector_t = vector_t<obs_ptr_t<void>>;
       using entity_storage_t = vector_t<entity_t>;
       using entity_span_t = span_t<const entity_t>;
 
@@ -38,7 +38,9 @@ namespace mwc {
       [[nodiscard]] virtual constexpr auto component_count() -> component_index_t = 0;
       [[nodiscard]] virtual constexpr auto component_indices() -> span_t<const component_index_t> = 0;
       [[nodiscard]] virtual constexpr auto hash() const -> archetype_hash_t = 0;
-      virtual auto component_column_data_pointers(const data_column_t a_component_column) const -> component_ptr_span_t = 0;
+      [[nodiscard]] virtual auto component_column_data_pointers(const data_column_t a_component_column)
+        -> component_ptr_vector_t = 0;
+      virtual auto insert_component_empty_component_column() -> void = 0;
       virtual auto remove_component_column(const data_column_t a_component_column) -> void = 0;
 
       entity_storage_t m_entities;
@@ -63,10 +65,11 @@ namespace mwc {
       [[nodiscard]] constexpr auto component_count() -> component_index_t override final;
       [[nodiscard]] constexpr auto component_indices() -> span_t<const component_index_t> override final;
       [[nodiscard]] constexpr auto hash() const -> archetype_hash_t override final;
-      //[[nodiscard]] constexpr auto entities() const -> const entity_span_t override final;
+      [[nodiscard]] auto component_column_data_pointers(const data_column_t a_component_column)
+        -> component_ptr_vector_t override final;
       auto insert_component_column(tp_components&&... a_components) -> void;
       auto remove_component_column(const data_column_t a_component_column) -> void override final;
-      auto component_column_data_pointers(const data_column_t a_component_column) const -> component_ptr_span_t override final;
+      auto insert_component_empty_component_column() -> void override final;
 
       template <typename tp_this>
       [[nodiscard]] constexpr auto configuration(this tp_this&& a_this) -> decltype(auto);
@@ -112,11 +115,6 @@ namespace mwc {
     constexpr auto archetype_ct<tp_components...>::hash() const -> archetype_hash_t {
       return archetype_hash<tp_components...>();
     }
-    /*template <component_c... tp_components>
-      requires(sizeof...(tp_components) > 0)
-    constexpr auto archetype_ct<tp_components...>::entities() const -> const entity_span_t {
-      return std::get<vector_t<entity_t>>(m_data);
-    }*/
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
     auto archetype_ct<tp_components...>::insert_component_column(tp_components&&... a_components) -> void {
@@ -134,11 +132,18 @@ namespace mwc {
     }
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
-    auto archetype_ct<tp_components...>::component_column_data_pointers(const data_column_t a_component_column) const
-      -> component_ptr_span_t {
+    auto archetype_ct<tp_components...>::insert_component_empty_component_column() -> void {
       auto& [... components] = m_components;
 
-      return {} /*{(static_cast<const void*>(&components[a_component_column]), ...)}*/;
+      (components.resize(components.size() + 1), ...);
+    }
+    template <component_c... tp_components>
+      requires(sizeof...(tp_components) > 0)
+    auto archetype_ct<tp_components...>::component_column_data_pointers(const data_column_t a_component_column)
+      -> component_ptr_vector_t {
+      auto& [... components] = m_components;
+
+      return vector_t {(static_cast<obs_ptr_t<void>>(&components[a_component_column]), ...)};
     }
   }
 }
