@@ -11,20 +11,11 @@ import std;
 
 import vkfw;
 
-struct test0 : mwc::ecs::component_st<test0> {
-  int i;
-};
-struct test1 : mwc::ecs::component_st<test1> {
-  float f;
-};
-struct test2 : mwc::ecs::component_st<test2> {
-  char c;
-};
-struct test3 : mwc::ecs::component_st<test3> {
-  char c;
-};
-
 int main() {
+  using test0 = mwc::ecs::test0;
+  using test1 = mwc::ecs::test1;
+  using test2 = mwc::ecs::test2;
+  using test3 = mwc::ecs::test3;
   constexpr auto xx = mwc::ecs::archetype_hash<test1>();
   //static_assert(xx == 23233);
   using t = decltype(mwc::ctti::observe_type_list<mwc::ecs::component_type_list_st>())::component_at_index_t<1>;

@@ -29,5 +29,18 @@ export namespace mwc {
     // concept modeling component types
     template <typename tp>
     concept component_c = std::is_base_of_v<component_st<tp>, tp>;
+
+    struct test0 : mwc::ecs::component_st<test0> {
+      int i;
+    };
+    struct test1 : mwc::ecs::component_st<test1> {
+      float f;
+    };
+    struct test2 : mwc::ecs::component_st<test2> {
+      char c;
+    };
+    struct test3 : mwc::ecs::component_st<test3> {
+      char c;
+    };
   }
 }

@@ -11,8 +11,8 @@ export namespace mwc {
   consteval auto file_type_extension_string() {
     using enum file_type_et;
     switch (tp_file_type) {
-      case e_binary : return "bin";
-      case e_text : return "txt";
+      case e_binary : return ".bin";
+      case e_text : return ".txt";
       default : contract_assert(false); std::unreachable();
     }
   }

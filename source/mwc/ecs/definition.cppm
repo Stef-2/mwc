@@ -10,7 +10,8 @@ namespace mwc {}
 export namespace mwc {
   namespace ecs {
     using entity_t = uint64_t;
-    using component_index_t = uint16_t;
+    using component_index_t = uint32_t;
+    using archetype_index_t = uint16_t;
     using archetype_hash_t = size_t;
   }
 }

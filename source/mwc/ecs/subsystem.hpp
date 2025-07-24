@@ -3,6 +3,7 @@
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 #include "mwc/ecs/archetype.hpp"
 
+import mwc_ctti;
 import mwc_definition;
 import mwc_subsystem;
 import mwc_ecs_definition;
@@ -33,42 +34,59 @@ namespace mwc {
     }
     template <bool b, component_c tp_x, component_c... tps>
     consteval auto sorted() -> bool {
-      if constexpr (b and sizeof...(tps) == 0)
-        return true;
-      if constexpr (b == false or sizeof...(tps) > 0) {
-        if constexpr (tp_x::identity > tps...[0] ::identity)
-          return sorted<true, tps...>();
-      } else
-        return false;
+      if constexpr (not b or sizeof...(tps) == 0)
+        return b;
+      else if constexpr (tp_x::identity > tps...[0] ::identity)
+        return sorted<b, tps...>();
+      else
+        return sorted<false, tps...>();
     }
     template <typename tp_tuple, component_c tp_x, component_c tp_y, component_c... tps>
     consteval auto sort() {
       if constexpr (sizeof...(tps) == 0) {
         using result_t = decltype(std::tuple_cat(tp_tuple {}, sort_components<tp_x, tp_y>()));
-        auto [... result] = result_t {};
-        if (not sorted<true, decltype(result)...>())
-          sort<tuple_t<>, tp_x, tp_y, tps...>();
-        else
-          return result_t {};
+        auto [... unpack] = result_t {};
+        if constexpr (not sorted<true, decltype(unpack)...>()) {
+          return sort<tuple_t<>, decltype(unpack)...>();
+        } else {
+          //auto [... result] = result_t {};
+          /*if constexpr (sorted<true, decltype(result)...>())
+            return sort<tuple_t<>, tp_x, tp_y, tps...>();
+          else*/
+          return std::tuple_cat(tp_tuple {}, sort_components<tp_x, tp_y>());
+        }
       }
-
       /*if constexpr (sizeof...(tps) == 1)
         return std::tuple_cat(tp_tuple {}, sort_components<tp_x, tp_y>());*/
 
-      if constexpr (sizeof...(tps) >= 1) {
+      if constexpr (sizeof...(tps) > 0) {
         using t = decltype(sort_components<tp_x, tp_y>());
         using combined_t = decltype(std::tuple_cat(tp_tuple {}, tuple_t<decltype(t::first)> {}));
         using rest_t = decltype(std::tuple_cat(tuple_t<decltype(t::second)> {}, tuple_t<tps...> {}));
         auto [... rest] = rest_t {};
         //static_assert((std::is_same_v<decltype(rest...[1]), void>));
         //static_assert(sizeof...(rest) == 4);
+        //return sort<combined_t, decltype(rest)...>();
         return sort<combined_t, decltype(rest)...>();
-      } /*else
-        return tp_tuple {};*/
+      }
+    }
+    template <component_c tp_x, component_c... tps>
+    consteval auto min() {
+      constexpr auto m = std::max({tp_x::identity, tps::identity...});
+      return decltype(ctti::observe_type_list<component_type_list_st>())::component_at_index_t<m> {};
+    }
+    template <typename tp_tuple, component_c tp_x, component_c... tps>
+    consteval auto bige_sort() {
+      //static_assert(sorted<true, tp_x, tps...>());
+      using t1 = decltype(sort<tp_tuple, tp_x, tps...>());
+      //using t2 = decltype(sort<t1, tp_x, tps...>());
+      //using t3 = decltype(sort<t2, tp_x, tps...>());
+
+      static_assert(std::is_same_v<char, t1>);
     }
     template </*component_c tp_component, */ component_c... tp_components>
     auto generate_archetype() -> void {
-      using t = decltype(sort<tuple_t<>, tp_components...>());
+      using t = decltype(bige_sort<tuple_t<>, tp_components...>());
       static_assert(std::is_same_v<t, char>);
       ecs_subsystem_st::archetypes.emplace_back(std::make_unique<archetype_ct<tp_components...>>());
     }

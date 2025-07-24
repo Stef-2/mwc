@@ -11,6 +11,7 @@ import std;
 
 namespace mwc {
   namespace ecs {
+
     template <component_c... tps>
       requires(sizeof...(tps) > 0)
     consteval auto archetype_hash() -> archetype_hash_t {
