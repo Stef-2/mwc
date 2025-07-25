@@ -3,7 +3,6 @@
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 #include "mwc/ecs/archetype.hpp"
 
-import mwc_ctti;
 import mwc_definition;
 import mwc_subsystem;
 import mwc_ecs_definition;
@@ -13,8 +12,7 @@ import mwc_observer_ptr;
 namespace mwc {
   namespace ecs {
     struct ecs_subsystem_st : public subsystem_st {
-      using archetype_base_ptr_t = std::unique_ptr<archetype_base_st>;
-      using archetype_storage_t = vector_t<archetype_base_ptr_t>;
+      using archetype_component_index_map_t = unordered_map_t<archetype_index_t, archetype_component_index_t>;
 
       using subsystem_st::subsystem_st;
 
@@ -22,71 +20,16 @@ namespace mwc {
       auto finalize() -> void override final;
 
       static inline auto entity_index = entity_t {0};
-      static inline auto archetypes = archetype_storage_t {};
+      static inline auto archetype_index = archetype_index_t {0};
+
+      static inline auto archetype_hash_map = unordered_map_t<archetype_hash_t, archetype_st> {};
+      static inline auto entity_archetype_map = unordered_map_t<entity_t, archetype_entity_index_st> {};
+      static inline auto component_archetype_map = unordered_map_t<component_index_t, archetype_component_index_map_t> {};
     };
-
-    template <component_c tp_component_x, component_c tp_component_y>
-    consteval auto sort_components() {
-      if constexpr (tp_component_x::identity > tp_component_y::identity)
-        return pair_t<tp_component_x, tp_component_y> {};
-      else
-        return pair_t<tp_component_y, tp_component_x> {};
-    }
-    template <bool b, component_c tp_x, component_c... tps>
-    consteval auto sorted() -> bool {
-      if constexpr (not b or sizeof...(tps) == 0)
-        return b;
-      else if constexpr (tp_x::identity > tps...[0] ::identity)
-        return sorted<b, tps...>();
-      else
-        return sorted<false, tps...>();
-    }
-    template <typename tp_tuple, component_c tp_x, component_c tp_y, component_c... tps>
-    consteval auto sort() {
-      if constexpr (sizeof...(tps) == 0) {
-        using result_t = decltype(std::tuple_cat(tp_tuple {}, sort_components<tp_x, tp_y>()));
-        auto [... unpack] = result_t {};
-        if constexpr (not sorted<true, decltype(unpack)...>()) {
-          return sort<tuple_t<>, decltype(unpack)...>();
-        } else {
-          //auto [... result] = result_t {};
-          /*if constexpr (sorted<true, decltype(result)...>())
-            return sort<tuple_t<>, tp_x, tp_y, tps...>();
-          else*/
-          return std::tuple_cat(tp_tuple {}, sort_components<tp_x, tp_y>());
-        }
-      }
-      /*if constexpr (sizeof...(tps) == 1)
-        return std::tuple_cat(tp_tuple {}, sort_components<tp_x, tp_y>());*/
-
-      if constexpr (sizeof...(tps) > 0) {
-        using t = decltype(sort_components<tp_x, tp_y>());
-        using combined_t = decltype(std::tuple_cat(tp_tuple {}, tuple_t<decltype(t::first)> {}));
-        using rest_t = decltype(std::tuple_cat(tuple_t<decltype(t::second)> {}, tuple_t<tps...> {}));
-        auto [... rest] = rest_t {};
-        //static_assert((std::is_same_v<decltype(rest...[1]), void>));
-        //static_assert(sizeof...(rest) == 4);
-        //return sort<combined_t, decltype(rest)...>();
-        return sort<combined_t, decltype(rest)...>();
-      }
-    }
-    template <component_c tp_x, component_c... tps>
-    consteval auto min() {
-      constexpr auto m = std::max({tp_x::identity, tps::identity...});
-      return decltype(ctti::observe_type_list<component_type_list_st>())::component_at_index_t<m> {};
-    }
-    template <typename tp_tuple, component_c tp_x, component_c... tps>
-    consteval auto bige_sort() {
-      //static_assert(sorted<true, tp_x, tps...>());
-      using t1 = decltype(sort<tp_tuple, tp_x, tps...>());
-      //using t2 = decltype(sort<t1, tp_x, tps...>());
-      //using t3 = decltype(sort<t2, tp_x, tps...>());
-
-      static_assert(std::is_same_v<char, t1>);
-    }
-    template </*component_c tp_component, */ component_c... tp_components>
+    /*
+    template <component_c... tp_components>
     auto generate_archetype() -> void {
-      using t = decltype(bige_sort<tuple_t<>, tp_components...>());
+      using t = decltype(sort_components<tuple_t<>, tp_components...>());
       static_assert(std::is_same_v<t, char>);
       ecs_subsystem_st::archetypes.emplace_back(std::make_unique<archetype_ct<tp_components...>>());
     }
@@ -97,34 +40,41 @@ namespace mwc {
       for (auto i = 0uz; i < ecs_subsystem_st::archetypes.size(); ++i)
         if (ecs_subsystem_st::archetypes[i].get()->hash() == hash)
           ecs_subsystem_st::archetypes.erase(ecs_subsystem_st::archetypes.begin() + i);
-    }
+    }*/
 
     template <component_c... tp_components>
-    [[nodiscard]] auto generate_entity(tp_components&&... a_components) -> entity_t
-      post(r : r != std::numeric_limits<entity_t>::max()) {
-      constexpr auto hash = archetype_hash<tp_components...>();
-      const auto entity = ecs_subsystem_st::entity_index;
-      ++ecs_subsystem_st::entity_index;
-
-      // determine if a matching archetype already exists
-      const auto archetype_iterator =
-        std::ranges::find_if(ecs_subsystem_st::archetypes, [](const ecs_subsystem_st::archetype_base_ptr_t& a_archetype_base) {
-          return a_archetype_base->hash() == hash;
-        });
-
-      auto archetype = obs_ptr_t<archetype_ct<tp_components...>> {};
-      if (archetype_iterator != ecs_subsystem_st::archetypes.end()) {
-        archetype = static_cast<archetype_ct<tp_components...>*>(archetype_iterator->get());
-      } else {
-        generate_archetype<tp_components...>();
-        archetype = static_cast<archetype_ct<tp_components...>*>(ecs_subsystem_st::archetypes.back().get());
+    [[nodiscard]] auto generate_entity1(tp_components&&... a_components) {
+      if constexpr (not std::is_same_v<tuple_t<tp_components...>, decltype(sorted_component_types<tp_components...>())>) {
+        auto newt = sorted_component_types<tp_components...>();
+        ((std::get<tp_components>(newt) = a_components), ...);
+        auto [... exp] = newt;
+        return generate_entity<decltype(exp)...>(std::forward<decltype(exp)>(exp)...);
       }
-
-      archetype->m_entities.emplace_back(entity);
-      archetype->insert_component_column(std::forward<tp_components>(a_components)...);
-
-      return entity;
     }
+    template <component_c... tp_components>
+    [[nodiscard]] constexpr auto generate_entity(tp_components&&... a_components) -> entity_t
+    /*post(r : r != std::numeric_limits<entity_t>::max())*/ {
+      // sort components according to their identification in ascending order
+      if constexpr (not std::is_same_v<tuple_t<tp_components...>, decltype(sorted_component_types<tp_components...>())>) {
+        auto sorted_component_tuple = sorted_component_types<tp_components...>();
+        ((std::get<tp_components>(sorted_component_tuple) = a_components), ...);
+        auto [... sorted_components] = sorted_component_tuple;
+        return generate_entity<decltype(sorted_components)...>(std::forward<decltype(sorted_components)>(sorted_components)...);
+      } else {
+        constexpr auto hash = archetype_hash<tp_components...>();
+        const auto entity = ecs_subsystem_st::entity_index;
+        ++ecs_subsystem_st::entity_index;
+
+        // determine if a matching archetype already exists
+        const auto archetype_iterator = ecs_subsystem_st::archetype_hash_map.find(hash);
+        if (archetype_iterator != ecs_subsystem_st::archetype_hash_map.end()) {
+          const auto component_column_index =
+            archetype_iterator->second.insert_component_column(std::forward<tp_components>(a_components)...);
+          int i;
+        }
+        return entity;
+      }
+    } /*
     inline auto destroy_entity(const entity_t a_entity) -> void {
       for (const auto& archetype : ecs_subsystem_st::archetypes) {
         auto& entities = archetype.get()->m_entities;
@@ -182,9 +132,9 @@ namespace mwc {
             current_archetype.get()->m_entities.erase(entity_iterator);
             //for (auto i = entity_t{0}; i < )
           }
-        }
-      }
-    }
+  }
+}
+}*/
 
     namespace global {
       inline auto ecs_subsystem =
