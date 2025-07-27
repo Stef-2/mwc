@@ -10,7 +10,7 @@ namespace mwc {}
 export namespace mwc {
   namespace ecs {
     // unique global entity identifier
-    using entity_t = uint64_t;
+    using entity_index_t = uint64_t;
     // unique global component identifier
     using component_index_t = uint32_t;
     // unique global archetype identifier

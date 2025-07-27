@@ -11,19 +11,6 @@ import std;
 
 import vkfw;
 
-struct test0 : mwc::ecs::component_st<test0> {
-  int i = 23;
-};
-struct test1 : mwc::ecs::component_st<test1> {
-  float f = 23;
-};
-struct test2 : mwc::ecs::component_st<test2> {
-  char c = 'a';
-};
-struct test3 : mwc::ecs::component_st<test3> {
-  bool b = true;
-};
-
 int main() {
   //using ttt = decltype(mwc::ecs::test<test1, test0, test2>({.f = 23}, {.i = 2}, {.c = 'a'}));
   //static_assert(std::is_same_v<ttt, char>);
@@ -32,7 +19,9 @@ int main() {
   using t = decltype(mwc::ctti::observe_type_list<mwc::ecs::component_type_list_st>())::component_at_index_t<1>;
   //static_assert(std::is_same_v<t, char>);
   //constexpr auto yy = mwc::ecs::archetype_hash<test3, test2>();
-  const auto e = mwc::ecs::generate_entity<test2, test0, test1>(test2 {}, test0 {}, test1 {});
+  const auto e = mwc::ecs::generate_entity<test2, test0, test1>(test2 {.c = 'b'}, test0 {.i = 69}, test1 {.f = 6.4f});
+  const auto c = mwc::ecs::entity_components<test2, test0, test1>(e);
+  mwc::ecs::destroy_entity(e);
   //mwc::ecs::entity_insert_components<test2>(e, {.c = 'x'});
   constexpr auto x = test0::identity;
   constexpr auto y = test1::identity;

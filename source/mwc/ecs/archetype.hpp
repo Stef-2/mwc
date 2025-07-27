@@ -32,13 +32,25 @@ namespace mwc {
         archetype_st* m_insertion;
         archetype_st* m_removal;
       };
-
       template <component_c... tp_components>
-      constexpr archetype_st(const archetype_index_t a_index)
+        requires(sizeof...(tp_components) > 0)
+      constexpr archetype_st(const archetype_index_t a_index, tp_components&&... a_components)
       : m_component_data {},
         m_element_count {0},
         m_hash {archetype_hash<tp_components...>()},
-        m_index {a_index} {}
+        m_index {a_index} {
+        m_component_data.resize(sizeof...(tp_components));
+        // initialize type erased component vectors
+        auto lambda = [&, this]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
+          ((m_component_data[tp_index].m_data = new vector_t<tp_components... [tp_index]> {}), ...);
+        };
+        lambda(std::make_index_sequence<sizeof...(tp_components)> {});
+
+        insert_component_column(std::forward<tp_components>(a_components)...);
+      }
+      ~archetype_st();
+      archetype_st(archetype_st&&) noexcept = default;
+      auto operator=(archetype_st&&) noexcept -> archetype_st& = default;
 
       template <component_c... tp_components>
       constexpr auto insert_component_column(tp_components&&... a_components) {
@@ -54,6 +66,17 @@ namespace mwc {
 
         return m_element_count;
       }
+      auto remove_component_column(const archetype_component_index_t a_component_column_index) {
+        ++m_element_count;
+        for (const auto& component_vector : m_component_data) {
+          // note: defined behaviour ?
+          auto type_erased_vector = std::bit_cast<vector_t<byte_t>*>(component_vector.m_data);
+          const auto begin = type_erased_vector->begin() + a_component_column_index * component_vector.m_data_size;
+          const auto end = begin + component_vector.m_data_size;
+          type_erased_vector->erase(begin, end);
+          type_erased_vector->resize(m_element_count);
+        }
+      }
       constexpr auto operator<=>(const archetype_st& a_other) const;
 
       vector_t<component_storage_st> m_component_data;
@@ -63,10 +86,11 @@ namespace mwc {
       //unordered_map_t<component_index_t, modification_map_st> m_modification_map;
     };
     struct archetype_entity_index_st {
-      archetype_st& m_archetype;
-      entity_t m_entity_index;
+      archetype_st* m_archetype;
+      entity_index_t m_entity_index;
     };
     struct archetype_component_index_st {
+      archetype_st* m_archetype;
       archetype_component_index_t m_component_index;
     };
   }
