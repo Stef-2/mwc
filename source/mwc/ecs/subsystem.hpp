@@ -24,16 +24,18 @@ struct test3 : mwc::ecs::component_st<test3> {
 
 namespace mwc {
   namespace ecs {
+    static constexpr auto invalid_entity = entity_index_t {0};
+    static constexpr auto invalid_archetype = archetype_index_t {0};
     struct ecs_subsystem_st : public subsystem_st {
       using subsystem_st::subsystem_st;
 
       auto initialize() -> void override final;
       auto finalize() -> void override final;
 
-      static inline auto entity_index = entity_index_t {0};
-      static inline auto archetype_index = archetype_index_t {0};
+      static inline auto entity_index = entity_index_t {1};
+      static inline auto archetype_index = archetype_index_t {1};
 
-      static inline auto hash_archetype_map = unordered_map_t<archetype_hash_t, archetype_st> {};
+      static inline auto hash_archetype_map = unordered_map_t<component_hash_t, archetype_st> {};
       static inline auto entity_archetype_map = unordered_map_t<entity_index_t, archetype_entity_index_st> {};
       static inline auto component_archetype_map = unordered_multimap_t<component_index_t, archetype_component_index_st> {};
     };
@@ -63,7 +65,7 @@ namespace mwc {
         auto [... sorted_components] = sorted_component_tuple;
         return generate_entity<decltype(sorted_components)...>(std::forward<decltype(sorted_components)>(sorted_components)...);
       } else {
-        constexpr auto hash = archetype_hash<tp_components...>();
+        constexpr auto hash = component_hash<tp_components...>();
         const auto entity_index = ecs_subsystem_st::entity_index;
         ++ecs_subsystem_st::entity_index;
 
@@ -71,10 +73,11 @@ namespace mwc {
         auto archetype_iterator = ecs_subsystem_st::hash_archetype_map.find(hash);
         if (archetype_iterator != ecs_subsystem_st::hash_archetype_map.end()) {
           // insert component data into the archetype
-          archetype_iterator->second.insert_component_column(std::forward<tp_components>(a_components)...);
+          archetype_iterator->second.insert_component_row(std::forward<tp_components>(a_components)...);
           // register entity - archetype mapping
-          ecs_subsystem_st::entity_archetype_map.emplace(entity_index,
-                                                         archetype_entity_index_st {&archetype_iterator->second, entity_index});
+          ecs_subsystem_st::entity_archetype_map.emplace(
+            entity_index,
+            archetype_entity_index_st {&archetype_iterator->second, archetype_iterator->second.m_element_count - 1});
           // a matching archetype does not exist, create one
         } else {
           const auto archetype_index = ecs_subsystem_st::archetype_index;
@@ -84,8 +87,9 @@ namespace mwc {
                                  .emplace(hash, archetype_st {archetype_index, std::forward<tp_components>(a_components)...})
                                  .first;
           // register entity - archetype mapping
-          ecs_subsystem_st::entity_archetype_map.emplace(entity_index,
-                                                         archetype_entity_index_st {&archetype_iterator->second, entity_index});
+          ecs_subsystem_st::entity_archetype_map.emplace(
+            entity_index,
+            archetype_entity_index_st {&archetype_iterator->second, archetype_iterator->second.m_element_count - 1});
           // register component - archetype mapping
           const auto lambda = [&archetype_iterator,
                                &archetype_index]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
@@ -102,52 +106,20 @@ namespace mwc {
     inline auto destroy_entity(const entity_index_t a_entity)
       -> void /*pre(ecs_subsystem_st::entity_archetype_map.contains(a_entity))*/ {
       const auto archetype = ecs_subsystem_st::entity_archetype_map[a_entity];
-      archetype.m_archetype->remove_component_column(archetype.m_entity_index);
+      archetype.m_archetype->remove_component_row(archetype.m_entity_index);
       ecs_subsystem_st::entity_archetype_map.erase(a_entity);
     }
     template <component_c... tp_components>
+      requires(sizeof...(tp_components) > 0)
     inline auto entity_components(const entity_index_t m_entity_index) {
-      [[maybe_unused]] auto [... sorted_components] = sorted_component_types<tp_components...>();
-
+      // determine the matching archetype
       const auto archetype = ecs_subsystem_st::entity_archetype_map[m_entity_index];
+      contract_assert(archetype.m_archetype != nullptr and m_entity_index != invalid_entity);
+
+      // components are returned in the requested order, not the internally sorted one
       auto components = tuple_t<tp_components...> {};
-      std::cout << "sanity check: " << ecs_subsystem_st::component_archetype_map.size() << '\n';
-      /*
-      for (auto& ca : ecs_subsystem_st::component_archetype_map) {
-        const auto f = ca.first;
-        std::cout << "id: " << f << '\n';
-        const auto s = ca.second;
-        for (auto& cb : s) {
-          std::cout << "f: " << cb.first << '\n';
-          std::cout << "s: " << cb.first << '\n';
-        }
-      }*/
-      /*const auto lambda = [&archetype, &components]<size_t... tp_index>(std::index_sequence<tp_index...>) {
-        const auto component_column_index =
-          (ecs_subsystem_st::component_archetype_map[tp_components...[tp_index] ::identity][archetype.m_archetype->m_index], ...);
-        const auto component_vector = (std::bit_cast<vector_t<tp_components...[tp_index]>*>(
-                                         archetype.m_archetype->m_component_data[component_column_index].m_data),
-                                       ...);
-        //static_assert(std::is_same_v<decltype(component_vector), char>);
-        ((std::get<tp_components...[tp_index]>(components) = component_vector->operator[](archetype.m_entity_index)), ...);
-      };
-      lambda(std::make_index_sequence<sizeof...(tp_components)> {});*/
       std::apply(
         [&archetype](auto&... a_components) -> void {
-          /*
-          ((a_components = std::bit_cast<vector_t<std::remove_cvref_t<decltype(a_components)>>*>(
-                             archetype.m_archetype->m_component_data[ecs_subsystem_st::component_archetype_map
-                                                                       .find(std::remove_cvref_t<decltype(a_components)>::identity)
-                                                                       ->second.m_component_index])
-                             ->operator[](archetype.m_entity_index)),
-           ...);*/
-          /* should work
-          const auto component_index =
-            ecs_subsystem_st::component_archetype_map.find(std::remove_cvref_t<decltype(a_components)>::identity)
-              ->second.m_component_index;
-          const auto component_vector = std::bit_cast<vector_t<std::remove_cvref_t<decltype(a_components)>>*>(
-            archetype.m_archetype->m_component_data[component_index]);
-          a_components = component_vector[archetype.m_entity_index];*/
           ((a_components = std::bit_cast<vector_t<std::remove_cvref_t<decltype(a_components)>>*>(
                              archetype.m_archetype
                                ->m_component_data[ecs_subsystem_st::component_archetype_map
@@ -160,6 +132,20 @@ namespace mwc {
         components);
 
       return components;
+    }
+    template <component_c... tp_components>
+      requires(sizeof...(tp_components) > 0)
+    inline auto insert_components(const entity_index_t a_entity_index, tp_components&&... a_components) {
+      // determine the current archetype
+      const auto current_archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
+      contract_assert(current_archetype.m_archetype != nullptr and a_entity_index != invalid_entity);
+
+      constexpr auto inserted_components_hash = component_hash<tp_components...>();
+      // determine if this class of archetype modification has been recorded before
+      if (current_archetype.m_archetype->m_modification_map.contains(inserted_components_hash)) {
+        const auto target_archetype = current_archetype.m_archetype->m_modification_map[inserted_components_hash];
+        target_archetype->insert_component_column();
+      }
     }
     /*
     template <component_c... tp_components>

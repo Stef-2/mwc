@@ -6,7 +6,6 @@ import mwc_definition;
 import mwc_static_string;
 
 export namespace mwc {
-  //template <static_string_st tp_static_string>
   consteval auto polynomial_rolling_hash(const string_view_t a_string) -> size_t {
     // polynomial rolling hash
     constexpr auto prime = size_t {53};

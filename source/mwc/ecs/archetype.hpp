@@ -11,10 +11,12 @@ import std;
 
 namespace mwc {
   namespace ecs {
-    template <component_c... tps>
-      requires(sizeof...(tps) > 0)
-    consteval auto archetype_hash() -> archetype_hash_t {
-      auto combined_hash = archetype_hash_t {0};
+    template <component_c... tp_components>
+      requires(sizeof...(tp_components) > 0)
+    consteval auto component_hash() -> component_hash_t {
+      auto [... sorted_components] = sorted_component_types<tp_components...>();
+
+      auto combined_hash = component_hash_t {0};
 
       const auto lambda = [&combined_hash]<component_c tp>() {
         // convert the component type identities to a string format, suitable for hashing
@@ -22,12 +24,13 @@ namespace mwc {
         combined_hash += polynomial_rolling_hash(string_view_t {identity_string.data(), identity_string.size()});
       };
 
-      (lambda.template operator()<tps>(), ...);
+      (lambda.template operator()<decltype(sorted_components)>(), ...);
 
       return combined_hash;
     }
 
     struct archetype_st : public irreproducible_st {
+      using component_row_data_t = vector_t<span_t<byte_t>>;
       struct modification_map_st {
         archetype_st* m_insertion;
         archetype_st* m_removal;
@@ -37,7 +40,7 @@ namespace mwc {
       constexpr archetype_st(const archetype_index_t a_index, tp_components&&... a_components)
       : m_component_data {},
         m_element_count {0},
-        m_hash {archetype_hash<tp_components...>()},
+        m_hash {component_hash<tp_components...>()},
         m_index {a_index} {
         m_component_data.resize(sizeof...(tp_components));
         // initialize type erased component vectors
@@ -46,14 +49,43 @@ namespace mwc {
         };
         lambda(std::make_index_sequence<sizeof...(tp_components)> {});
 
-        insert_component_column(std::forward<tp_components>(a_components)...);
+        insert_component_row(std::forward<tp_components>(a_components)...);
       }
       ~archetype_st();
       archetype_st(archetype_st&&) noexcept = default;
       auto operator=(archetype_st&&) noexcept -> archetype_st& = default;
 
       template <component_c... tp_components>
-      constexpr auto insert_component_column(tp_components&&... a_components) {
+      constexpr auto component_row(const archetype_entity_index_t a_entity_index) {
+        constexpr auto requested_component_hash = component_hash<tp_components...>();
+        contract_assert(requested_component_hash == m_hash);
+
+        auto [... components] = sorted_component_types<tp_components...>();
+
+        const auto lambda = [this, &components..., a_entity_index]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
+          ((components...[tp_index] = std::bit_cast<vector_t<std::remove_reference_t<decltype(components...[tp_index])>>*>(
+                                        m_component_data[tp_index].m_data)
+                                        ->operator[](a_entity_index)),
+           ...);
+        };
+        lambda(std::make_index_sequence<sizeof...(tp_components)> {});
+
+        return std::forward_as_tuple(components...);
+      }
+      constexpr auto component_data_row(const archetype_entity_index_t a_entity_index) -> component_row_data_t {
+        auto component_row_data = component_row_data_t {};
+        component_row_data.reserve(m_component_data.size());
+
+        for (const auto& component : m_component_data) {
+          const auto component_vector = std::bit_cast<vector_t<byte_t>*>(component.m_data);
+          const auto begin = component_vector->begin() + component.m_data_size * a_entity_index;
+          component_row_data.emplace_back(span_t {begin, component.m_data_size});
+        }
+
+        return component_row_data;
+      }
+      template <component_c... tp_components>
+      constexpr auto insert_component_row(tp_components&&... a_components) {
         static_assert(std::is_same_v<tuple_t<tp_components...>, decltype(sorted_component_types<tp_components...>())>);
 
         auto lambda = [&, this]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
@@ -66,24 +98,25 @@ namespace mwc {
 
         return m_element_count;
       }
-      auto remove_component_column(const archetype_component_index_t a_component_column_index) {
+      auto remove_component_row(const archetype_entity_index_t a_entity_index) {
         ++m_element_count;
         for (const auto& component_vector : m_component_data) {
           // note: defined behaviour ?
           auto type_erased_vector = std::bit_cast<vector_t<byte_t>*>(component_vector.m_data);
-          const auto begin = type_erased_vector->begin() + a_component_column_index * component_vector.m_data_size;
+          const auto begin = type_erased_vector->begin() + a_entity_index * component_vector.m_data_size;
           const auto end = begin + component_vector.m_data_size;
           type_erased_vector->erase(begin, end);
           type_erased_vector->resize(m_element_count);
         }
       }
+
       constexpr auto operator<=>(const archetype_st& a_other) const;
 
       vector_t<component_storage_st> m_component_data;
       size_t m_element_count;
-      archetype_hash_t m_hash;
+      component_hash_t m_hash;
       archetype_index_t m_index;
-      //unordered_map_t<component_index_t, modification_map_st> m_modification_map;
+      unordered_map_t<component_hash_t, modification_map_st> m_modification_map;
     };
     struct archetype_entity_index_st {
       archetype_st* m_archetype;
