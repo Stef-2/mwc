@@ -47,7 +47,7 @@ export namespace mwc {
       }
     };
 
-    // // utility requird for constant evaluated, observable and modifiable state
+    // utility required for constant evaluated, observable and modifiable state
     template <typename, auto>
     struct type_identified_declaration_st {
       friend consteval auto state_function(type_identified_declaration_st, auto...);

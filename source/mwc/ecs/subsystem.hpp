@@ -12,6 +12,7 @@ import mwc_observer_ptr;
 struct test0 : mwc::ecs::component_st<test0> {
   int i = 23;
 };
+
 struct test1 : mwc::ecs::component_st<test1> {
   float f = 2.0f;
 };

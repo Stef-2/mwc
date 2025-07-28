@@ -80,11 +80,6 @@ export namespace mwc {
     }
 
     // constant evaulated, observable and modifiable type lists
-    template <typename...>
-    struct type_list {};
-    template <typename...>
-    struct type_list2 {};
-
     template <template <typename...> typename tp_list, typename tp, auto tp_state = 0, auto tp_unique = [] {}>
     consteval auto type_list_push_back() {
       if constexpr (requires { observe(element_st<tp_list, tp_state> {}); })
