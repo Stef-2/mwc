@@ -7,7 +7,7 @@
       "binaryDir": "${sourceDir}/build/${presetName}",
       "generator": "Ninja",
       "environment": {
-        "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1 -gdwarf-5 -ggdb -ggdb3"
+        "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1 -gdwarf -glldb -fno-limit-debug-info -fstandalone-debug"
       },
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": true
@@ -20,7 +20,7 @@
         "PROJECT_CXX_FEATURE_FLAGS": "-fcontracts -fcontracts-nonattr -fno-exceptions -fno-rtti -fstrict-enums --embed-dir=${sourceDir}",
         "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
         "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree -fdiagnostics-color=always -fdiagnostics-set-output=text:experimental-nesting=yes",
-        "COMPILER_CXX_DEBUG_DEFINITIONS": "-ggdb -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG_BACKTRACE -D_GLIBCXX_ASSERTIONS"
+        "COMPILER_CXX_DEBUG_DEFINITIONS": "-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG_BACKTRACE -D_GLIBCXX_ASSERTIONS"
       },
       "cacheVariables": {
         "CMAKE_CXX_COMPILER": "/opt/compiler-explorer/gcc-contracts-nonattr-trunk/bin/g++",

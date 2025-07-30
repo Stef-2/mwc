@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mwc/core/contract/definition.hpp"
+
 #include "mwc/graphics/vulkan/memory_mapped_buffer.hpp"
 #include "mwc/core/memory/virtual_allocator.hpp"
 #include "mwc/core/container/data_span.hpp"

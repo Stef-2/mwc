@@ -34,6 +34,8 @@ namespace mwc {
         })},
         m_properties {std::invoke([this]([[maybe_unused]] this auto&& a_this) -> properties_st {
           // structure chain type deduction
+          tuple_t<int, float> x;
+          auto [... z] = x;
           [[maybe_unused]] auto& [... default_properties_pack] = m_properties.m_default_properties_chain;
           [[maybe_unused]] auto& [... memory_properties_pack] = m_properties.m_memory_properties_chain;
 

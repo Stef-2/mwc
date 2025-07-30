@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mwc/core/contract/definition.hpp"
+
 #include "mwc/core/utility/semantic_version.hpp"
 #include "mwc/graphics/vulkan/context.hpp"
 #include "mwc/graphics/vulkan/handle.hpp"

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mwc/core/contract/definition.hpp"
+
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 #include "mwc/window/subsystem.hpp"
 

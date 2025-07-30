@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mwc/core/contract/definition.hpp"
+
 //generate a string_view_t from the contents of this file
 consteval auto file_contents() post(r : mwc::contracts::valid_data_size(r)) {
   // import the file contents into an array of characters

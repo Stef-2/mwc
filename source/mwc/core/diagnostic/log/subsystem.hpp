@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mwc/core/contract/definition.hpp"
+
 #define SUB "\n\t↳"
 
 #include "mwc/core/chrono/subsystem.hpp"

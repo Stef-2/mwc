@@ -1,5 +1,7 @@
 module;
 
+#include "mwc/core/contract/definition.hpp"
+
 export module mwc_file_type;
 
 import std;

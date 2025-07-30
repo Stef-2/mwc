@@ -33,8 +33,21 @@ export namespace mwc {
 
     // type erased component storage
     struct component_storage_st {
-      void* m_data;
-      size_t m_data_size;
+      using data_span_t = span_t<byte_t>;
+
+      vector_t<byte_t> m_data;
+      size_t m_component_size;
+      archetype_component_index_t m_component_index;
+    };
+    // type erased view over component storage
+    struct component_storage_view_st {
+      component_storage_st::data_span_t m_data_span;
+      archetype_component_index_t m_component_index;
+    };
+    // data used for runtime component type information
+    struct component_runtime_information_st {
+      size_t m_component_size;
+      component_index_t m_component_index;
     };
 
     // sort components according to their identification in ascending order
@@ -78,7 +91,10 @@ export namespace mwc {
     }
     template <component_c tp_component, component_c... tp_components>
     consteval auto sorted_component_types() {
-      return component_type_sort<tuple_t<>, tp_component, tp_components...>();
+      if constexpr (sizeof...(tp_components) == 0)
+        return tuple_t<tp_component> {};
+      else
+        return component_type_sort<tuple_t<>, tp_component, tp_components...>();
     }
   }
 }

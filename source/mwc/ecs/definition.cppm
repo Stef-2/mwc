@@ -17,7 +17,7 @@ export namespace mwc {
     using archetype_index_t = uint16_t;
     // hash code generated from component indices
     using component_hash_t = size_t;
-    // entity index ithin an archetype
+    // entity index within an archetype
     using archetype_entity_index_t = uint32_t;
     // component index within an archetype
     using archetype_component_index_t = uint16_t;

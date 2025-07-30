@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mwc/core/contract/definition.hpp"
+
 import mwc_definition;
 import mwc_concept;
 import mwc_minimal_integral;

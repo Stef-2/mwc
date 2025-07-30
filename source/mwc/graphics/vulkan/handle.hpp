@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mwc/core/contract/definition.hpp"
+
 #include "mwc/graphics/vulkan/debug.hpp"
 #include "mwc/core/utility/pointer_cast.hpp"
 
