@@ -4,8 +4,8 @@
 #include "mwc/ecs/archetype.hpp"
 
 import mwc_subsystem;
-import mwc_ecs_definition;
-import mwc_ecs_component;
+//import mwc_ecs_definition;
+//import mwc_ecs_component;
 import mwc_ctti;
 
 import std;
@@ -13,9 +13,6 @@ import std;
 import vkfw;
 
 int main() {
-  std::vector<int> v;
-  v.push_back(1);
-  v.push_back(2);
   //using ttt = decltype(mwc::ecs::test<test1, test0, test2>({.f = 23}, {.i = 2}, {.c = 'a'}));
   //static_assert(std::is_same_v<ttt, char>);
   //constexpr auto xx = mwc::ecs::component_hash<test1>();
@@ -29,7 +26,9 @@ int main() {
   test0* i = (test0*)ac[0].data();
   test1* f = (test1*)ac[1].data();
   test2* cc = (test2*)ac[2].data();
-  mwc::ecs::insert_components<test3>(1, test3 {.b = false});
+  mwc::ecs::insert_components<test3>(1, test3 {.b = true});
+  mwc::ecs::remove_components<test1>(1);
+  auto after_ac = mwc::ecs::entity_components<test2, test0, test3>(e);
   const auto ac2 = mwc::ecs::ecs_subsystem_st::entity_archetype_map[1].m_archetype->component_data_row(0);
 
   mwc::ecs::destroy_entity(e);

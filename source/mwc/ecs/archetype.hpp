@@ -1,36 +1,45 @@
 #pragma once
 
 #include "mwc/core/contract/definition.hpp"
+#include "mwc/ecs/definition.hpp"
+#include "mwc/ecs/component.hpp"
 
 import mwc_definition;
-import mwc_ecs_definition;
+//import mwc_ecs_definition;
+//import mwc_ecs_component;
 import mwc_type_mobility;
 import mwc_hash;
 import mwc_observer_ptr;
-import mwc_ecs_component;
+import mwc_concept;
 
 import std;
 
 namespace mwc {
   namespace ecs {
-    template <component_c... tp_components>
-      requires(sizeof...(tp_components) > 0)
+    template <typename tp_operator, component_c... tp_components>
+      requires(sizeof...(tp_components) > 0) and concepts::any_of_c<tp_operator, std::plus<>, std::minus<>>
     constexpr auto component_hash(component_hash_t a_initial_hash = 0) -> component_hash_t {
-      auto [... sorted_components] = sorted_component_types<tp_components...>();
 
       const auto lambda = [&a_initial_hash]<component_c tp>() {
         // convert the component type identities to a string format, suitable for hashing
-        constexpr auto identity_string = std::bit_cast<array_t<char, sizeof(tp::identity)>>(tp::identity);
-        a_initial_hash += polynomial_rolling_hash(string_view_t {identity_string.data(), identity_string.size()});
+        auto identity_string = array_t<char_t, sizeof(component_hash_t)> {};
+        std::to_chars(identity_string.data(), identity_string.data() + identity_string.size(), tp::identity);
+        if constexpr (std::is_same_v<tp_operator, std::plus<>>)
+          a_initial_hash += polynomial_rolling_hash(identity_string);
+        else
+          a_initial_hash -= polynomial_rolling_hash(identity_string);
       };
-      (lambda.template operator()<decltype(sorted_components)>(), ...);
+      (lambda.template operator()<tp_components>(), ...);
 
       return a_initial_hash;
     }
     inline auto component_hash(component_hash_t a_initial_hash, const span_t<component_index_t> a_component_indices)
       -> component_hash_t {
-      for (const auto component_index : a_component_indices)
-        a_initial_hash += polynomial_rolling_hash(std::to_string(component_index));
+      for (const auto component_index : a_component_indices) {
+        auto identity_string = array_t<char_t, sizeof(component_hash_t)> {};
+        std::to_chars(identity_string.data(), identity_string.data() + identity_string.size(), component_index);
+        a_initial_hash += polynomial_rolling_hash(identity_string);
+      }
 
       return a_initial_hash;
     }
@@ -46,8 +55,10 @@ namespace mwc {
       constexpr archetype_st(const archetype_index_t a_index, tp_components&&... a_components)
       : m_component_data {},
         m_entity_count {0},
-        m_component_hash {component_hash<tp_components...>()},
+        m_component_hash {component_hash<std::plus<>, tp_components...>()},
         m_index {a_index} {
+        static_assert(std::is_same_v<tuple_t<tp_components...>, decltype(sorted_component_types<tp_components...>())>);
+
         m_component_data.reserve(sizeof...(tp_components));
         const auto lambda = [this]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
           (m_component_data.emplace_back(vector_t<byte_t> {}, sizeof(tp_components...[tp_index]),
@@ -64,21 +75,25 @@ namespace mwc {
         m_index {a_index} {
         m_component_data.reserve(a_components.size());
         auto component_hash = component_hash_t {0};
-        for (const auto& component : a_components) {
-          m_component_data.emplace_back(vector_t<byte_t> {}, component.m_component_size, component.m_component_index);
-          std::cout << "cd sz: " << component.m_component_size << '\n';
-          component_hash += polynomial_rolling_hash(std::to_string(component.m_component_index));
+        for (auto i = archetype_component_index_t {0}; i < a_components.size(); ++i) {
+          m_component_data.emplace_back(vector_t<byte_t> {}, a_components[i].m_component_size, a_components[i].m_component_index);
+          m_component_data.back().m_data.reserve(a_components[i].m_component_size);
+          auto identity_string = array_t<char_t, sizeof(component_hash_t)> {};
+          std::to_chars(identity_string.data(), identity_string.data() + identity_string.size(),
+                        a_components[i].m_component_index);
+          component_hash += polynomial_rolling_hash(identity_string);
         }
         m_component_hash = component_hash;
       }
 
       auto component_count() const -> archetype_component_index_t;
       auto entity_count() const -> archetype_entity_index_t;
+      auto component_index(const component_index_t a_component_index) const -> archetype_component_index_t;
 
       template <component_c... tp_components>
         requires(sizeof...(tp_components) > 0)
       constexpr auto component_row(const archetype_entity_index_t a_entity_index) {
-        constexpr auto requested_component_hash = component_hash<tp_components...>();
+        constexpr auto requested_component_hash = component_hash<std::plus<>, tp_components...>();
         contract_assert(requested_component_hash == m_component_hash);
 
         auto [... components] = sorted_component_types<tp_components...>();
@@ -125,16 +140,18 @@ namespace mwc {
         contract_assert(a_components.size() == component_count());
 
         for (auto i = archetype_component_index_t {0}; i < a_components.size(); ++i)
-          if (m_component_data[i].m_component_index == a_components[i].m_component_index)
-            m_component_data[i].m_data.append_range(a_components[i].m_data_span);
+          for (auto j = archetype_entity_index_t {0}; j < m_component_data.size(); ++j)
+            if (m_component_data[j].m_component_index == a_components[i].m_component_index)
+              m_component_data[j].m_data.append_range(a_components[i].m_data_span);
         ++m_entity_count;
 
         return m_entity_count;
       }
       auto remove_component_row(const archetype_entity_index_t a_entity_index) {
-        std::cout << "cc: " << m_component_data.size() << '\n';
+        std::cout << "component count: " << component_count() << '\n';
         for (auto& component : m_component_data) {
-          // note: defined behaviour ?
+          std::cout << "rmeoved component sz: " << component.m_component_size << '\n';
+          std::cout << "rmeoved component actual byte sz: " << component.m_data.size() << '\n';
           const auto begin = component.m_data.begin() + a_entity_index * component.m_component_size;
           const auto end = begin + component.m_component_size;
           component.m_data.erase(begin, end);
@@ -156,9 +173,9 @@ namespace mwc {
       obs_ptr_t<archetype_st> m_archetype;
       entity_index_t m_entity_index;
     };
-    struct archetype_component_index_st {
+    /*struct archetype_component_index_st {
       obs_ptr_t<archetype_st> m_archetype;
       archetype_component_index_t m_component_index;
-    };
+    };*/
   }
 }

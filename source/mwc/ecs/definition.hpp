@@ -1,13 +1,14 @@
-module;
+#pragma once
+//module;
 
-export module mwc_ecs_definition;
+//export module mwc_ecs_definition;
 
 import mwc_definition;
 import mwc_type_identity;
 
 namespace mwc {}
 
-export namespace mwc {
+/*export */ namespace mwc {
   namespace ecs {
     // unique global entity identifier
     using entity_index_t = uint64_t;

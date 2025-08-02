@@ -1,16 +1,18 @@
-module;
+#pragma once
+//module;
 
-export module mwc_ecs_component;
+//export module mwc_ecs_component;
 
 import mwc_definition;
-import mwc_ecs_definition;
+//import mwc_ecs_definition;
+#include "mwc/ecs/definition.hpp"
 import mwc_type_identity;
 import mwc_observer_ptr;
 import mwc_ctti;
 
 import std;
 
-export namespace mwc {
+/*export */ namespace mwc {
   namespace ecs {
     // component type tracking
     template <typename... tps>

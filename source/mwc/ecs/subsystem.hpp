@@ -2,14 +2,16 @@
 
 #include "mwc/core/contract/definition.hpp"
 
-#include "archetype.hpp"
+#include "mwc/ecs/archetype.hpp"
+#include "mwc/ecs/definition.hpp"
+#include "mwc/ecs/component.hpp"
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 #include "mwc/ecs/archetype.hpp"
 
 import mwc_definition;
 import mwc_subsystem;
-import mwc_ecs_definition;
-import mwc_ecs_component;
+//import mwc_ecs_definition;
+//import mwc_ecs_component;
 import mwc_observer_ptr;
 
 struct test0 : mwc::ecs::component_st<test0> {
@@ -41,7 +43,8 @@ namespace mwc {
 
       static inline auto hash_archetype_map = unordered_map_t<component_hash_t, archetype_st> {};
       static inline auto entity_archetype_map = unordered_map_t<entity_index_t, archetype_entity_index_st> {};
-      static inline auto component_archetype_map = unordered_multimap_t<component_index_t, archetype_component_index_st> {};
+      static inline auto component_archetype_map =
+        unordered_multimap_t<component_index_t, unordered_map_t<archetype_st*, archetype_component_index_t>> {};
     };
 
     template <component_c... tp_components>
@@ -54,13 +57,13 @@ namespace mwc {
         auto [... sorted_components] = sorted_component_tuple;
         return generate_entity<decltype(sorted_components)...>(std::forward<decltype(sorted_components)>(sorted_components)...);
       } else {
-        constexpr auto hash = component_hash<tp_components...>();
+        constexpr auto hash = component_hash<std::plus<>, tp_components...>();
         const auto entity_index = ecs_subsystem_st::entity_index;
         ++ecs_subsystem_st::entity_index;
 
         // determine if a matching archetype already exists
         auto archetype_iterator = ecs_subsystem_st::hash_archetype_map.find(hash);
-        if (archetype_iterator != ecs_subsystem_st::hash_archetype_map.end()) {
+        if (archetype_iterator != ecs_subsystem_st::hash_archetype_map.end()) [[likely]] {
           // insert component data into the archetype
           archetype_iterator->second.insert_component_row(std::forward<tp_components>(a_components)...);
           // register entity - archetype mapping
@@ -68,7 +71,7 @@ namespace mwc {
             entity_index,
             archetype_entity_index_st {&archetype_iterator->second, archetype_iterator->second.entity_count() - 1});
           // a matching archetype does not exist, create one
-        } else {
+        } else [[unlikely]] {
           const auto archetype_index = ecs_subsystem_st::archetype_index;
           ++ecs_subsystem_st::archetype_index;
 
@@ -84,7 +87,11 @@ namespace mwc {
                                &archetype_index]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
             ((ecs_subsystem_st::component_archetype_map.emplace(
                tp_components... [tp_index] ::identity,
-               archetype_component_index_st { .m_archetype = &archetype_iterator->second, .m_component_index = tp_index })),
+               unordered_map_t<archetype_st*, archetype_component_index_t> {
+                 pair_t {
+                   &archetype_iterator->second, tp_index
+                 }
+               })),
              ...);
           };
           lambda(std::make_index_sequence<sizeof...(tp_components)> {});
@@ -93,7 +100,7 @@ namespace mwc {
       }
     }
     inline auto destroy_entity(const entity_index_t a_entity)
-      -> void /*pre(ecs_subsystem_st::entity_archetype_map.contains(a_entity))*/ {
+      -> void pre(ecs_subsystem_st::entity_archetype_map.contains(a_entity)) {
       const auto archetype = ecs_subsystem_st::entity_archetype_map[a_entity];
       archetype.m_archetype->remove_component_row(archetype.m_entity_index);
       ecs_subsystem_st::entity_archetype_map.erase(a_entity);
@@ -110,13 +117,11 @@ namespace mwc {
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
     inline auto insert_components(const entity_index_t a_entity_index, tp_components&&... a_components) -> void {
-      // determine the current archetype
+      // determine the source archetype
       const auto source_archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
       contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != invalid_entity);
 
-      std::cout << "sz: " << ecs_subsystem_st::hash_archetype_map.size() << std::endl;
-
-      constexpr auto inserted_components_hash = component_hash<tp_components...>();
+      constexpr auto inserted_components_hash = component_hash<std::plus<>, tp_components...>();
       // determine if this class of component modification has been recorded before
       if (source_archetype.m_archetype->m_modification_map.contains(inserted_components_hash)) [[likely]] {
         auto& target_archetype = *source_archetype.m_archetype->m_modification_map[inserted_components_hash].m_insertion;
@@ -130,13 +135,11 @@ namespace mwc {
          .m_component_index = std::remove_cvref_t<decltype(a_components)>::identity}),
          ...);
 
-        //const auto target_entity_index = target_archetype.insert_component_row(std::forward<tp_components>(a_components)...) - 1;
         const auto& source_entity_index = source_archetype.m_entity_index;
-        // move each component from source to target archetype
+        // register each existing component in the source archetype for transfer
         for (auto i = archetype_component_index_t {0}; i < source_archetype.m_archetype->component_count(); ++i) {
           auto& source_component_storage = source_archetype.m_archetype->m_component_data[i];
-          const auto& target_component_column =
-            ecs_subsystem_st::component_archetype_map.find(source_component_storage.m_component_index)->second.m_component_index;
+          const auto& target_component_column = target_archetype.component_index(source_component_storage.m_component_index);
           auto& target_component_storage = target_archetype.m_component_data[target_component_column];
 
           const auto source_data_begin =
@@ -147,34 +150,32 @@ namespace mwc {
           target_component_data.emplace_back(
             component_storage_view_st {.m_data_span = {source_data_begin, source_data_end},
                                        .m_component_index = source_component_storage.m_component_index});
-          /*target_component_storage.m_data.insert_range(target_component_storage.m_data.begin() + target_entity_index,
-                                                       std::ranges::subrange {source_data_begin, source_data_end});*/
-          // remove component data from the source archetype
-          source_component_storage.m_data.erase(source_data_begin, source_data_end);
         }
+        // insert combined component data into the target archetype
         target_archetype.insert_component_data_row(target_component_data);
+        // remove component data from the source archetype
+        source_archetype.m_archetype->remove_component_row(source_entity_index);
         // register the entity with the target archetype
         ecs_subsystem_st::entity_archetype_map[a_entity_index] =
-          archetype_entity_index_st {.m_archetype = &target_archetype, .m_entity_index = target_archetype.entity_count()};
+          archetype_entity_index_st {.m_archetype = &target_archetype, .m_entity_index = target_archetype.entity_count() - 1};
         return;
       }
       // no record of this class of component modification exists, possible reasons:
       // this is the first time an entity is making this kind of archetype transition, but the target archetype exists
       // the target archetype doesn't exist
       else [[unlikely]] {
-        const auto combined_hash = component_hash<tp_components...>(source_archetype.m_archetype->m_component_hash);
+        const auto combined_hash = component_hash<std::plus<>, tp_components...>(source_archetype.m_archetype->m_component_hash);
         // determine if the target archetype exists
         const auto target_archetype_iterator = ecs_subsystem_st::hash_archetype_map.find(combined_hash);
         if (target_archetype_iterator != ecs_subsystem_st::hash_archetype_map.end()) {
           // target archetype exists, record this class of component modification and call again
           auto& target_archetype = target_archetype_iterator->second;
-          constexpr auto input_component_hash = component_hash<tp_components...>();
-          source_archetype.m_archetype->m_modification_map.emplace(
-            input_component_hash,
-            archetype_st::modification_map_st {.m_insertion = &target_archetype});
-          target_archetype.m_modification_map.emplace(
-            input_component_hash,
-            archetype_st::modification_map_st {.m_removal = source_archetype.m_archetype});
+          constexpr auto input_component_hash = component_hash<std::plus<>, tp_components...>();
+
+          auto& source_modification_map = source_archetype.m_archetype->m_modification_map[input_component_hash];
+          source_modification_map.m_insertion = &target_archetype;
+          auto& target_modification_map = target_archetype.m_modification_map[input_component_hash];
+          target_modification_map.m_removal = source_archetype.m_archetype;
 
           return insert_components(a_entity_index, std::forward<tp_components>(a_components)...);
         }
@@ -195,9 +196,20 @@ namespace mwc {
               component_runtime_information_st {.m_component_size = source_component.m_component_size,
                                                 .m_component_index = source_component.m_component_index});
           }
-          ecs_subsystem_st::hash_archetype_map.emplace(
-            combined_hash,
-            archetype_st {ecs_subsystem_st::archetype_index++, component_runtime_information});
+          // sort the component runtime information according to component indices
+          std::ranges::sort(component_runtime_information,
+                            [](const auto& a_x, const auto& a_y) { return a_x.m_component_index < a_y.m_component_index; });
+
+          // generate a new archetype
+          const auto generated_archetype_ptr =
+            &ecs_subsystem_st::hash_archetype_map
+               .emplace(combined_hash, archetype_st {ecs_subsystem_st::archetype_index++, component_runtime_information})
+               .first->second;
+          // register components with the new archetype
+          for (auto i = archetype_component_index_t {}; i < component_runtime_information.size(); ++i)
+            ecs_subsystem_st::component_archetype_map.emplace(
+              component_runtime_information[i].m_component_index,
+              unordered_map_t<archetype_st*, archetype_component_index_t> {{generated_archetype_ptr, i}});
 
           return insert_components(a_entity_index, std::forward<tp_components>(a_components)...);
         }
@@ -205,52 +217,94 @@ namespace mwc {
       std::unreachable();
       contract_assert(false);
     }
-    /*
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
-    auto entity_insert_components(const entity_t a_entity, tp_components&&... a_components) -> void {
-      constexpr auto inserted_archetype_hash = archetype_hash<tp_components...>();
+    inline auto remove_components(const entity_index_t a_entity_index) -> void {
+      const auto source_archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
+      contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != invalid_entity);
 
-      // determing the entities current archetype, combine its hash with the new one
-      for (const auto& current_archetype : ecs_subsystem_st::archetypes) {
-        auto& entities = current_archetype.get()->m_entities;
-        const auto entity_iterator = std::ranges::find(entities, a_entity);
-        if (entity_iterator != entities.end()) {
-          auto combined_hash = current_archetype.get()->hash();
+      constexpr auto inserted_components_hash = component_hash<std::plus<>, tp_components...>();
+      // determine if this class of component modification has been recorded before
+      if (source_archetype.m_archetype->m_modification_map.contains(inserted_components_hash)) [[likely]] {
+        auto& target_archetype = *source_archetype.m_archetype->m_modification_map[inserted_components_hash].m_insertion;
+        const auto& source_entity_index = source_archetype.m_entity_index;
 
-          // rehash using the new component types
-          const auto lambda = [&combined_hash]<component_c tp>() {
-            // convert the component type identities to a string format, suitable for hashing
-            constexpr auto identity_string = std::bit_cast<array_t<char, sizeof(tp::identity)>>(tp::identity);
-            combined_hash += polynomial_rolling_hash(string_view_t {identity_string.data(), identity_string.size()});
+        // transfer common components from source to target archetype
+        for (auto i = archetype_component_index_t {0}; i < target_archetype.component_count(); ++i) {
+          auto& target_component_storage = target_archetype.m_component_data[i];
+          const auto& source_component_column =
+            source_archetype.m_archetype->component_index(target_component_storage.m_component_index);
+          auto& source_component_storage = source_archetype.m_archetype->m_component_data[source_component_column];
+
+          const auto source_data_begin =
+            source_component_storage.m_data.begin() + source_entity_index * source_component_storage.m_component_size;
+          const auto source_data_end = source_data_begin + source_component_storage.m_component_size;
+
+          target_archetype.m_component_data[i].m_data.append_range(std::ranges::subrange {source_data_begin, source_data_end});
+        }
+        // remove component data from the source archetype
+        source_archetype.m_archetype->remove_component_row(source_entity_index);
+        // register the entity with the target archetype
+        ecs_subsystem_st::entity_archetype_map[a_entity_index] =
+          archetype_entity_index_st {.m_archetype = &target_archetype, .m_entity_index = target_archetype.entity_count()};
+        return;
+      }
+      // no record of this class of component modification exists, possible reasons:
+      // this is the first time an entity is making this kind of archetype transition, but the target archetype exists
+      // the target archetype doesn't exist
+      else [[unlikely]] {
+        const auto combined_hash = component_hash<std::minus<>, tp_components...>(source_archetype.m_archetype->m_component_hash);
+        // determine if the target archetype exists
+        const auto target_archetype_iterator = ecs_subsystem_st::hash_archetype_map.find(combined_hash);
+        if (target_archetype_iterator != ecs_subsystem_st::hash_archetype_map.end()) {
+          // target archetype exists, record this class of component modification and call again
+          auto& target_archetype = target_archetype_iterator->second;
+          constexpr auto input_component_hash = component_hash<std::plus<>, tp_components...>();
+
+          auto& source_modification_map = source_archetype.m_archetype->m_modification_map[input_component_hash];
+          source_modification_map.m_insertion = &target_archetype;
+          auto& target_modification_map = target_archetype.m_modification_map[input_component_hash];
+          target_modification_map.m_removal = source_archetype.m_archetype;
+
+          return remove_components<tp_components...>(a_entity_index);
+        }
+        // the target archetype doesn't exist, generate one and call again
+        else {
+          auto component_runtime_information = std::vector<component_runtime_information_st> {};
+          component_runtime_information.reserve(source_archetype.m_archetype->component_count() - sizeof...(tp_components));
+
+          const auto lambda = [&component_runtime_information,
+                               &source_archetype]<component_c tp_component, component_c... tps>(this auto&& a_this) -> void {
+            for (const auto& source_component : source_archetype.m_archetype->m_component_data)
+              if (source_component.m_component_index != tp_component::identity)
+                component_runtime_information.emplace_back(
+                  component_runtime_information_st {.m_component_size = source_component.m_component_size,
+                                                    .m_component_index = source_component.m_component_index});
+            if constexpr (sizeof...(tps) > 0)
+              return a_this.template operator()<tps...>();
           };
-          (lambda.template operator()<tp_components>(), ...);
+          lambda.template operator()<tp_components...>();
 
-          // attempt to find an archetype with the combined component hash
-          const auto target_archetype =
-            std::ranges::find_if(ecs_subsystem_st::archetypes,
-                                 [combined_hash](const ecs_subsystem_st::archetype_base_ptr_t& a_archetype_base) {
-                                   return a_archetype_base->hash() == combined_hash;
-                                 });
-          if (target_archetype != ecs_subsystem_st::archetypes.end()) {
-            const auto current_component_indices = current_archetype.get()->component_indices();
-            const auto target_component_indices = target_archetype->get()->component_indices();
-            contract_assert(current_component_indices.size() == target_component_indices.size());
+          // sort the component runtime information according to component indices
+          std::ranges::sort(component_runtime_information,
+                            [](const auto& a_x, const auto& a_y) { return a_x.m_component_index < a_y.m_component_index; });
+          // generate a new archetype
+          const auto generated_archetype_ptr =
+            &ecs_subsystem_st::hash_archetype_map
+               .emplace(combined_hash, archetype_st {ecs_subsystem_st::archetype_index++, component_runtime_information})
+               .first->second;
+          // register components with the new archetype
+          for (auto i = archetype_component_index_t {}; i < component_runtime_information.size(); ++i)
+            ecs_subsystem_st::component_archetype_map.emplace(
+              component_runtime_information[i].m_component_index,
+              unordered_map_t<archetype_st*, archetype_component_index_t> {{generated_archetype_ptr, i}});
 
-            const auto current_component_pointers =
-              current_archetype.get()->component_column_data_pointers(current_archetype.get()->m_entities.size());
-            const auto target_component_pointers =
-              target_archetype->get()->component_column_data_pointers(target_archetype->get()->m_entities.size() + 1);
-            contract_assert(current_component_pointers.size() == target_component_pointers.size());
-
-            // transfer the entity
-            target_archetype->get()->m_entities.emplace_back(*entity_iterator);
-            current_archetype.get()->m_entities.erase(entity_iterator);
-            //for (auto i = entity_t{0}; i < )
-          }
-  }
-}
-}*/
+          return remove_components<tp_components...>(a_entity_index);
+        }
+      }
+      std::unreachable();
+      contract_assert(false);
+    }
 
     namespace global {
       inline auto ecs_subsystem =
