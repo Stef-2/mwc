@@ -13,13 +13,13 @@ export namespace mwc {
     template <size_t tp_bit>
     consteval auto set_bit() {
       if constexpr (tp_bit < std::numeric_limits<uint8_t>::digits)
-        return uint8_t {1} << tp_bit;
+        return uint8_t {1} << (tp_bit - 1);
       else if constexpr (tp_bit < std::numeric_limits<uint16_t>::digits)
-        return uint16_t {1} << tp_bit;
+        return uint16_t {1} << (tp_bit - 1);
       else if constexpr (tp_bit < std::numeric_limits<uint32_t>::digits)
-        return uint32_t {1} << tp_bit;
+        return uint32_t {1} << (tp_bit - 1);
       else if constexpr (tp_bit < std::numeric_limits<uint64_t>::digits)
-        return uint64_t {1} << tp_bit;
+        return uint64_t {1} << (tp_bit - 1);
       else
         static_assert(false, "bit shift out of range");
     }

@@ -46,16 +46,18 @@ namespace mwc {
 
     struct archetype_st : public irreproducible_st {
       using component_row_data_t = vector_t<component_storage_st::data_span_t>;
+
       struct modification_map_st {
         obs_ptr_t<archetype_st> m_insertion;
         obs_ptr_t<archetype_st> m_removal;
       };
+
       template <component_c... tp_components>
         requires(sizeof...(tp_components) > 0)
       constexpr archetype_st(const archetype_index_t a_index, tp_components&&... a_components)
       : m_component_data {},
         m_entity_count {0},
-        m_component_hash {component_hash<std::plus<>, tp_components...>()},
+        m_component_hash {ecs::component_hash<std::plus<>, tp_components...>()},
         m_index {a_index} {
         static_assert(std::is_same_v<tuple_t<tp_components...>, decltype(sorted_component_types<tp_components...>())>);
 
@@ -75,6 +77,7 @@ namespace mwc {
         m_index {a_index} {
         m_component_data.reserve(a_components.size());
         auto component_hash = component_hash_t {0};
+
         for (auto i = archetype_component_index_t {0}; i < a_components.size(); ++i) {
           m_component_data.emplace_back(vector_t<byte_t> {}, a_components[i].m_component_size, a_components[i].m_component_index);
           m_component_data.back().m_data.reserve(a_components[i].m_component_size);
@@ -88,18 +91,20 @@ namespace mwc {
 
       auto component_count() const -> archetype_component_index_t;
       auto entity_count() const -> archetype_entity_index_t;
+      auto component_hash() const -> component_hash_t;
+      auto index() const -> archetype_index_t;
       auto component_index(const component_index_t a_component_index) const -> archetype_component_index_t;
 
       template <component_c... tp_components>
         requires(sizeof...(tp_components) > 0)
       constexpr auto component_row(const archetype_entity_index_t a_entity_index) {
-        constexpr auto requested_component_hash = component_hash<std::plus<>, tp_components...>();
+        constexpr auto requested_component_hash = ecs::component_hash<std::plus<>, tp_components...>();
         contract_assert(requested_component_hash == m_component_hash);
 
         auto [... components] = sorted_component_types<tp_components...>();
 
         // note: consider returning references rather than values
-        const auto lambda = [this, &components..., a_entity_index]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
+        const auto lambda = [this, &components..., a_entity_index]<size_t... tp_index>(std::index_sequence<tp_index...>) {
           ((components...[tp_index] = std::bit_cast<vector_t<std::remove_cvref_t<decltype(components...[tp_index])>>*>(
                                         &m_component_data[tp_index].m_data)
                                         ->operator[](a_entity_index)),
@@ -113,7 +118,6 @@ namespace mwc {
         auto component_row_data = component_row_data_t {};
         component_row_data.reserve(m_component_data.size());
 
-        // note: consider returning references rather than values
         for (auto& component : m_component_data) {
           auto begin = component.m_data.begin() + component.m_component_size * a_entity_index;
           component_row_data.emplace_back(span_t {begin, component.m_component_size});
@@ -148,10 +152,7 @@ namespace mwc {
         return m_entity_count;
       }
       auto remove_component_row(const archetype_entity_index_t a_entity_index) {
-        std::cout << "component count: " << component_count() << '\n';
         for (auto& component : m_component_data) {
-          std::cout << "rmeoved component sz: " << component.m_component_size << '\n';
-          std::cout << "rmeoved component actual byte sz: " << component.m_data.size() << '\n';
           const auto begin = component.m_data.begin() + a_entity_index * component.m_component_size;
           const auto end = begin + component.m_component_size;
           component.m_data.erase(begin, end);
@@ -173,9 +174,5 @@ namespace mwc {
       obs_ptr_t<archetype_st> m_archetype;
       entity_index_t m_entity_index;
     };
-    /*struct archetype_component_index_st {
-      obs_ptr_t<archetype_st> m_archetype;
-      archetype_component_index_t m_component_index;
-    };*/
   }
 }

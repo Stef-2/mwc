@@ -37,20 +37,37 @@ import std;
     struct component_storage_st {
       using data_span_t = span_t<byte_t>;
 
+      constexpr auto operator<=>(const component_storage_st& a_other) const;
+
       vector_t<byte_t> m_data;
       size_t m_component_size;
       archetype_component_index_t m_component_index;
     };
     // type erased view over component storage
     struct component_storage_view_st {
+      constexpr auto operator<=>(const component_storage_view_st& a_other) const;
+
       component_storage_st::data_span_t m_data_span;
       archetype_component_index_t m_component_index;
     };
     // data used for runtime component type information
     struct component_runtime_information_st {
+      constexpr auto operator<=>(const component_runtime_information_st& a_other) const;
+
       size_t m_component_size;
       component_index_t m_component_index;
     };
+
+    // implementation
+    constexpr auto component_storage_st::operator<=>(const component_storage_st& a_other) const {
+      return m_component_index <=> a_other.m_component_index;
+    }
+    constexpr auto component_storage_view_st::operator<=>(const component_storage_view_st& a_other) const {
+      return m_component_index <=> a_other.m_component_index;
+    }
+    constexpr auto component_runtime_information_st::operator<=>(const component_runtime_information_st& a_other) const {
+      return m_component_index <=> a_other.m_component_index;
+    }
 
     // sort components according to their identification in ascending order
     template <typename tp_tuple, component_c tp_x, component_c tp_y, component_c... tps>
@@ -97,6 +114,12 @@ import std;
         return tuple_t<tp_component> {};
       else
         return component_type_sort<tuple_t<>, tp_component, tp_components...>();
+    }
+    template <component_c tp_component, component_c... tp_components>
+    consteval auto sorted_component_reference_types() {
+      auto [... unpack_tuple] = sorted_component_types<tp_component, tp_components...>();
+
+      return std::declval<tuple_t<std::add_lvalue_reference_t<decltype(unpack_tuple)>...>>();
     }
   }
 }

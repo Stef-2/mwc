@@ -7,6 +7,7 @@
 
 import mwc_definition;
 import mwc_subsystem;
+import mwc_input_scene;
 
 import fastgltf;
 
@@ -23,6 +24,9 @@ namespace mwc {
       static inline fastgltf::Parser gltf_parser;
     };
 
+    auto read_text_file(const filepath_t& a_filepath) -> string_t;
+    auto read_binary_file(const filepath_t& a_filepath) -> vector_t<byte_t>;
+    auto read_scene_file(const filepath_t& a_filepath) -> scene_st;
     namespace global {
       inline auto input_subsystem =
         input_subsystem_st {{&diagnostic::log::global::logging_subsystem, &mwc::global::window_subsystem},

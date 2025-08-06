@@ -6,8 +6,6 @@
 import mwc_definition;
 import mwc_type_identity;
 
-namespace mwc {}
-
 /*export */ namespace mwc {
   namespace ecs {
     // unique global entity identifier
@@ -22,5 +20,8 @@ namespace mwc {}
     using archetype_entity_index_t = uint32_t;
     // component index within an archetype
     using archetype_component_index_t = uint16_t;
+
+    static constexpr auto invalid_entity = entity_index_t {0};
+    static constexpr auto invalid_archetype = archetype_index_t {0};
   }
 }
