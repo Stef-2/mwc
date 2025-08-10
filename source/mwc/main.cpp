@@ -16,11 +16,22 @@ import std;
 import vkfw;
 
 int main() {
-  const auto scene = mwc::input::read_scene_file("/home/billy/dev/mwc/data/mesh/cube.glb");
-  for (auto i = 0; i < scene.m_meshes.back().m_vertex_storage.size(); i += 3 * 4) {
-    const auto vertex = std::bit_cast<mwc::geometry::vertex_position_st*>(scene.m_meshes.back().m_vertex_storage.data() + i);
-    std::cout << vertex->m_position.x() << " " << vertex->m_position.y() << " " << vertex->m_position.z() << '\n';
+  /*const auto scene = mwc::input::read_scene_file("/home/billy/dev/mwc/data/mesh/cube.glb");
+  std::cout << scene.m_meshes.back().m_vertex_storage.size() / scene.m_meshes.back().m_vertex_model_size << '\n';
+  for (auto i = 0; i < scene.m_meshes.back().m_vertex_storage.size(); i += scene.m_meshes.back().m_vertex_model_size) {
+    auto pos = std::bit_cast<mwc::array_t<float, 3>*>(scene.m_meshes.back().m_vertex_storage.data() + i);
+    auto nor = std::bit_cast<mwc::array_t<float, 3>*>(scene.m_meshes.back().m_vertex_storage.data() + i + 12);
+    auto tan = std::bit_cast<mwc::array_t<float, 4>*>(scene.m_meshes.back().m_vertex_storage.data() + i + 12 + 12);
+    auto uv = std::bit_cast<mwc::array_t<float, 2>*>(scene.m_meshes.back().m_vertex_storage.data() + i + 12 + 12 + 16);
+
+    std::cout << "P: (" << (*pos)[0] << " " << (*pos)[1] << " " << (*pos)[2] << ')';
+    std::cout << " N: (" << (*nor)[0] << " " << (*nor)[1] << " " << (*nor)[2] << ')';
+    std::cout << " T: (" << (*tan)[0] << " " << (*tan)[1] << " " << (*tan)[2] << " " << (*tan)[3] << ')';
+    std::cout << " U: (" << (*uv)[0] << " " << (*uv)[1] << ')' << "\n";
   }
+  std::cout << "idx count: " << scene.m_meshes.back().m_index_storage.size() << '\n';
+  for (const auto idx : scene.m_meshes.back().m_index_storage)
+    std::cout << idx << "\n";
   const auto e = mwc::ecs::generate_entity<test2, test0, test1>(test2 {.c = 'b'}, test0 {.i = 69}, test1 {.f = 6.4f});
   const auto c = mwc::ecs::entity_components<test2, test0, test1>(e);
   const auto ac = mwc::ecs::ecs_subsystem_st::entity_archetype_map[1].m_archetype->component_data_row(0);
@@ -48,7 +59,7 @@ int main() {
 
   return 0;
 
-  // testing =======================
+  // testing =======================*/
   mwc::initialize_subsystems();
   mwc::mwc_ct mwc {};
 

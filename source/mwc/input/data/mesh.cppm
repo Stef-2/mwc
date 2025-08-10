@@ -3,6 +3,7 @@ module;
 export module mwc_input_mesh;
 
 import mwc_definition;
+import mwc_geometry;
 import mwc_vertex_model;
 import mwc_bit_mask;
 
@@ -22,15 +23,18 @@ export namespace mwc {
 
       vertex_storage_t m_vertex_storage;
       index_storage_t m_index_storage;
+      geometry::transformation_t<> m_transformation;
     };
 
     struct dynamic_mesh_st {
       using vertex_storage_t = vector_t<byte_t>;
-      using index_storage_t = uint32_t;
+      using index_storage_t = vector_t<uint32_t>;
 
       vertex_storage_t m_vertex_storage;
       index_storage_t m_index_storage;
+      geometry::transformation_t<> m_transformation;
       bit_mask_t<geometry::vertex_component_bit_mask_et> m_vertex_component_bit_mask;
+      size_t m_vertex_model_size;
     };
   }
 }

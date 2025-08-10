@@ -37,15 +37,17 @@ void handle_contract_violation(const std::contracts::contract_violation& a_viola
   const auto assertion_kind = assertion_kind_string(a_violation.kind());
   const auto evaluation_semantic = evaluation_semantic_string(a_violation.semantic());
   const auto detection_mode = detection_mode_string(a_violation.detection_mode());
+  const auto contract_violation_string = std::format("contract violation: {0}" SUB "assertion kind: {1}" SUB
+                                                     "evaluation semantic: {2}" SUB "detection mode: {3}" SUB,
+                                                     a_violation.comment(),
+                                                     assertion_kind,
+                                                     evaluation_semantic,
+                                                     detection_mode);
   if constexpr (mwc::diagnostic::logging_subsystem_switch()) {
-    mwc::critical(std::format("contract violation: {0}" SUB "assertion kind: {1}" SUB "evaluation semantic: {2}" SUB
-                              "detection mode: {3}" SUB,
-                              a_violation.comment(),
-                              assertion_kind,
-                              evaluation_semantic,
-                              detection_mode),
-                  a_violation.location());
+    mwc::critical(contract_violation_string, a_violation.location());
 
     mwc::diagnostic::log::global::logging_subsystem.finalize();
+  } else {
+    std::print("{0}", contract_violation_string);
   }
 }
