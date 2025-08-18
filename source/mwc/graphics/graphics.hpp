@@ -17,7 +17,7 @@
 #include "mwc/graphics/vulkan/queue.hpp"
 #include "mwc/graphics/vulkan/suballocated_memory_mapped_buffer.hpp"
 #include "mwc/graphics/vulkan/dynamic_rendering_state.hpp"
-#include "mwc/graphics/user_interface/dear_imgui.hpp"
+#include "mwc/graphics/user_interface/user_interface.hpp"
 
 import mwc_definition;
 
@@ -60,7 +60,7 @@ namespace mwc {
       vulkan::queue_ct m_transfer_queue;
       vulkan::suballocated_memory_mapped_buffer_ct m_common_buffer;
       vulkan::dynamic_rendering_state_ct m_dynamic_rendering_state;
-      dear_imgui_ct m_dear_imgui;
+      user_interface_ct m_user_interface;
       configuration_st m_configuration;
     };
 

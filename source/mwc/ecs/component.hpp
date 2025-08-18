@@ -8,6 +8,7 @@ import mwc_definition;
 #include "mwc/ecs/definition.hpp"
 import mwc_type_identity;
 import mwc_observer_ptr;
+import mwc_type_identity;
 import mwc_ctti;
 
 import std;
@@ -24,14 +25,17 @@ import std;
     };
 
     // crtp type to be inherited by ecs component types
-    template <typename tp>
-    struct component_st : public ctti::type_identity_st<tp, component_index_t> {
+    template <typename tp, typename tp_underlying_pod = void>
+    struct component_st : public ctti::type_index_st<tp, component_index_t>, ctti::type_identity_st<tp> {
+      using underlying_pod_t = tp_underlying_pod;
       using _ = decltype(ctti::type_list_push_back<component_type_list_st, tp>());
     };
 
     // concept modeling component types
     template <typename tp>
-    concept component_c = std::is_base_of_v<component_st<tp>, tp>;
+    concept component_c =
+      std::is_base_of_v<component_st<std::remove_cvref_t<tp>, typename std::remove_cvref_t<tp>::underlying_pod_t>,
+                        std::remove_cvref_t<tp>>;
 
     // type erased component storage
     struct component_storage_st {
@@ -74,7 +78,7 @@ import std;
     consteval auto component_type_sort() {
       // sort the two elements currently being operated on
       constexpr auto ascending_sort = [] {
-        if constexpr (tp_x::identity < tp_y::identity)
+        if constexpr (tp_x::index < tp_y::index)
           return pair_t<tp_x, tp_y> {};
         else
           return pair_t<tp_y, tp_x> {};
@@ -84,7 +88,7 @@ import std;
                                          this auto&& a_this) {
         if constexpr (not tp_assertion or sizeof...(tp_rest) == 0)
           return tp_assertion;
-        else if constexpr (tp_first::identity < tp_rest...[0] ::identity)
+        else if constexpr (tp_first::index < tp_rest...[0] ::index)
           return a_this.template operator()<tp_assertion, tp_rest...>();
         else
           return a_this.template operator()<false, tp_rest...>();

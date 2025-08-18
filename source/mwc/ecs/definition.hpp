@@ -21,7 +21,8 @@ import mwc_type_identity;
     // component index within an archetype
     using archetype_component_index_t = uint16_t;
 
-    static constexpr auto invalid_entity = entity_index_t {0};
-    static constexpr auto invalid_archetype = archetype_index_t {0};
+    static constexpr auto null_entity = entity_index_t {0};
+    static constexpr auto null_component = component_index_t {0};
+    static constexpr auto null_archetype = archetype_index_t {0};
   }
 }

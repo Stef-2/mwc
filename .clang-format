@@ -24,7 +24,6 @@ RequiresExpressionIndentation: Keyword
 RequiresClausePosition: OwnLineWithBrace
 RemoveSemicolon: true
 RemoveParentheses: Leave
-RemoveBracesLLVM: true
 ReferenceAlignment: Pointer
 PointerAlignment: Left
 PackConstructorInitializers: CurrentLine
@@ -96,3 +95,4 @@ ReflowComments: false
 PenaltyBreakOpenParenthesis: 10
 PenaltyExcessCharacter: 10
 PenaltyReturnTypeOnItsOwnLine: 10
+RemoveBracesLLVM: false

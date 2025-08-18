@@ -14,17 +14,17 @@ import mwc_subsystem;
 //import mwc_ecs_component;
 import mwc_observer_ptr;
 
-struct test0 : mwc::ecs::component_st<test0> {
+struct test0 : mwc::ecs::component_st<test0, int> {
   int i = 23;
 };
 
-struct test1 : mwc::ecs::component_st<test1> {
+struct test1 : mwc::ecs::component_st<test1, float> {
   float f = 2.0f;
 };
-struct test2 : mwc::ecs::component_st<test2> {
+struct test2 : mwc::ecs::component_st<test2, char> {
   char c = 'a';
 };
-struct test3 : mwc::ecs::component_st<test3> {
+struct test3 : mwc::ecs::component_st<test3, bool> {
   bool b = true;
 };
 
@@ -69,7 +69,7 @@ namespace mwc {
         // register component - archetype mapping
         const auto lambda = [&archetype_iterator, &archetype_index]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
           ((ecs_subsystem_st::component_archetype_map.emplace(
-             tp_components... [tp_index] ::identity,
+             tp_components... [tp_index] ::index,
              unordered_map_t<obs_ptr_t<archetype_st>, archetype_component_index_t> {
                pair_t {
                  &archetype_iterator->second, tp_index
@@ -135,7 +135,7 @@ namespace mwc {
     inline auto entity_components(const entity_index_t m_entity_index) {
       // determine the matching archetype
       const auto& archetype = ecs_subsystem_st::entity_archetype_map[m_entity_index];
-      contract_assert(archetype.m_archetype != nullptr and m_entity_index != invalid_entity);
+      contract_assert(archetype.m_archetype != nullptr and m_entity_index != null_entity);
 
       return archetype.m_archetype->component_row<tp_components...>(archetype.m_entity_index);
     }
@@ -154,7 +154,7 @@ namespace mwc {
     inline auto insert_components(const entity_index_t a_entity_index, tp_components&&... a_components) -> void {
       // determine the source archetype
       const auto source_archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
-      contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != invalid_entity);
+      contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != null_entity);
 
       constexpr auto inserted_components_hash = component_hash<std::plus<>, tp_components...>();
       // determine if this class of component modification has been recorded before
@@ -167,7 +167,7 @@ namespace mwc {
 
         (target_component_data.emplace_back(component_storage_view_st {
          .m_data_span = {span_t<byte_t, sizeof(a_components)> {std::bit_cast<byte_t*>(&a_components), sizeof(a_components)}},
-         .m_component_index = std::remove_cvref_t<decltype(a_components)>::identity}),
+         .m_component_index = std::remove_cvref_t<decltype(a_components)>::index}),
          ...);
 
         const auto& source_entity_index = source_archetype.m_entity_index;
@@ -220,7 +220,7 @@ namespace mwc {
           const auto lambda = [&component_runtime_information]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
             (component_runtime_information.emplace_back(
                component_runtime_information_st {.m_component_size = sizeof(tp_components...[tp_index]),
-                                                 .m_component_index = tp_components...[tp_index] ::identity}),
+                                                 .m_component_index = tp_components...[tp_index] ::index}),
              ...);
           };
           lambda(std::make_index_sequence<sizeof...(tp_components)> {});
@@ -254,7 +254,7 @@ namespace mwc {
       requires(sizeof...(tp_components) > 0)
     inline auto remove_components(const entity_index_t a_entity_index) -> void {
       const auto source_archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
-      contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != invalid_entity);
+      contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != null_entity);
 
       constexpr auto inserted_components_hash = component_hash<std::plus<>, tp_components...>();
       // determine if this class of component modification has been recorded before
@@ -309,7 +309,7 @@ namespace mwc {
           const auto lambda = [&component_runtime_information,
                                &source_archetype]<component_c tp_component, component_c... tps>(this auto&& a_this) -> void {
             for (const auto& source_component : source_archetype.m_archetype->m_component_data)
-              if (source_component.m_component_index != tp_component::identity)
+              if (source_component.m_component_index != tp_component::index)
                 component_runtime_information.emplace_back(
                   component_runtime_information_st {.m_component_size = source_component.m_component_size,
                                                     .m_component_index = source_component.m_component_index});

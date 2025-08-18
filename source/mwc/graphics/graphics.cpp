@@ -43,15 +43,13 @@ namespace mwc {
       .m_virtual_allocator_configuration =
         virtual_allocator_ct::configuration_st {.m_virtual_block_create_flags = vma::VirtualBlockCreateFlags {}}}},
       m_dynamic_rendering_state {m_surface},
-      m_dear_imgui {a_window,         m_context,  m_instance, m_physical_device, m_logical_device, m_queue_families.graphics(),
-                    m_graphics_queue, m_swapchain},
+      m_user_interface {dear_imgui_ct {a_window, m_context, m_instance, m_physical_device, m_logical_device,
+                                       m_queue_families.graphics(), m_graphics_queue, m_swapchain}},
       m_configuration {a_configuration} {}
 
     auto graphics_ct::render() -> void {
       //imgui
-      ImGui_ImplVulkan_NewFrame();
-      ImGui_ImplGlfw_NewFrame();
-      ImGui::NewFrame();
+      m_user_interface.begin_frame();
 
       //m_graphics_queue.command_pool()->reset(vk::CommandPoolResetFlagBits {});
       auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
@@ -77,12 +75,8 @@ namespace mwc {
       //std::cout << "frame idx: " << m_frame_synchronizer.m_frame_index << '\n';
       m_swapchain.transition_layout<vulkan::swapchain_ct::layout_state_et::e_presentation>(cmd);
 
-      bool wtf = false;
-      ImGui::ShowDemoWindow(&wtf);
-
-      ImGui::Render();
-      ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *cmd);
-
+      m_user_interface.generate_debug_interface();
+      m_user_interface.render(cmd);
       cmd.end();
 
       //auto render_fence = m_logical_device->createFence(vk::FenceCreateInfo {/*vk::FenceCreateFlagBits::eSignaled*/}).value();

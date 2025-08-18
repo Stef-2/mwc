@@ -19,9 +19,9 @@ namespace mwc {
       return m_index;
     }
     auto archetype_st::component_index(const component_index_t a_component_index) const -> archetype_component_index_t {
-      for (const auto& component : m_component_data)
-        if (component.m_component_index == a_component_index)
-          return component.m_component_index;
+      for (auto i = archetype_component_index_t {0}; i < m_component_data.size(); ++i)
+        if (m_component_data[i].m_component_index == a_component_index)
+          return i;
 
       contract_assert(false);
       std::unreachable();

@@ -23,7 +23,7 @@ namespace mwc {
       const auto lambda = [&a_initial_hash]<component_c tp>() {
         // convert the component type identities to a string format, suitable for hashing
         auto identity_string = array_t<char_t, sizeof(component_hash_t)> {};
-        std::to_chars(identity_string.data(), identity_string.data() + identity_string.size(), tp::identity);
+        std::to_chars(identity_string.data(), identity_string.data() + identity_string.size(), tp::index);
         if constexpr (std::is_same_v<tp_operator, std::plus<>>)
           a_initial_hash += polynomial_rolling_hash(identity_string);
         else
@@ -64,7 +64,7 @@ namespace mwc {
         m_component_data.reserve(sizeof...(tp_components));
         const auto lambda = [this]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
           (m_component_data.emplace_back(vector_t<byte_t> {}, sizeof(tp_components...[tp_index]),
-                                         tp_components...[tp_index] ::identity),
+                                         tp_components...[tp_index] ::index),
            ...);
         };
         lambda(std::make_index_sequence<sizeof...(tp_components)> {});

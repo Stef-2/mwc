@@ -54,10 +54,27 @@ namespace mwc {
       const auto vulkan_initialization = ImGui_ImplVulkan_Init(&imgui_vulkan_initialization_info);
       contract_assert(vulkan_initialization);
     }
+    dear_imgui_ct::dear_imgui_ct(dear_imgui_ct&& a_other) noexcept
+    : m_descriptor_pool {std::move(a_other.m_descriptor_pool)},
+      m_imgui_context {std::exchange(a_other.m_imgui_context, nullptr)} {}
+    auto dear_imgui_ct::begin_frame() const -> void {
+      ImGui_ImplVulkan_NewFrame();
+      ImGui_ImplGlfw_NewFrame();
+      ImGui::NewFrame();
+    }
+    auto dear_imgui_ct::render(const vk::raii::CommandBuffer& a_command_buffer) const -> void {
+      auto render = false;
+      ImGui::ShowDemoWindow(&render);
+
+      ImGui::Render();
+      ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *a_command_buffer);
+    }
     dear_imgui_ct::~dear_imgui_ct() {
-      ImGui_ImplVulkan_Shutdown();
-      ImGui_ImplGlfw_Shutdown();
-      ImGui::DestroyContext(m_imgui_context);
+      if (m_imgui_context) {
+        ImGui_ImplVulkan_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext(m_imgui_context);
+      }
     }
   }
 }

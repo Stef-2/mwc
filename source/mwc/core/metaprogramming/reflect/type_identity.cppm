@@ -4,8 +4,6 @@ export module mwc_type_identity;
 
 import mwc_definition;
 import mwc_ctti;
-import mwc_compiler;
-import mwc_static_string;
 import mwc_hash;
 
 import std;
@@ -15,35 +13,27 @@ export namespace mwc {
     // crtp type to be inherited by types requiring constant evaluated name reflection and unique type hash generation
     // built on constant evaluated reflection of implementation defined output of [std::source_location::function_name()]
     template <typename tp>
-    // only works on clang
-      requires(utility::compiler() == utility::compiler_et::e_clang)
-    struct type_name_st {
-      static consteval auto type_name(const bool include_namespace = true) {
-        constexpr auto source_location = std::source_location::current();
-        constexpr auto function_name = std::string_view {source_location.function_name()};
+    struct type_identity_st {
+      static constexpr auto type_name(const bool a_include_namespace = true) {
+        // this can't be constexpr as gcc removes template information from the function name in that case
+        const auto source_location = std::source_location::current();
+        const auto function_name = std::string_view {source_location.function_name()};
 
-        constexpr auto last_open_angle_bracket_position = function_name.rfind('<');
-        constexpr auto last_closed_angle_bracket_position = function_name.rfind('>');
+        constexpr auto equals_string = string_view_t {"= "};
+        constexpr auto scope_resolution_string = string_view_t {"::"};
 
-        if (include_namespace) {
-          constexpr auto begin = last_open_angle_bracket_position + 1;
-          constexpr auto size = last_closed_angle_bracket_position - begin;
+        const auto last_equals_position = function_name.rfind(equals_string) + equals_string.size();
+        const auto last_scope_resolution_operator_position =
+          function_name.rfind(scope_resolution_string) + scope_resolution_string.size();
+        const auto begin = a_include_namespace ? last_equals_position : last_scope_resolution_operator_position;
+        const auto end = function_name.rfind(']');
 
-          return function_name.substr(begin, size);
-        } else {
-          constexpr auto scope_resolution_operator = std::string_view {"::"};
-          constexpr auto begin = function_name.rfind(scope_resolution_operator, last_closed_angle_bracket_position) +
-                                 scope_resolution_operator.size();
-          constexpr auto size = last_closed_angle_bracket_position - begin;
-
-          return function_name.substr(begin, size);
-        }
+        return function_name.substr(begin, end - begin);
       }
-      static consteval auto type_hash() {
+      static constexpr auto type_hash() {
         constexpr auto name = type_name(/*include_namespace*/ true);
-        constexpr auto static_string = static_string_st {name};
 
-        return hash<static_string>();
+        return polynomial_rolling_hash(span_t {name.data(), name.size()});
       }
     };
 
@@ -70,8 +60,8 @@ export namespace mwc {
 
     // crtp type to be inherited by types requiring unique identification
     template <typename tp, typename tp_size = uint64_t>
-    struct type_identity_st {
-      static constexpr auto identity = tp_size {ctti::type_identity<tp, tp_size {0}>()};
+    struct type_index_st {
+      static constexpr auto index = tp_size {ctti::type_identity<tp, tp_size {1}>()};
     };
   }
 }
