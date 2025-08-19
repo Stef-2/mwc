@@ -188,8 +188,15 @@ namespace mwc {
         }
         // insert combined component data into the target archetype
         target_archetype.insert_component_data_row(target_component_data);
-        // remove component data from the source archetype
-        source_archetype.m_archetype->remove_component_row(source_entity_index);
+        // move last component row to the current source archetype component row
+        const auto source_entity_count_after_removal = source_archetype.m_archetype->move_last_component_row(source_entity_index);
+        // find the entity whose data was just moved and record its new component location
+        for (auto& [entity_index, archetype_entity_map] : ecs_subsystem_st::entity_archetype_map) {
+          if (archetype_entity_map.m_archetype == source_archetype.m_archetype and
+              archetype_entity_map.m_entity_index == source_entity_count_after_removal) {
+            archetype_entity_map.m_entity_index = source_entity_index;
+          }
+        }
         // register the entity with the target archetype
         ecs_subsystem_st::entity_archetype_map[a_entity_index] =
           archetype_entity_index_st {.m_archetype = &target_archetype, .m_entity_index = target_archetype.entity_count() - 1};

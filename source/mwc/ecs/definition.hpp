@@ -6,6 +6,8 @@
 import mwc_definition;
 import mwc_type_identity;
 
+import std;
+
 /*export */ namespace mwc {
   namespace ecs {
     // unique global entity identifier
@@ -24,5 +26,7 @@ import mwc_type_identity;
     static constexpr auto null_entity = entity_index_t {0};
     static constexpr auto null_component = component_index_t {0};
     static constexpr auto null_archetype = archetype_index_t {0};
+    static constexpr auto null_archetype_entity_index = std::numeric_limits<archetype_entity_index_t>::max();
+    static constexpr auto null_archetype_component_index = std::numeric_limits<archetype_component_index_t>::max();
   }
 }

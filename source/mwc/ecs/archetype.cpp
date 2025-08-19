@@ -23,8 +23,7 @@ namespace mwc {
         if (m_component_data[i].m_component_index == a_component_index)
           return i;
 
-      contract_assert(false);
-      std::unreachable();
+      return null_archetype_component_index;
     }
   }
 }

@@ -72,11 +72,25 @@ namespace mwc {
         ImGui::TableSetupColumn(header_string.c_str());
       });
       ImGui::TableHeadersRow();
-      ImGui::TableNextRow();
 
       const auto lambda = []<size_t tp_index, size_t... tp_indices>(this auto&& a_this,
                                                                     std::index_sequence<tp_index, tp_indices...>) {
         using component_t = std::tuple_element_t<tp_index, component_tuple_t>;
+
+        const auto row_index = ImGui::TableGetRowIndex() - 1;
+        auto entity_archetype_record = ecs::ecs_subsystem_st::entity_archetype_map.begin();
+        std::advance(entity_archetype_record, row_index);
+        if (entity_archetype_record == ecs::ecs_subsystem_st::entity_archetype_map.end())
+          return;
+
+        ImGui::TableSetColumnIndex(tp_index);
+        const auto archetype_component_index = entity_archetype_record->second.m_archetype->component_index(component_t::index);
+        if (archetype_component_index != ecs::null_archetype_component_index) {
+          const auto component_data_ptr = std::bit_cast<vector_t<component_t>*>(
+            &entity_archetype_record->second.m_archetype->m_component_data[archetype_component_index].m_data);
+          ImGui::Text(format(component_data_ptr->operator[](entity_archetype_record->second.m_entity_index)).c_str());
+        }
+        /*
         ImGui::TableSetColumnIndex(tp_index + 1);
 
         constexpr auto button_label = string_t {std::tuple_element_t<tp_index, component_tuple_t>::type_name()};
@@ -104,12 +118,15 @@ namespace mwc {
         if (ImGui::BeginPopupContextItem(nullptr, ImGuiPopupFlags_MouseButtonLeft)) {
           ImGui::Text(header_string.c_str());
           ImGui::EndPopup();
-        }
+        }*/
 
         if constexpr (sizeof...(tp_indices) > 0)
           a_this(std::index_sequence<tp_indices...> {});
       };
-      lambda(std::make_index_sequence<component_count> {});
+      for (auto i = ecs::archetype_entity_index_t {0}; i < ecs::ecs_subsystem_st::entity_archetype_map.size(); ++i) {
+        ImGui::TableNextRow();
+        lambda(std::make_index_sequence<component_count> {});
+      }
       /*
       for (const auto& [entity_index, archetype_entity_index] : ecs::ecs_subsystem_st::entity_archetype_map) {
         auto& archetype = *archetype_entity_index.m_archetype;

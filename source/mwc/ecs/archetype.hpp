@@ -93,6 +93,7 @@ namespace mwc {
       auto entity_count() const -> archetype_entity_index_t;
       auto component_hash() const -> component_hash_t;
       auto index() const -> archetype_index_t;
+      // determine the archetype component index
       auto component_index(const component_index_t a_component_index) const -> archetype_component_index_t;
 
       template <component_c... tp_components>
@@ -155,6 +156,19 @@ namespace mwc {
         for (auto& component : m_component_data) {
           const auto begin = component.m_data.begin() + a_entity_index * component.m_component_size;
           const auto end = begin + component.m_component_size;
+          component.m_data.erase(begin, end);
+        }
+        --m_entity_count;
+
+        return m_entity_count;
+      }
+      auto move_last_component_row(const archetype_entity_index_t a_target_entity_index) {
+        const auto last_entity_index = m_entity_count - 1;
+
+        for (auto& component : m_component_data) {
+          const auto begin = component.m_data.begin() + last_entity_index * component.m_component_size;
+          const auto end = begin + component.m_component_size;
+          std::copy(begin, end, component.m_data.begin() + a_target_entity_index * component.m_component_size);
           component.m_data.erase(begin, end);
         }
         --m_entity_count;
