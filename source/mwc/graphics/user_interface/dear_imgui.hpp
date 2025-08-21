@@ -31,6 +31,8 @@ namespace mwc {
         uint32_t m_descriptor_count;
       };
 
+      static auto centered_text(const string_view_t a_string) -> void;
+
       dear_imgui_ct(const window_ct& a_window,
                     const vulkan::context_st& a_context,
                     const vulkan::instance_ct& a_instance,

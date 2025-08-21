@@ -89,11 +89,15 @@ namespace mwc {
         m_component_hash = component_hash;
       }
 
-      auto component_count() const -> archetype_component_index_t;
-      auto entity_count() const -> archetype_entity_index_t;
-      auto component_hash() const -> component_hash_t;
+      auto component_count() const -> archetype_component_index_t /*pre(m_component_data.size() != 0)*/;
+      auto entity_count() const -> archetype_entity_index_t pre(m_entity_count != 0);
+      auto component_hash() const -> component_hash_t /*pre(m_component_hash != 0)*/;
+      template <typename tp_this>
+      constexpr auto component_data(this tp_this&& a_this) -> decltype(auto) {
+        return std::forward_like<decltype(a_this)>(a_this.m_component_data);
+      }
       auto index() const -> archetype_index_t;
-      // determine the archetype component index
+      // determine the archetype component index, return [null_archetype_component_index] if it is not present
       auto component_index(const component_index_t a_component_index) const -> archetype_component_index_t;
 
       template <component_c... tp_components>

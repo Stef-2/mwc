@@ -6,6 +6,15 @@
 
 namespace mwc {
   namespace graphics {
+    auto dear_imgui_ct::centered_text(const string_view_t a_string) -> void {
+      const auto text_width = ImGui::CalcTextSize(a_string.data()).x;
+      const auto content_region_width = ImGui::GetContentRegionAvail().x;
+      const auto offset = (content_region_width - text_width) * 0.5;
+
+      ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
+      ImGui::TextUnformatted(a_string.data());
+    }
+
     dear_imgui_ct::dear_imgui_ct(const window_ct& a_window, const vulkan::context_st& a_context,
                                  const vulkan::instance_ct& a_instance, const vulkan::physical_device_ct& a_physical_device,
                                  const vulkan::logical_device_ct& a_logical_device,
