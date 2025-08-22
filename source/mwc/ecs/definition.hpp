@@ -23,9 +23,9 @@ import std;
     // component index within an archetype
     using archetype_component_index_t = uint16_t;
 
-    static constexpr auto null_entity = entity_index_t {0};
-    static constexpr auto null_component = component_index_t {0};
-    static constexpr auto null_archetype = archetype_index_t {0};
+    static constexpr auto null_entity_index = entity_index_t {0};
+    static constexpr auto null_component_index = component_index_t {0};
+    static constexpr auto null_archetype_index = archetype_index_t {0};
     static constexpr auto null_archetype_entity_index = std::numeric_limits<archetype_entity_index_t>::max();
     static constexpr auto null_archetype_component_index = std::numeric_limits<archetype_component_index_t>::max();
   }

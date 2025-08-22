@@ -24,8 +24,8 @@ export namespace mwc {
 
   // constant evaluated for-loop
   template <size_t tp_i, size_t tp_n, typename tp_functor>
+    requires(tp_i <= tp_n)
   constexpr auto static_for_loop(const tp_functor& a_functor) {
-    static_assert(tp_i <= tp_n);
     if constexpr (tp_i < tp_n) {
       a_functor.template operator()<tp_i>();
       static_for_loop<tp_i + 1, tp_n>(a_functor);

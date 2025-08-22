@@ -6,44 +6,6 @@
 import mwc_metaprogramming_utility;
 import mwc_ctti;
 
-// byte_t formatter
-template <>
-struct std::formatter<mwc::byte_t, mwc::char_t> {
-  constexpr auto parse(const std::format_parse_context& a_context) {
-    return a_context.begin();
-  }
-  constexpr auto format(const mwc::byte_t a_byte, std::format_context& a_context) const {
-    return std::format_to(a_context.out(), "{0}", std::to_integer<mwc::size_t>(a_byte));
-  }
-};
-
-namespace {
-  template <mwc::ecs::component_c tp_component>
-  constexpr auto format_component_data(tp_component a_component) {
-    using underlying_pod_t = std::remove_cvref_t<tp_component>::underlying_pod_t;
-
-    auto buffer = mwc::string_t {};
-
-    if constexpr (std::formattable<underlying_pod_t, mwc::char_t>) {
-      if constexpr (sizeof(tp_component) > sizeof(underlying_pod_t)) {
-        auto ptr = std::bit_cast<underlying_pod_t*>(&a_component);
-        for (auto i = 0; i < sizeof(tp_component) / sizeof(underlying_pod_t); ++i) {
-          std::format_to(std::back_inserter(buffer), "{0}", ptr[i]);
-        }
-      } else {
-        return std::format("{0}", *std::bit_cast<underlying_pod_t*>(&a_component));
-      }
-    } else {
-      const auto bytes = std::bit_cast<mwc::byte_t*>(&a_component);
-      for (auto i = 0; i < sizeof(tp_component); ++i) {
-        std::format_to(std::back_inserter(buffer), "{0} ", bytes[i]);
-      }
-    }
-
-    return buffer;
-  }
-}
-
 namespace mwc {
   namespace graphics {
     user_interface_ct::user_interface_ct(dear_imgui_ct&& a_dear_imgui, const configuration_st& a_configuration)
@@ -70,7 +32,7 @@ namespace mwc {
       ImGui::BeginTable("ecs", component_count + 1, table_flags, table_size);
       ImGui::TableSetupColumn("entity");
       mwc::static_for_loop<0, component_count>([]<size_t tp_index> {
-        constexpr auto header_string = string_t {std::tuple_element_t<tp_index, component_tuple_t>::type_name()};
+        constexpr auto header_string = string_t {std::tuple_element_t<tp_index, component_tuple_t>::type_name(false)};
         ImGui::TableSetupColumn(header_string.c_str());
       });
       ImGui::TableHeadersRow();

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mwc/core/contract/definition.hpp"
-
+#include "mwc/ecs/component_convergence.hpp"
 #include "mwc/ecs/archetype.hpp"
 #include "mwc/ecs/definition.hpp"
 #include "mwc/ecs/component.hpp"
@@ -10,22 +10,10 @@
 
 import mwc_definition;
 import mwc_subsystem;
+//import mwc_geometry;
 //import mwc_ecs_definition;
 //import mwc_ecs_component;
 import mwc_observer_ptr;
-
-struct test0 : mwc::ecs::component_st<test0, int> {
-  int i = 23;
-};
-struct test1 : mwc::ecs::component_st<test1, float> {
-  float f = 2.0f;
-};
-struct test2 : mwc::ecs::component_st<test2, char> {
-  char c = 'a';
-};
-struct test3 : mwc::ecs::component_st<test3, bool> {
-  bool b = true;
-};
 
 namespace mwc {
   namespace ecs {
@@ -35,9 +23,10 @@ namespace mwc {
       auto initialize() -> void override final;
       auto finalize() -> void override final;
 
-      static inline auto entity_index = entity_index_t {null_entity + 1};
-      static inline auto archetype_index = archetype_index_t {null_archetype + 1};
+      static inline auto entity_index = entity_index_t {null_entity_index + 1};
+      static inline auto archetype_index = archetype_index_t {null_archetype_index + 1};
 
+      static inline auto null_archetype = archetype_st {null_archetype_index, span_t<component_runtime_information_st, 0> {}};
       static inline auto hash_archetype_map = unordered_map_t<component_hash_t, archetype_st> {};
       static inline auto entity_archetype_map = unordered_map_t<entity_index_t, archetype_entity_index_st> {};
       static inline auto component_archetype_map =
@@ -79,22 +68,17 @@ namespace mwc {
           a_entity_index,
           archetype_entity_index_st {&generated_archetype_iterator->second, 0});
         // register component - archetype mapping
-        const auto lambda = [&generated_archetype_iterator,
-                             &archetype_index]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
-          ((ecs_subsystem_st::component_archetype_map.emplace(
-             tp_components... [tp_index] ::index,
-             unordered_map_t<obs_ptr_t<archetype_st>, archetype_component_index_t> {
-               pair_t {
-                 &generated_archetype_iterator->second, tp_index
-               }
-             })),
-           ...);
-        };
-        lambda(std::make_index_sequence<sizeof...(tp_components)> {});
+        static_for_loop<0, sizeof...(tp_components)>([&generated_archetype_iterator, &archetype_index]<size_t tp_index> {
+          ecs_subsystem_st::component_archetype_map.emplace(
+            tp_components... [tp_index] ::index,
+            unordered_map_t<obs_ptr_t<archetype_st>, archetype_component_index_t> {
+              pair_t {
+                &generated_archetype_iterator->second, tp_index
+              }
+            });
+        });
         // register modification mapping between the null archetype and newly created one
-        register_archetype_modification(hash,
-                                        ecs_subsystem_st::hash_archetype_map.find(component_hash_t {0})->second,
-                                        generated_archetype_iterator->second);
+        register_archetype_modification(hash, ecs_subsystem_st::null_archetype, generated_archetype_iterator->second);
 
         return generated_archetype_iterator;
       }
@@ -114,9 +98,7 @@ namespace mwc {
           unordered_map_t<archetype_st*, archetype_component_index_t> {{&generated_archetype_iterator->second, i}});
 
       // register modification mapping between the null archetype and the newly created one
-      register_archetype_modification(a_component_hash,
-                                      ecs_subsystem_st::hash_archetype_map.find(component_hash_t {0})->second,
-                                      generated_archetype_iterator->second);
+      register_archetype_modification(a_component_hash, ecs_subsystem_st::null_archetype, generated_archetype_iterator->second);
 
       return generated_archetype_iterator;
     }
@@ -161,7 +143,7 @@ namespace mwc {
     inline auto entity_components(const entity_index_t m_entity_index) {
       // determine the matching archetype
       const auto& archetype = ecs_subsystem_st::entity_archetype_map[m_entity_index];
-      contract_assert(archetype.m_archetype != nullptr and m_entity_index != null_entity);
+      contract_assert(archetype.m_archetype != nullptr and m_entity_index != null_entity_index);
 
       return archetype.m_archetype->component_row<tp_components...>(archetype.m_entity_index);
     }
@@ -170,7 +152,7 @@ namespace mwc {
     inline auto insert_components(const entity_index_t a_entity_index, tp_components&&... a_components) -> void {
       // determine the source archetype
       const auto source_archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
-      contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != null_entity);
+      contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != null_entity_index);
 
       constexpr auto inserted_components_hash = component_hash<std::plus<>, tp_components...>();
       // determine if this class of component modification has been recorded before
@@ -245,13 +227,11 @@ namespace mwc {
           auto component_runtime_information = vector_t<component_runtime_information_st> {};
           component_runtime_information.reserve(source_archetype.m_archetype->component_count() + sizeof...(tp_components));
 
-          const auto lambda = [&component_runtime_information]<size_t... tp_index>(std::index_sequence<tp_index...>) -> void {
-            (component_runtime_information.emplace_back(
-               component_runtime_information_st {.m_component_size = sizeof(tp_components...[tp_index]),
-                                                 .m_component_index = tp_components...[tp_index] ::index}),
-             ...);
-          };
-          lambda(std::make_index_sequence<sizeof...(tp_components)> {});
+          static_for_loop<0, sizeof...(tp_components)>([&component_runtime_information]<size_t tp_index> {
+            component_runtime_information.emplace_back(
+              component_runtime_information_st {.m_component_size = sizeof(tp_components...[tp_index]),
+                                                .m_component_index = tp_components...[tp_index] ::index});
+          });
           for (const auto& source_component : source_archetype.m_archetype->m_component_data) {
             component_runtime_information.emplace_back(
               component_runtime_information_st {.m_component_size = source_component.m_component_size,
@@ -272,7 +252,7 @@ namespace mwc {
       requires(sizeof...(tp_components) > 0)
     inline auto remove_components(const entity_index_t a_entity_index) -> void {
       const auto source_archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
-      contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != null_entity);
+      contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != null_entity_index);
 
       constexpr auto removed_components_hash = component_hash<std::plus<>, tp_components...>();
 
@@ -339,21 +319,16 @@ namespace mwc {
           auto component_runtime_information = vector_t<component_runtime_information_st> {};
           component_runtime_information.reserve(source_archetype.m_archetype->component_count() - sizeof...(tp_components));
 
-          const auto lambda = [&component_runtime_information,
-                               &source_archetype]<component_c tp_component, component_c... tps>(this auto&& a_this) -> void {
+          static_for_loop<0, sizeof...(tp_components)>([&component_runtime_information, &source_archetype]<size_t tp_index> {
             for (const auto& source_component : source_archetype.m_archetype->m_component_data)
-              if (source_component.m_component_index != tp_component::index)
+              if (source_component.m_component_index != tp_components...[tp_index] ::index)
                 component_runtime_information.emplace_back(
                   component_runtime_information_st {.m_component_size = source_component.m_component_size,
                                                     .m_component_index = source_component.m_component_index});
-            if constexpr (sizeof...(tps) > 0)
-              return a_this.template operator()<tps...>();
-          };
-          lambda.template operator()<tp_components...>();
+          });
 
           // sort the component runtime information according to component indices
-          std::ranges::sort(component_runtime_information,
-                            [](const auto& a_x, const auto& a_y) { return a_x.m_component_index < a_y.m_component_index; });
+          std::ranges::sort(component_runtime_information, std::less {});
           // generate a new archetype
           generate_archetype(combined_hash, component_runtime_information);
           // call again

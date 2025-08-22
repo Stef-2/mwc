@@ -6,9 +6,12 @@
 import mwc_definition;
 //import mwc_ecs_definition;
 #include "mwc/ecs/definition.hpp"
+import mwc_metaprogramming_utility;
+import mwc_concept;
 import mwc_type_identity;
 import mwc_observer_ptr;
 import mwc_type_identity;
+import mwc_hash;
 import mwc_ctti;
 
 import std;
@@ -124,6 +127,33 @@ import std;
       auto [... unpack_tuple] = sorted_component_types<tp_component, tp_components...>();
 
       return std::declval<tuple_t<std::add_lvalue_reference_t<decltype(unpack_tuple)>...>>();
+    }
+    template <typename tp_operator, component_c... tp_components>
+      requires(sizeof...(tp_components) > 0) and concepts::any_of_c<tp_operator, std::plus<>, std::minus<>>
+    constexpr auto component_hash(component_hash_t a_initial_hash = 0) -> component_hash_t {
+
+      static_for_loop<0, sizeof...(tp_components)>([&]<size_t tp_index> {
+        // convert the component type identities to a string format, suitable for hashing
+        auto identity_string = array_t<char_t, sizeof(component_hash_t)> {};
+        std::to_chars(identity_string.data(), identity_string.data() + identity_string.size(),
+                      tp_components...[tp_index] ::index);
+        if constexpr (std::is_same_v<tp_operator, std::plus<>>)
+          a_initial_hash += polynomial_rolling_hash(identity_string);
+        else
+          a_initial_hash -= polynomial_rolling_hash(identity_string);
+      });
+
+      return a_initial_hash;
+    }
+    inline auto component_hash(component_hash_t a_initial_hash, const span_t<component_index_t> a_component_indices)
+      -> component_hash_t {
+      for (const auto component_index : a_component_indices) {
+        auto identity_string = array_t<char_t, sizeof(component_hash_t)> {};
+        std::to_chars(identity_string.data(), identity_string.data() + identity_string.size(), component_index);
+        a_initial_hash += polynomial_rolling_hash(identity_string);
+      }
+
+      return a_initial_hash;
     }
   }
 }

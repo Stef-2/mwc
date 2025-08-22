@@ -33,7 +33,7 @@ export namespace mwc {
       static constexpr auto type_hash() {
         constexpr auto name = type_name(/*include_namespace*/ true);
 
-        return polynomial_rolling_hash(span_t {name.data(), name.size()});
+        return polynomial_rolling_hash(span_t<const char_t> {name.data(), name.size()});
       }
     };
 
