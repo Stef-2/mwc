@@ -55,6 +55,12 @@ namespace mwc {
 
     m_configuration.m_full_screen = a_full_screen;
   }
+  auto window_ct::closing_requested() const -> bool_t {
+    return m_window->shouldClose().value;
+  }
+  auto window_ct::request_closing() const -> void {
+    m_window->setShouldClose(true);
+  }
   auto window_ct::vkfw_monitor() const -> const vkfw::Monitor& {
     return m_monitor;
   }

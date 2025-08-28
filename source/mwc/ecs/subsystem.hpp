@@ -172,9 +172,6 @@ namespace mwc {
         // register each existing components in the source archetype for transfer
         for (auto i = archetype_component_index_t {0}; i < source_archetype.m_archetype->component_count(); ++i) {
           auto& source_component_storage = source_archetype.m_archetype->m_component_data[i];
-          const auto& target_component_column = target_archetype.component_index(source_component_storage.m_component_index);
-          auto& target_component_storage = target_archetype.m_component_data[target_component_column];
-
           const auto source_data_begin =
             source_component_storage.m_data.begin() + source_entity_index * source_component_storage.m_component_size;
           const auto source_data_end = source_data_begin + source_component_storage.m_component_size;

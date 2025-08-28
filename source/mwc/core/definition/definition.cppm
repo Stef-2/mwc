@@ -78,13 +78,28 @@ export namespace mwc {
   using optional_t = std::optional<tp>;
   template <typename tp_first, typename tp_second>
   using pair_t = std::pair<tp_first, tp_second>;
+
   template <typename tp_key, typename tp_value, typename tp_compare = std::less<tp_key>,
             typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
   using map_t = std::map<tp_key, tp_value, tp_compare, tp_allocator>;
   template <typename tp_key, typename tp_value, typename tp_hash = std::hash<tp_key>,
             typename tp_key_equal = std::equal_to<tp_key>, typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
   using unordered_map_t = std::unordered_map<tp_key, tp_value, tp_hash, tp_key_equal, tp_allocator>;
+  template <typename tp_key, typename tp_value, typename tp_compare = std::less<tp_key>,
+            typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
+  using multimap_t = std::multimap<tp_key, tp_value, tp_compare, tp_allocator>;
   template <typename tp_key, typename tp_value, typename tp_hash = std::hash<tp_key>,
             typename tp_key_equal = std::equal_to<tp_key>, typename tp_allocator = std::allocator<pair_t<const tp_key, tp_value>>>
   using unordered_multimap_t = std::unordered_multimap<tp_key, tp_value, tp_hash, tp_key_equal, tp_allocator>;
+
+  template <typename tp_key, typename tp_compare = std::less<tp_key>, typename tp_allocator = std::allocator<tp_key>>
+  using set_t = std::set<tp_key, tp_compare, tp_allocator>;
+  template <typename tp_key, typename tp_hash = std::hash<tp_key>, typename tp_key_equal = std::equal_to<tp_key>,
+            typename tp_allocator = std::allocator<tp_key>>
+  using unordered_set_t = std::unordered_set<tp_key, tp_hash, tp_key_equal, tp_allocator>;
+  template <typename tp_key, typename tp_compare = std::less<tp_key>, typename tp_allocator = std::allocator<tp_key>>
+  using multiset_t = std::multiset<tp_key, tp_compare, tp_allocator>;
+  template <typename tp_key, typename tp_hash = std::hash<tp_key>, typename tp_key_equal = std::equal_to<tp_key>,
+            typename tp_allocator = std::allocator<tp_key>>
+  using unordered_multiset_t = std::unordered_multiset<tp_key, tp_hash, tp_key_equal, tp_allocator>;
 }

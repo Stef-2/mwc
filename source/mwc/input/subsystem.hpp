@@ -3,13 +3,13 @@
 #include "mwc/core/contract/definition.hpp"
 
 #include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/input/data/scene.hpp"
 #include "mwc/window/subsystem.hpp"
 
 import mwc_definition;
 import mwc_subsystem;
-import mwc_input_scene;
 
-import fastgltf;
+import vkfw;
 
 import std;
 
@@ -21,7 +21,16 @@ namespace mwc {
       auto initialize() -> void override final;
       auto finalize() -> void override final;
 
-      static inline fastgltf::Parser gltf_parser;
+      static auto poll_hardware_events() -> decltype(vkfw::pollEvents());
+
+      struct keyboard_st {
+        static inline unordered_set_t<vkfw::Key> key_map;
+      };
+      struct cursor_st {
+        static inline float64_t x_position;
+        static inline float64_t y_position;
+        static inline unordered_set_t<vkfw::MouseButton> key_map;
+      };
     };
 
     auto read_text_file(const filepath_t& a_filepath) -> string_t;

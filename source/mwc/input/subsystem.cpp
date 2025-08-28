@@ -2,8 +2,11 @@
 
 import mwc_vertex_model;
 import mwc_enum_bitwise_operators;
+import mwc_metaprogramming_utility;
 import mwc_geometry;
 import mwc_enum_range;
+
+import fastgltf;
 
 // vertex component specializations
 template <>
@@ -27,6 +30,8 @@ struct fastgltf::ElementTraits<mwc::geometry::vertex_joints_st::array_t>
                               mwc::geometry::vertex_joints_st::array_t::value_type> {};
 namespace mwc {
   namespace input {
+    static inline auto gltf_parser = fastgltf::Parser {};
+
     constexpr auto gltf_vertex_component_string(const geometry::vertex_component_bit_mask_et a_component) {
       switch (a_component) {
         using enum geometry::vertex_component_bit_mask_et;
@@ -41,12 +46,17 @@ namespace mwc {
       }
     }
     auto input_subsystem_st::initialize() -> void {
+      keyboard_st::key_map.reserve(std::to_underlying(vkfw::Key::eLAST));
+      cursor_st::key_map.reserve(std::to_underlying(vkfw::MouseButton::eLAST));
       gltf_parser = fastgltf::Parser {fastgltf::Extensions::None};
 
       m_initialized = true;
     }
     auto input_subsystem_st::finalize() -> void {
       m_initialized = false;
+    }
+    auto input_subsystem_st::poll_hardware_events() -> decltype(vkfw::pollEvents()) {
+      return vkfw::pollEvents();
     }
     auto read_text_file(const filepath_t& a_filepath) -> string_t {
       auto input_file_stream = std::ifstream {a_filepath, std::ios::in};
@@ -75,23 +85,29 @@ namespace mwc {
       contract_assert(data_buffer_error == fastgltf::Error::None);
 
       constexpr auto parse_options = fastgltf::Options::GenerateMeshIndices;
-      const auto& [parse_error, asset] = input_subsystem_st::gltf_parser.loadGltfBinary(data_buffer, a_filepath, parse_options);
+      const auto& [parse_error, asset] = gltf_parser.loadGltfBinary(data_buffer, a_filepath, parse_options);
       contract_assert(parse_error == fastgltf::Error::None);
+      // assert one scene per file
       contract_assert(asset.scenes.size() == 1);
 
-      auto scene = scene_st {};
-      scene.m_meshes.reserve(asset.meshes.size());
+      const auto& gltf_scene = asset.scenes[0];
+      // note: warning will go away with P2287
+      auto native_scene =
+        scene_st {{gltf_scene.name.c_str()}, .m_nodes = decltype(scene_st::m_nodes)::configuration_st {asset.nodes.size()}};
+      native_scene.m_meshes.reserve(asset.meshes.size());
 
+      // iterate scene meshes
       for (auto i = 0uz; i < asset.meshes.size(); ++i) {
         const auto& mesh = asset.meshes[i];
 
-        scene.m_meshes.emplace_back();
+        native_scene.m_meshes.emplace_back();
+        native_scene.m_meshes.back().m_name = mesh.name;
 
         for (const auto& primitive : mesh.primitives) {
           auto accessor_offset_pairs = std::vector<std::pair<const fastgltf::Accessor*, std::size_t>> {};
           accessor_offset_pairs.reserve(utility::enum_range<geometry::vertex_component_bit_mask_et>().size());
 
-          // determine which vector components are present
+          // determine which components the mash has
           for (const auto component : utility::bit_mask_enum_range<geometry::vertex_component_bit_mask_et>()) {
             const auto vertex_component = geometry::vertex_component_bit_mask_et {component};
             const auto component_string = gltf_vertex_component_string(vertex_component);
@@ -101,57 +117,73 @@ namespace mwc {
               continue;
 
             accessor_offset_pairs.emplace_back(&asset.accessors[attribute->accessorIndex],
-                                               scene.m_meshes.back().m_vertex_model_size);
-            scene.m_meshes.back().m_vertex_model_size += geometry::vertex_component_size(vertex_component);
-            scene.m_meshes.back().m_vertex_component_bit_mask |= component;
+                                               native_scene.m_meshes.back().m_vertex_model_size);
+            native_scene.m_meshes.back().m_vertex_model_size += geometry::vertex_component_size(vertex_component);
+            native_scene.m_meshes.back().m_vertex_component_bit_mask |= component;
           }
-          scene.m_meshes.back().m_vertex_storage.resize(
-            scene.m_meshes.back().m_vertex_model_size * accessor_offset_pairs.front().first->count);
-          scene.m_meshes.back().m_index_storage.resize(asset.accessors[primitive.indicesAccessor.value()].count);
+          native_scene.m_meshes.back().m_vertex_storage.resize(
+            native_scene.m_meshes.back().m_vertex_model_size * accessor_offset_pairs.front().first->count);
+          native_scene.m_meshes.back().m_index_storage.resize(asset.accessors[primitive.indicesAccessor.value()].count);
 
           using namespace geometry;
           using vertex_component_tuple_t =
             tuple_t<vertex_position_st, vertex_normal_st, vertex_tangent_st, vertex_uv_st, vertex_color_st, vertex_joints_st, vertex_weights_st>;
           // write vertex component data
-          auto lambda = [&asset, &scene, &accessor_offset_pairs]<size_t tp_index, size_t... tp_indices>(
-                          this auto&& a_this,
-                          std::index_sequence<tp_index, tp_indices...>) {
-            if (scene.m_meshes.back().m_vertex_component_bit_mask bitand utility::set_bit<tp_index + 1>())
-              fastgltf::iterateAccessorWithIndex<typename std::tuple_element_t<tp_index, vertex_component_tuple_t>::array_t>(
-                asset,
-                *accessor_offset_pairs[tp_index].first,
-                [&](const auto& a_component, const size_t a_index) {
-                  std::memcpy(scene.m_meshes.back().m_vertex_storage.data() +
-                                (a_index * scene.m_meshes.back().m_vertex_model_size + accessor_offset_pairs[tp_index].second),
-                              &a_component, sizeof(a_component));
-                });
-            if constexpr (sizeof...(tp_indices) > 0)
-              a_this(std::index_sequence<tp_indices...> {});
-          };
-          lambda(std::make_index_sequence<std::tuple_size_v<vertex_component_tuple_t>> {});
-
+          static_for_loop<0, std::tuple_size_v<vertex_component_tuple_t>>(
+            [&asset, &native_scene, &accessor_offset_pairs]<size_t tp_index> {
+              if (native_scene.m_meshes.back().m_vertex_component_bit_mask bitand utility::set_bit<tp_index + 1>())
+                fastgltf::iterateAccessorWithIndex<typename std::tuple_element_t<tp_index, vertex_component_tuple_t>::array_t>(
+                  asset,
+                  *accessor_offset_pairs[tp_index].first,
+                  [&](const auto& a_component, const size_t a_index) {
+                    std::memcpy(
+                      native_scene.m_meshes.back().m_vertex_storage.data() +
+                        (a_index * native_scene.m_meshes.back().m_vertex_model_size + accessor_offset_pairs[tp_index].second),
+                      &a_component, sizeof(a_component));
+                  });
+            });
           // write vertex index data
-          fastgltf::copyFromAccessor<decltype(scene)::mesh_storage_t::value_type::index_storage_t::value_type>(
+          fastgltf::copyFromAccessor<decltype(native_scene)::mesh_storage_t::value_type::index_storage_t::value_type>(
             asset,
             asset.accessors[primitive.indicesAccessor.value()],
-            scene.m_meshes.back().m_index_storage.data());
+            native_scene.m_meshes.back().m_index_storage.data());
         }
-        // iterate scene nodes
-        fastgltf::iterateSceneNodes(
-          asset,
-          0,
-          fastgltf::math::fmat4x4 {1.0},
-          [&scene, &i](const fastgltf::Node& a_node, const fastgltf::math::fmat4x4& a_transform_matrix) {
-            static_assert(sizeof(decltype(a_transform_matrix)) == sizeof(geometry::transformation_t<>));
-
-            if (a_node.meshIndex.value() == i)
-              std::memcpy(scene.m_meshes.back().m_transformation.data(),
-                          a_transform_matrix.data(),
-                          sizeof(geometry::transformation_t<>));
-          });
       }
-      return scene;
-    }
+      // iterate scene nodes
+      const auto root_node_count = gltf_scene.nodeIndices.size();
+      if (root_node_count > 1)
+        mwc::warning(std::format("scene loaded from {0} has {1} root nodes", a_filepath.c_str(), root_node_count));
 
+      const auto iterate_node_hierarchy = [&asset, &gltf_scene, &native_scene](
+                                            this auto&& a_this,
+                                            const decltype(gltf_scene.nodeIndices)::value_type a_parent_index) -> void {
+        for (const auto& child_index : asset.nodes[a_parent_index].children) {
+          const auto& child_node = asset.nodes[child_index];
+          const auto transformation_matrix = fastgltf::getTransformMatrix(child_node);
+          const auto mesh_index = child_node.meshIndex ? child_node.meshIndex.value() : scene_st::node_data_st::null_mesh_index;
+          native_scene.m_nodes.insert_node(
+            scene_st::node_data_st {.m_transformation = *std::bit_cast<geometry::transformation_t<>*>(&transformation_matrix),
+                                    .m_mesh_index = static_cast<scene_st::node_data_st::index_t>(mesh_index)},
+            a_parent_index);
+
+          // call recursively
+          a_this(child_index);
+        }
+      };
+
+      for (auto i = 0uz; i < root_node_count; ++i) {
+        const auto& root_node = asset.nodes[gltf_scene.nodeIndices[i]];
+        const auto transformation_matrix = fastgltf::getTransformMatrix(root_node);
+        const auto mesh_index = root_node.meshIndex ? root_node.meshIndex.value() : scene_st::node_data_st::null_mesh_index;
+        native_scene.m_nodes.insert_node(
+          scene_st::node_data_st {.m_transformation = *std::bit_cast<geometry::transformation_t<>*>(&transformation_matrix),
+                                  .m_mesh_index = static_cast<scene_st::node_data_st::index_t>(mesh_index)},
+          gltf_scene.nodeIndices[i]);
+        iterate_node_hierarchy(gltf_scene.nodeIndices[i]);
+      }
+      contract_assert(native_scene.m_nodes.node_count() == asset.nodes.size());
+
+      return native_scene;
+    }
   }
 }
