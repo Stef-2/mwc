@@ -2,7 +2,6 @@
 
 #include "mwc/ecs/definition.hpp"
 #include "mwc/ecs/subsystem.hpp"
-#include "mwc/ecs/component_convergence.hpp"
 
 import mwc_type_mobility;
 
@@ -27,7 +26,7 @@ namespace mwc {
       template <component_c... tp_components>
       constexpr auto remove_components() const;
 
-      private:
+      protected:
       entity_index_t m_index;
     };
 
@@ -35,7 +34,26 @@ namespace mwc {
     template <component_c... tp_components>
     constexpr entity_ct::entity_ct(tp_components&&... a_components)
     : m_index {mwc::ecs::generate_entity(std::forward<tp_components>(a_components)...)} {}
+    constexpr entity_ct::entity_ct(entity_ct&& a_other) noexcept
+    : m_index {std::exchange(a_other.m_index, null_entity_index)} {}
+    constexpr auto entity_ct::operator=(entity_ct&& a_other) noexcept -> entity_ct& {
+      m_index = std::exchange(a_other.m_index, null_entity_index);
 
+      return *this;
+    }
+    constexpr entity_ct::~entity_ct() {
+      if (m_index != null_entity_index)
+        destroy_entity(m_index);
+    }
+    constexpr auto entity_ct::operator<=>(const entity_ct& a_other) const {
+      return m_index <=> a_other.m_index;
+    }
+    constexpr entity_ct::operator entity_index_t() const {
+      return m_index;
+    }
+    constexpr auto entity_ct::index() const -> entity_index_t {
+      return m_index;
+    }
     template <component_c... tp_components>
     constexpr auto entity_ct::components() const {
       return entity_components<tp_components...>(m_index);

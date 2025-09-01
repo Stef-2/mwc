@@ -4,6 +4,7 @@
 
 import mwc_math_definition;
 import mwc_geometry;
+import mwc_camera_projection_type;
 
 namespace mwc {
   namespace ecs {
@@ -35,6 +36,9 @@ namespace mwc {
     };
     struct camera_projection_st : public component_st<camera_projection_st, geometry::default_scalar_t> {
       math::matrix_t<geometry::default_scalar_t, 4, 4> m_projection;
+    };
+    struct camera_type_st : public component_st<camera_type_st, std::underlying_type_t<graphics::camera_projection_et>> {
+      graphics::camera_projection_et m_projection_type;
     };
   }
 }

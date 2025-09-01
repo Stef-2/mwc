@@ -12,6 +12,12 @@ export namespace mwc {
     using value_t = tp_value;
   };
 
+  // valueless type pair
+  template <typename tp_first, typename tp_second>
+  struct type_pair_st {
+    using first_t = tp_first;
+    using second_t = tp_second;
+  };
   // map [tp_enumerator] to [tp]
   // enum_key_value must be a constant value expression
   template <auto tp_enumerator, typename tp>

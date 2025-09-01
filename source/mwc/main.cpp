@@ -44,12 +44,13 @@ int main() {
     std::cout << node.m_data.m_transformation << '\n';
     std::cout << node.m_data.m_mesh_index << '\n';
   }
-  const auto e = entity_ct {test2 {.c = 'b'}, test0 {.i = {69, 33}}, test1 {.f = 6.4f}};
+  const auto comp = test0 {};
+  const auto e = entity_ct {test2 {.c = 'b'}, comp, test1 {.f = 6.4f}};
   const auto e2 = mwc::ecs::generate_entity<test2, test0, test1>(test2 {.c = 'a'}, test0 {.i = {222, 442}}, test1 {.f = 1.42f});
   const auto e3 = mwc::ecs::generate_entity<test0, test1>(test0 {.i = {53, -26}}, test1 {.f = 23.57f});
   const auto e4 = mwc::ecs::generate_entity<test1, test3>(test1 {.f = -3.025f}, test3 {.b = true});
-  const auto e5 =
-    mwc::ecs::generate_entity(transformation_st {.m_transformation = mwc::geometry::transformation_t<>::Identity()});
+  const auto e5
+    = mwc::ecs::generate_entity(transformation_st {.m_transformation = mwc::geometry::transformation_t<>::Identity()});
   //const auto e5 = mwc::ecs::generate_entity(mwc::geometry::position_st {.m_position = {1.0f, 2.0f, 3.0f}});
   //static_assert(mwc::geometry::position_st::index == 55);
   //static_assert(test4::index == 55);

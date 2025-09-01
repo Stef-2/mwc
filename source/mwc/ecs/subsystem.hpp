@@ -23,14 +23,14 @@ namespace mwc {
       auto initialize() -> void override final;
       auto finalize() -> void override final;
 
-      static inline auto entity_index = entity_index_t {null_entity_index + 1};
-      static inline auto archetype_index = archetype_index_t {null_archetype_index + 1};
+      static constinit inline auto entity_index = entity_index_t {null_entity_index + 1};
+      static constinit inline auto archetype_index = archetype_index_t {null_archetype_index + 1};
 
       static inline auto null_archetype = archetype_st {null_archetype_index, span_t<component_runtime_information_st, 0> {}};
       static inline auto hash_archetype_map = unordered_map_t<component_hash_t, archetype_st> {};
       static inline auto entity_archetype_map = unordered_map_t<entity_index_t, archetype_entity_index_st> {};
-      static inline auto component_archetype_map =
-        unordered_multimap_t<component_index_t, unordered_map_t<obs_ptr_t<archetype_st>, archetype_component_index_t>> {};
+      static inline auto component_archetype_map
+        = unordered_multimap_t<component_index_t, unordered_map_t<obs_ptr_t<archetype_st>, archetype_component_index_t>> {};
     };
 
     constexpr auto
@@ -50,25 +50,26 @@ namespace mwc {
       if constexpr (not std::is_same_v<tuple_t<tp_components...>, decltype(sorted_component_types<tp_components...>())>) {
         // components are not provided in a sorted order, sort them
         auto sorted_component_tuple = sorted_component_types<tp_components...>();
-        ((std::get<tp_components>(sorted_component_tuple) = a_components), ...);
+        ((std::get<std::remove_cvref_t<tp_components>>(sorted_component_tuple) = a_components), ...);
         auto [... sorted_components] = sorted_component_tuple;
         // call again
-        return generate_archetype<decltype(sorted_components)...>(std::forward<decltype(sorted_components)>(sorted_components)...);
+        return generate_archetype<decltype(sorted_components)...>(a_entity_index,
+                                                                  std::forward<decltype(sorted_components)>(sorted_components)...);
       } else {
         constexpr auto hash = component_hash<std::plus<>, tp_components...>();
         const auto archetype_index = ecs_subsystem_st::archetype_index;
         ++ecs_subsystem_st::archetype_index;
 
-        const auto generated_archetype_iterator =
-          ecs_subsystem_st::hash_archetype_map
-            .emplace(hash, archetype_st {archetype_index, std::forward<tp_components>(a_components)...})
-            .first;
+        const auto generated_archetype_iterator
+          = ecs_subsystem_st::hash_archetype_map
+              .emplace(hash, archetype_st {archetype_index, std::forward<tp_components>(a_components)...})
+              .first;
         // register entity - archetype mapping
         mwc::ecs::ecs_subsystem_st::entity_archetype_map.emplace(
           a_entity_index,
           archetype_entity_index_st {&generated_archetype_iterator->second, 0});
         // register component - archetype mapping
-        static_for_loop<0, sizeof...(tp_components)>([&generated_archetype_iterator, &archetype_index]<size_t tp_index> {
+        static_for_loop<0, sizeof...(tp_components)>([&generated_archetype_iterator]<size_t tp_index> {
           ecs_subsystem_st::component_archetype_map.emplace(
             tp_components... [tp_index] ::index,
             unordered_map_t<obs_ptr_t<archetype_st>, archetype_component_index_t> {
@@ -83,14 +84,14 @@ namespace mwc {
         return generated_archetype_iterator;
       }
     }
-    inline auto generate_archetype(const component_hash_t a_component_hash,
-                                   const span_t<component_runtime_information_st>
-                                     a_runtime_component_information)
+    constexpr auto generate_archetype(const component_hash_t a_component_hash,
+                                      const span_t<component_runtime_information_st>
+                                        a_runtime_component_information)
       pre(std::ranges::is_sorted(a_runtime_component_information, std::less {})) {
-      const auto generated_archetype_iterator =
-        ecs_subsystem_st::hash_archetype_map
-          .emplace(a_component_hash, archetype_st {ecs_subsystem_st::archetype_index++, a_runtime_component_information})
-          .first;
+      const auto generated_archetype_iterator
+        = ecs_subsystem_st::hash_archetype_map
+            .emplace(a_component_hash, archetype_st {ecs_subsystem_st::archetype_index++, a_runtime_component_information})
+            .first;
       // register components with the new archetype
       for (auto i = archetype_component_index_t {}; i < a_runtime_component_information.size(); ++i)
         ecs_subsystem_st::component_archetype_map.emplace(
@@ -106,11 +107,13 @@ namespace mwc {
     [[nodiscard]] constexpr auto generate_entity(tp_components&&... a_components) -> entity_index_t
     /*post(r : r != std::numeric_limits<entity_t>::max())*/ {
       // determine if the components are sorted according to their index
-      if constexpr (not std::is_same_v<tuple_t<tp_components...>, decltype(sorted_component_types<tp_components...>())>) {
+      if constexpr (
+        not std::is_same_v<tuple_t<std::remove_cvref_t<tp_components>...>, decltype(sorted_component_types<tp_components...>())>) {
         auto sorted_component_tuple = sorted_component_types<tp_components...>();
-        ((std::get<tp_components>(sorted_component_tuple) = a_components), ...);
+        ((std::get<std::remove_cvref_t<tp_components>>(sorted_component_tuple) = a_components), ...);
         auto [... sorted_components] = sorted_component_tuple;
-        return generate_entity<decltype(sorted_components)...>(std::forward<decltype(sorted_components)>(sorted_components)...);
+        return std::apply([](auto&&... a_components) { return generate_entity(a_components...); }, sorted_component_tuple);
+        //return generate_entity<decltype(sorted_components)...>(std::forward<decltype(sorted_components)>(sorted_components)...);
       } else {
         constexpr auto hash = component_hash<std::plus<>, tp_components...>();
         const auto entity_index = ecs_subsystem_st::entity_index;
@@ -131,6 +134,8 @@ namespace mwc {
         }
         return entity_index;
       }
+      contract_assert(false);
+      std::unreachable();
     }
     inline auto destroy_entity(const entity_index_t a_entity)
       -> void pre(ecs_subsystem_st::entity_archetype_map.contains(a_entity)) {
@@ -140,7 +145,7 @@ namespace mwc {
     }
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
-    inline auto entity_components(const entity_index_t m_entity_index) {
+    constexpr auto entity_components(const entity_index_t m_entity_index) {
       // determine the matching archetype
       const auto& archetype = ecs_subsystem_st::entity_archetype_map[m_entity_index];
       contract_assert(archetype.m_archetype != nullptr and m_entity_index != null_entity_index);
@@ -149,7 +154,7 @@ namespace mwc {
     }
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
-    inline auto insert_components(const entity_index_t a_entity_index, tp_components&&... a_components) -> void {
+    constexpr auto insert_components(const entity_index_t a_entity_index, tp_components&&... a_components) -> void {
       // determine the source archetype
       const auto source_archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
       contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != null_entity_index);
@@ -172,8 +177,8 @@ namespace mwc {
         // register each existing components in the source archetype for transfer
         for (auto i = archetype_component_index_t {0}; i < source_archetype.m_archetype->component_count(); ++i) {
           auto& source_component_storage = source_archetype.m_archetype->m_component_data[i];
-          const auto source_data_begin =
-            source_component_storage.m_data.begin() + source_entity_index * source_component_storage.m_component_size;
+          const auto source_data_begin
+            = source_component_storage.m_data.begin() + source_entity_index * source_component_storage.m_component_size;
           const auto source_data_end = source_data_begin + source_component_storage.m_component_size;
 
           // register source component data for transfer
@@ -185,12 +190,12 @@ namespace mwc {
         target_archetype.insert_component_data_row(target_component_data);
         if (source_archetype.m_archetype->entity_count() > 1) {
           // move last component row to the current source archetype component row
-          const auto source_entity_count_after_removal =
-            source_archetype.m_archetype->move_last_component_row(source_entity_index);
+          const auto source_entity_count_after_removal
+            = source_archetype.m_archetype->move_last_component_row(source_entity_index);
           // find the entity whose data was just moved and record its new component row
           for (auto& [entity_index, archetype_entity_map] : ecs_subsystem_st::entity_archetype_map) {
-            if (archetype_entity_map.m_archetype == source_archetype.m_archetype and
-                archetype_entity_map.m_entity_index == source_entity_count_after_removal) {
+            if (archetype_entity_map.m_archetype == source_archetype.m_archetype
+                and archetype_entity_map.m_entity_index == source_entity_count_after_removal) {
               archetype_entity_map.m_entity_index = source_entity_index;
             }
           }
@@ -198,8 +203,8 @@ namespace mwc {
           source_archetype.m_archetype->remove_component_row(source_entity_index);
         }
         // register the entity with the target archetype
-        ecs_subsystem_st::entity_archetype_map[a_entity_index] =
-          archetype_entity_index_st {.m_archetype = &target_archetype, .m_entity_index = target_archetype.entity_count() - 1};
+        ecs_subsystem_st::entity_archetype_map[a_entity_index]
+          = archetype_entity_index_st {.m_archetype = &target_archetype, .m_entity_index = target_archetype.entity_count() - 1};
         return;
       }
       // no record of this class of component modification exists, possible reasons:
@@ -227,7 +232,7 @@ namespace mwc {
           static_for_loop<0, sizeof...(tp_components)>([&component_runtime_information]<size_t tp_index> {
             component_runtime_information.emplace_back(
               component_runtime_information_st {.m_component_size = sizeof(tp_components...[tp_index]),
-                                                .m_component_index = tp_components...[tp_index] ::index});
+                                                .m_component_index = std::remove_cvref_t<tp_components...[tp_index]>::index});
           });
           for (const auto& source_component : source_archetype.m_archetype->m_component_data) {
             component_runtime_information.emplace_back(
@@ -247,7 +252,7 @@ namespace mwc {
     }
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
-    inline auto remove_components(const entity_index_t a_entity_index) -> void {
+    constexpr auto remove_components(const entity_index_t a_entity_index) -> void {
       const auto source_archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
       contract_assert(source_archetype.m_archetype != nullptr and a_entity_index != null_entity_index);
 
@@ -263,24 +268,24 @@ namespace mwc {
         // transfer common components from source to target archetype
         for (auto i = archetype_component_index_t {0}; i < target_archetype.component_count(); ++i) {
           auto& target_component_storage = target_archetype.m_component_data[i];
-          const auto& source_component_column =
-            source_archetype.m_archetype->component_index(target_component_storage.m_component_index);
+          const auto& source_component_column
+            = source_archetype.m_archetype->component_index(target_component_storage.m_component_index);
           auto& source_component_storage = source_archetype.m_archetype->m_component_data[source_component_column];
 
-          const auto source_data_begin =
-            source_component_storage.m_data.begin() + source_entity_index * source_component_storage.m_component_size;
+          const auto source_data_begin
+            = source_component_storage.m_data.begin() + source_entity_index * source_component_storage.m_component_size;
           const auto source_data_end = source_data_begin + source_component_storage.m_component_size;
 
           target_archetype.m_component_data[i].m_data.append_range(std::ranges::subrange {source_data_begin, source_data_end});
         }
         if (source_archetype.m_archetype->entity_count() > 1) {
           // move last component row to the current source archetype component row
-          const auto source_entity_count_after_removal =
-            source_archetype.m_archetype->move_last_component_row(source_entity_index);
+          const auto source_entity_count_after_removal
+            = source_archetype.m_archetype->move_last_component_row(source_entity_index);
           // find the entity whose data was just moved and record its new component row
           for (auto& [entity_index, archetype_entity_map] : ecs_subsystem_st::entity_archetype_map) {
-            if (archetype_entity_map.m_archetype == source_archetype.m_archetype and
-                archetype_entity_map.m_entity_index == source_entity_count_after_removal) {
+            if (archetype_entity_map.m_archetype == source_archetype.m_archetype
+                and archetype_entity_map.m_entity_index == source_entity_count_after_removal) {
               archetype_entity_map.m_entity_index = source_entity_index;
             }
           }
@@ -290,8 +295,8 @@ namespace mwc {
         // target archetype received a row of components
         ++target_archetype.m_entity_count;
         // register the entity with the target archetype
-        ecs_subsystem_st::entity_archetype_map[a_entity_index] =
-          archetype_entity_index_st {.m_archetype = &target_archetype, .m_entity_index = target_archetype.entity_count() - 1};
+        ecs_subsystem_st::entity_archetype_map[a_entity_index]
+          = archetype_entity_index_st {.m_archetype = &target_archetype, .m_entity_index = target_archetype.entity_count() - 1};
         return;
       }
       // no record of this class of component modification exists, possible reasons:
@@ -337,8 +342,8 @@ namespace mwc {
     }
 
     namespace global {
-      inline auto ecs_subsystem =
-        ecs::ecs_subsystem_st {{&diagnostic::log::global::logging_subsystem}, string_view_t {"entity component subsystem"}};
+      inline auto ecs_subsystem
+        = ecs::ecs_subsystem_st {{&diagnostic::log::global::logging_subsystem}, string_view_t {"entity component subsystem"}};
     }
   }
 }

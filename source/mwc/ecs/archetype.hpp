@@ -80,9 +80,9 @@ namespace mwc {
 
         // note: consider returning references rather than values
         static_for_loop<0, sizeof...(tp_components)>([this, &components..., a_entity_index]<size_t tp_index> {
-          components...[tp_index] =
-            std::bit_cast<vector_t<std::remove_cvref_t<decltype(components...[tp_index])>>*>(&m_component_data[tp_index].m_data)
-              ->operator[](a_entity_index);
+          components...[tp_index] = std::bit_cast<vector_t<std::remove_cvref_t<decltype(components...[tp_index])>>*>(
+                                      &m_component_data[tp_index].m_data)
+                                      ->operator[](a_entity_index);
         });
         return std::forward_as_tuple(components...);
       }
@@ -99,7 +99,8 @@ namespace mwc {
       }
       template <component_c... tp_components>
       constexpr auto insert_component_row(tp_components&&... a_components) {
-        static_assert(std::is_same_v<tuple_t<tp_components...>, decltype(sorted_component_types<tp_components...>())>);
+        static_assert(
+          std::is_same_v<tuple_t<std::remove_cvref_t<tp_components>...>, decltype(sorted_component_types<tp_components...>())>);
         contract_assert(sizeof...(tp_components) == component_count());
 
         static_for_loop<0, sizeof...(tp_components)>([&]<size_t tp_index> {

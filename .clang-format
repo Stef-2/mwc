@@ -49,6 +49,7 @@ EmptyLineBeforeAccessModifier: Always
 BreakTemplateDeclarations: Yes
 BreakFunctionDefinitionParameters: false
 BreakBeforeConceptDeclarations: Always
+BreakBeforeBinaryOperators: All
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel: false
@@ -74,6 +75,7 @@ AllowShortIfStatementsOnASingleLine: Never
 AllowShortCompoundRequirementOnASingleLine: true
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortCaseExpressionOnASingleLine: true
+AllowShortEnumsOnASingleLine: false
 AllowShortBlocksOnASingleLine: Never
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowAllArgumentsOnNextLine: false

@@ -29,22 +29,30 @@ namespace mwc {
                         vulkan::queue_ct::configuration_st {.m_family_index = m_queue_families.transfer().m_index}},
       m_common_buffer {
       m_logical_device, m_memory_allocator,
-      vulkan::suballocated_memory_mapped_buffer_ct::configuration_st {
-      .m_memory_mapped_buffer_configuration =
-        vulkan::memory_mapped_buffer_ct::configuration_st {
-        .m_buffer_create_info = vk::BufferCreateInfo {vk::BufferCreateFlags {}, vk::DeviceSize {byte_count<std::mega>(256)},
-                                                      vk::BufferUsageFlagBits::eTransferSrc, vk::SharingMode::eExclusive,
-                                                      /*pQueueFamilyIndices*/ 0},
-        .m_allocation_create_info =
-          vma::AllocationCreateInfo {vma::AllocationCreateFlags {vma::AllocationCreateFlagBits::eMapped bitor
-                                                                 vma::AllocationCreateFlagBits::eHostAccessRandom},
-                                     vma::MemoryUsage::eAuto, vk::MemoryPropertyFlags {vk::MemoryPropertyFlagBits::eHostVisible},
-                                     vk::MemoryPropertyFlags {vk::MemoryPropertyFlagBits::eDeviceLocal}}},
-      .m_virtual_allocator_configuration =
-        virtual_allocator_ct::configuration_st {.m_virtual_block_create_flags = vma::VirtualBlockCreateFlags {}}}},
+      vulkan::suballocated_memory_mapped_buffer_ct::
+        configuration_st {
+        .m_memory_mapped_buffer_configuration
+        = vulkan::memory_mapped_buffer_ct::configuration_st {.m_buffer_create_info
+                                                             = vk::BufferCreateInfo {vk::BufferCreateFlags {},
+                                                                                     vk::DeviceSize {byte_count<std::mega>(256)},
+                                                                                     vk::BufferUsageFlagBits::eTransferSrc,
+                                                                                     vk::SharingMode::eExclusive,
+                                                                                     /*pQueueFamilyIndices*/ 0},
+                                                             .m_allocation_create_info
+                                                             = vma::AllocationCreateInfo {vma::AllocationCreateFlags {
+                                                                                          vma::AllocationCreateFlagBits::eMapped
+                                                                                          bitor vma::AllocationCreateFlagBits::eHostAccessRandom},
+                                                                                          vma::MemoryUsage::eAuto,
+                                                                                          vk::MemoryPropertyFlags {
+                                                                                          vk::MemoryPropertyFlagBits::eHostVisible},
+                                                                                          vk::MemoryPropertyFlags {
+                                                                                          vk::MemoryPropertyFlagBits::eDeviceLocal}}},
+        .m_virtual_allocator_configuration
+        = virtual_allocator_ct::configuration_st {.m_virtual_block_create_flags = vma::VirtualBlockCreateFlags {}}}},
       m_dynamic_rendering_state {m_surface},
       m_user_interface {dear_imgui_ct {a_window, m_context, m_instance, m_physical_device, m_logical_device,
                                        m_queue_families.graphics(), m_graphics_queue, m_swapchain}},
+      m_camera {camera_ct::configuration_st<camera_projection_et::e_perspective>::default_configuration()},
       m_configuration {a_configuration} {}
 
     auto graphics_ct::render() -> void {
@@ -62,8 +70,8 @@ namespace mwc {
       /*auto image_acquired_fence =
         m_logical_device->createFence(vk::FenceCreateInfo {}).value();*/
       //const auto [_, image_idx] = m_swapchain.unique_handle().acquireNextImage(1000, {}, *image_acquired_fence);
-      const auto [result, image_idx, /*image_acquired_semaphore,*/ render_info] =
-        m_swapchain.acquire_next_image(cmd, *frame_data.m_image_acquired_semaphore);
+      const auto [result, image_idx, /*image_acquired_semaphore,*/ render_info]
+        = m_swapchain.acquire_next_image(cmd, *frame_data.m_image_acquired_semaphore);
       //m_logical_device->waitForFences(*image_acquired_fence, true, 0);
       //m_logical_device->resetFences(*image_acquired_fence);
 
@@ -80,11 +88,11 @@ namespace mwc {
       cmd.end();
 
       //auto render_fence = m_logical_device->createFence(vk::FenceCreateInfo {/*vk::FenceCreateFlagBits::eSignaled*/}).value();
-      auto wait_semaphores =
-        vk::SemaphoreSubmitInfo {*frame_data.m_image_acquired_semaphore, 0, vk::PipelineStageFlagBits2::eTopOfPipe};
+      auto wait_semaphores
+        = vk::SemaphoreSubmitInfo {*frame_data.m_image_acquired_semaphore, 0, vk::PipelineStageFlagBits2::eTopOfPipe};
       vk::CommandBufferSubmitInfo submit_info {*cmd};
-      auto signal_semaphores =
-        vk::SemaphoreSubmitInfo {*frame_data.m_render_complete_semaphore, 0, vk::PipelineStageFlagBits2::eBottomOfPipe};
+      auto signal_semaphores
+        = vk::SemaphoreSubmitInfo {*frame_data.m_render_complete_semaphore, 0, vk::PipelineStageFlagBits2::eBottomOfPipe};
       m_graphics_queue->submit2(vk::SubmitInfo2 {vk::SubmitFlags {}, wait_semaphores, submit_info, signal_semaphores});
 
       //m_logical_device->waitForFences(*render_fence, true, 0);
@@ -93,8 +101,8 @@ namespace mwc {
       auto present_info = vk::PresentInfoKHR {*frame_data.m_render_complete_semaphore, m_swapchain.native_handle(), image_idx};
       m_graphics_queue->presentKHR(present_info);
       //m_logical_device->waitIdle();
-      if (m_frame_synchronizer.m_frame_count > 0 and
-          m_frame_synchronizer.m_frame_index % m_frame_synchronizer.m_frame_count == 0) {
+      if (m_frame_synchronizer.m_frame_count > 0
+          and m_frame_synchronizer.m_frame_index % m_frame_synchronizer.m_frame_count == 0) {
         m_graphics_queue->waitIdle();
         m_command_pool->reset(vk::CommandPoolResetFlagBits {});
       }

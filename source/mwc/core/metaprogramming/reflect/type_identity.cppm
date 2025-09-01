@@ -3,6 +3,7 @@ module;
 export module mwc_type_identity;
 
 import mwc_definition;
+import mwc_sso_capacity;
 import mwc_ctti;
 import mwc_hash;
 
@@ -15,7 +16,7 @@ export namespace mwc {
     template <typename tp>
     struct type_identity_st {
       static constexpr auto type_name(const bool a_include_namespace = true) {
-        // this can't be constexpr as gcc removes template information from the function name in that case
+        // this must not be constexpr as gcc removes template information from the function name in that case
         const auto source_location = std::source_location::current();
         const auto function_name = std::string_view {source_location.function_name()};
 
@@ -27,6 +28,8 @@ export namespace mwc {
           function_name.rfind(scope_resolution_string) + scope_resolution_string.size();
         const auto begin = a_include_namespace ? last_equals_position : last_scope_resolution_operator_position;
         const auto end = function_name.rfind(']');
+        if (end - begin > utility::sso_capacity())
+          return string_view_t {"type name too long"};
 
         return function_name.substr(begin, end - begin);
       }

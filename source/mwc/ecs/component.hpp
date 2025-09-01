@@ -36,9 +36,9 @@ import std;
 
     // concept modeling component types
     template <typename tp>
-    concept component_c =
-      std::is_base_of_v<component_st<std::remove_cvref_t<tp>, typename std::remove_cvref_t<tp>::underlying_pod_t>,
-                        std::remove_cvref_t<tp>>;
+    concept component_c
+      = std::is_base_of_v<component_st<std::remove_cvref_t<tp>, typename std::remove_cvref_t<tp>::underlying_pod_t>,
+                          std::remove_cvref_t<tp>>;
 
     // type erased component storage
     struct component_storage_st {
@@ -81,21 +81,21 @@ import std;
     consteval auto component_type_sort() {
       // sort the two elements currently being operated on
       constexpr auto ascending_sort = [] {
-        if constexpr (tp_x::index < tp_y::index)
+        if constexpr (std::remove_cvref_t<tp_x>::index < std::remove_cvref_t<tp_y>::index)
           return pair_t<tp_x, tp_y> {};
         else
           return pair_t<tp_y, tp_x> {};
       };
       // determine if the elements are sorted in ascending order
-      constexpr auto determine_order = []<bool tp_assertion = true, component_c tp_first, component_c... tp_rest>(
-                                         this auto&& a_this) {
-        if constexpr (not tp_assertion or sizeof...(tp_rest) == 0)
-          return tp_assertion;
-        else if constexpr (tp_first::index < tp_rest...[0] ::index)
-          return a_this.template operator()<tp_assertion, tp_rest...>();
-        else
-          return a_this.template operator()<false, tp_rest...>();
-      };
+      constexpr auto determine_order
+        = []<bool tp_assertion = true, component_c tp_first, component_c... tp_rest>(this auto&& a_this) {
+            if constexpr (not tp_assertion or sizeof...(tp_rest) == 0)
+              return tp_assertion;
+            else if constexpr (tp_first::index < tp_rest...[0] ::index)
+              return a_this.template operator()<tp_assertion, tp_rest...>();
+            else
+              return a_this.template operator()<false, tp_rest...>();
+          };
 
       if constexpr (sizeof...(tps) > 0) {
         using sorted_t = decltype(ascending_sort());
@@ -120,7 +120,7 @@ import std;
       if constexpr (sizeof...(tp_components) == 0)
         return tuple_t<tp_component> {};
       else
-        return component_type_sort<tuple_t<>, tp_component, tp_components...>();
+        return component_type_sort<tuple_t<>, std::remove_cvref_t<tp_component>, std::remove_cvref_t<tp_components>...>();
     }
     template <component_c tp_component, component_c... tp_components>
     consteval auto sorted_component_reference_types() {
@@ -136,7 +136,7 @@ import std;
         // convert the component type identities to a string format, suitable for hashing
         auto identity_string = array_t<char_t, sizeof(component_hash_t)> {};
         std::to_chars(identity_string.data(), identity_string.data() + identity_string.size(),
-                      tp_components...[tp_index] ::index);
+                      std::remove_cvref_t<tp_components...[tp_index]>::index);
         if constexpr (std::is_same_v<tp_operator, std::plus<>>)
           a_initial_hash += polynomial_rolling_hash(identity_string);
         else

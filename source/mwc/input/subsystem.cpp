@@ -90,10 +90,13 @@ namespace mwc {
       // assert one scene per file
       contract_assert(asset.scenes.size() == 1);
 
-      const auto& gltf_scene = asset.scenes[0];
+      const auto& gltf_scene = asset.scenes.front();
       // note: warning will go away with P2287
-      auto native_scene =
-        scene_st {{gltf_scene.name.c_str()}, .m_nodes = decltype(scene_st::m_nodes)::configuration_st {asset.nodes.size()}};
+      auto native_scene = scene_st {
+        {gltf_scene.name.c_str()},
+        .m_meshes = {},
+        .m_nodes = decltype(scene_st::m_nodes)::configuration_st {asset.nodes.size()},
+      };
       native_scene.m_meshes.reserve(asset.meshes.size());
 
       // iterate scene meshes
@@ -154,9 +157,8 @@ namespace mwc {
       if (root_node_count > 1)
         mwc::warning(std::format("scene loaded from {0} has {1} root nodes", a_filepath.c_str(), root_node_count));
 
-      const auto iterate_node_hierarchy = [&asset, &gltf_scene, &native_scene](
-                                            this auto&& a_this,
-                                            const decltype(gltf_scene.nodeIndices)::value_type a_parent_index) -> void {
+      const auto iterate_node_hierarchy =
+        [&asset, &native_scene](this auto&& a_this, const decltype(gltf_scene.nodeIndices)::value_type a_parent_index) -> void {
         for (const auto& child_index : asset.nodes[a_parent_index].children) {
           const auto& child_node = asset.nodes[child_index];
           const auto transformation_matrix = fastgltf::getTransformMatrix(child_node);

@@ -52,7 +52,7 @@ namespace mwc {
         constexpr auto table_flags = ImGuiTableFlags_Borders bitor ImGuiTableFlags_HighlightHoveredColumn bitor
                                      ImGuiTableFlags_ScrollX bitor ImGuiTableFlags_ScrollY bitor ImGuiTableFlags_RowBg bitor
                                      ImGuiTableFlags_SizingFixedSame;
-        constexpr auto table_size = ImVec2 {640, 480};
+        constexpr auto table_size = ImVec2 {0, 480};
         ImGui::BeginTable("ecs", component_count + 1, table_flags, table_size);
         ImGui::TableSetupColumn("entity");
         mwc::static_for_loop<0, component_count>([]<size_t tp_index> {
