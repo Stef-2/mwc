@@ -47,7 +47,7 @@ namespace mwc {
     }
     auto input_subsystem_st::initialize() -> void {
       keyboard_st::key_map.reserve(std::to_underlying(vkfw::Key::eLAST));
-      cursor_st::key_map.reserve(std::to_underlying(vkfw::MouseButton::eLAST));
+      mouse_st::key_map.reserve(std::to_underlying(vkfw::MouseButton::eLAST));
       gltf_parser = fastgltf::Parser {fastgltf::Extensions::None};
 
       m_initialized = true;
@@ -58,7 +58,7 @@ namespace mwc {
     auto input_subsystem_st::poll_hardware_events() -> decltype(vkfw::pollEvents()) {
       return vkfw::pollEvents();
     }
-    auto read_text_file(const filepath_t& a_filepath) -> string_t {
+    auto read_text_file(const file_path_t& a_filepath) -> string_t {
       auto input_file_stream = std::ifstream {a_filepath, std::ios::in};
       contract_assert(input_file_stream);
       auto buffer = std::stringstream {};
@@ -68,7 +68,7 @@ namespace mwc {
 
       return buffer.str();
     }
-    auto read_binary_file(const filepath_t& a_filepath) -> vector_t<byte_t> {
+    auto read_binary_file(const file_path_t& a_filepath) -> vector_t<byte_t> {
       auto input_file_stream = std::ifstream {a_filepath, std::ios::binary bitor std::ios::in};
       contract_assert(input_file_stream);
 
@@ -80,7 +80,7 @@ namespace mwc {
 
       return buffer;
     }
-    auto read_scene_file(const filepath_t& a_filepath) -> scene_st {
+    auto read_scene_file(const file_path_t& a_filepath) -> scene_st {
       auto [data_buffer_error, data_buffer] = fastgltf::GltfDataBuffer::FromPath(a_filepath);
       contract_assert(data_buffer_error == fastgltf::Error::None);
 
@@ -91,9 +91,7 @@ namespace mwc {
       contract_assert(asset.scenes.size() == 1);
 
       const auto& gltf_scene = asset.scenes.front();
-      // note: warning will go away with P2287
       auto native_scene = scene_st {
-        {gltf_scene.name.c_str()},
         .m_meshes = {},
         .m_nodes = decltype(scene_st::m_nodes)::configuration_st {asset.nodes.size()},
       };
@@ -129,8 +127,8 @@ namespace mwc {
           native_scene.m_meshes.back().m_index_storage.resize(asset.accessors[primitive.indicesAccessor.value()].count);
 
           using namespace geometry;
-          using vertex_component_tuple_t =
-            tuple_t<vertex_position_st, vertex_normal_st, vertex_tangent_st, vertex_uv_st, vertex_color_st, vertex_joints_st, vertex_weights_st>;
+          using vertex_component_tuple_t
+            = tuple_t<vertex_position_st, vertex_normal_st, vertex_tangent_st, vertex_uv_st, vertex_color_st, vertex_joints_st, vertex_weights_st>;
           // write vertex component data
           static_for_loop<0, std::tuple_size_v<vertex_component_tuple_t>>(
             [&asset, &native_scene, &accessor_offset_pairs]<size_t tp_index> {
@@ -140,8 +138,8 @@ namespace mwc {
                   *accessor_offset_pairs[tp_index].first,
                   [&](const auto& a_component, const size_t a_index) {
                     std::memcpy(
-                      native_scene.m_meshes.back().m_vertex_storage.data() +
-                        (a_index * native_scene.m_meshes.back().m_vertex_model_size + accessor_offset_pairs[tp_index].second),
+                      native_scene.m_meshes.back().m_vertex_storage.data()
+                        + (a_index * native_scene.m_meshes.back().m_vertex_model_size + accessor_offset_pairs[tp_index].second),
                       &a_component, sizeof(a_component));
                   });
             });
@@ -157,8 +155,8 @@ namespace mwc {
       if (root_node_count > 1)
         mwc::warning(std::format("scene loaded from {0} has {1} root nodes", a_filepath.c_str(), root_node_count));
 
-      const auto iterate_node_hierarchy =
-        [&asset, &native_scene](this auto&& a_this, const decltype(gltf_scene.nodeIndices)::value_type a_parent_index) -> void {
+      const auto iterate_node_hierarchy
+        = [&asset, &native_scene](this auto&& a_this, const decltype(gltf_scene.nodeIndices)::value_type a_parent_index) -> void {
         for (const auto& child_index : asset.nodes[a_parent_index].children) {
           const auto& child_node = asset.nodes[child_index];
           const auto transformation_matrix = fastgltf::getTransformMatrix(child_node);

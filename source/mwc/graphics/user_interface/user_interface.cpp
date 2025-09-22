@@ -1,6 +1,7 @@
 #include "mwc/graphics/user_interface/user_interface.hpp"
 #include "mwc/graphics/user_interface/data_render.hpp"
 #include "mwc/ecs/definition.hpp"
+#include "mwc/core/diagnostic/log/subsystem.hpp"
 #include "mwc/ecs/subsystem.hpp"
 #include "mwc/input/subsystem.hpp"
 
@@ -19,9 +20,18 @@ namespace mwc {
       m_dear_imgui.render(a_command_buffer);
     }
     auto user_interface_ct::generate_debug_interface() const -> void {
-      auto open = true;
-      ImGui::Begin("debug", &open);
+      ImGui::Begin("debug", nullptr);
 
+      // logging
+      if constexpr (diagnostic::logging_subsystem_switch()) {
+        if (ImGui::BeginChild("logging", ImVec2 {0.0, ImGui::GetFrameHeight() * (10 + 1)}, ImGuiChildFlags_Borders)) {
+          dear_imgui_ct::centered_text("logging");
+          const auto begin_ptr = diagnostic::log::global::logging_subsystem.string_sink.c_str();
+          const auto end_ptr = begin_ptr + diagnostic::log::global::logging_subsystem.string_sink.size();
+          ImGui::TextUnformatted(begin_ptr, end_ptr);
+        }
+        ImGui::EndChild();
+      }
       // input
       if (ImGui::BeginChild("input", ImVec2 {0.0, ImGui::GetFrameHeight() * (3 + 1)}, ImGuiChildFlags_Borders)) {
         dear_imgui_ct::centered_text("input");
@@ -34,10 +44,10 @@ namespace mwc {
                                              : std::to_string(std::to_underlying(pressed_keyboard_key)).c_str());
         }
         ImGui::TextUnformatted(std::format("cursor: {0} - {1}",
-                                           input::input_subsystem_st::cursor_st::x_position,
-                                           input::input_subsystem_st::cursor_st::y_position)
+                                           input::input_subsystem_st::mouse_st::x_position,
+                                           input::input_subsystem_st::mouse_st::y_position)
                                  .c_str());
-        for (const auto& pressed_mouse_key : input::input_subsystem_st::cursor_st::key_map) {
+        for (const auto& pressed_mouse_key : input::input_subsystem_st::mouse_st::key_map) {
           ImGui::SameLine();
           ImGui::SmallButton(std::to_string(std::to_underlying(pressed_mouse_key)).c_str());
         }
@@ -49,9 +59,9 @@ namespace mwc {
         using component_tuple_t = typename decltype(ctti::observe_type_list<ecs::component_type_list_st>())::component_tuple_t;
         constexpr auto component_count = std::tuple_size_v<component_tuple_t>;
 
-        constexpr auto table_flags = ImGuiTableFlags_Borders bitor ImGuiTableFlags_HighlightHoveredColumn bitor
-                                     ImGuiTableFlags_ScrollX bitor ImGuiTableFlags_ScrollY bitor ImGuiTableFlags_RowBg bitor
-                                     ImGuiTableFlags_SizingFixedSame;
+        constexpr auto table_flags = ImGuiTableFlags_Borders bitor ImGuiTableFlags_HighlightHoveredColumn
+                               bitor ImGuiTableFlags_ScrollX bitor ImGuiTableFlags_ScrollY bitor ImGuiTableFlags_RowBg
+                               bitor ImGuiTableFlags_SizingFixedSame;
         constexpr auto table_size = ImVec2 {0, 480};
         ImGui::BeginTable("ecs", component_count + 1, table_flags, table_size);
         ImGui::TableSetupColumn("entity");
@@ -74,11 +84,11 @@ namespace mwc {
             ImGui::OpenPopupOnItemClick(std::bit_cast<const char*>(&entity_archetype_record->first),
                                         ImGuiPopupFlags_MouseButtonLeft);
             if (ImGui::BeginPopup(std::bit_cast<const char*>(&entity_archetype_record->first))) {
-              const auto entity_archetype_string =
-                std::format("located in archetype:\n\tindex: {0}\n\tcomponent hash: {1}\n\tentity row: {2}",
-                            entity_archetype_record->second.m_archetype->index(),
-                            entity_archetype_record->second.m_archetype->component_hash(),
-                            entity_archetype_record->second.m_entity_index);
+              const auto entity_archetype_string
+                = std::format("located in archetype:\n\tindex: {0}\n\tcomponent hash: {1}\n\tentity row: {2}",
+                              entity_archetype_record->second.m_archetype->index(),
+                              entity_archetype_record->second.m_archetype->component_hash(),
+                              entity_archetype_record->second.m_entity_index);
               ImGui::TextUnformatted(entity_archetype_string.c_str());
               ImGui::EndPopup();
             }
@@ -94,8 +104,8 @@ namespace mwc {
 
             ImGui::TableSetColumnIndex(tp_index);
 
-            const auto archetype_component_index =
-              entity_archetype_record->second.m_archetype->component_index(component_t::index);
+            const auto archetype_component_index
+              = entity_archetype_record->second.m_archetype->component_index(component_t::index);
             if (archetype_component_index != ecs::null_archetype_component_index) {
               const auto component_vector_ptr = std::bit_cast<vector_t<component_t>*>(
                 &entity_archetype_record->second.m_archetype->m_component_data[archetype_component_index].m_data);
@@ -104,11 +114,11 @@ namespace mwc {
               dear_imgui_ct::centered_text(component_data_string);
               ImGui::OpenPopupOnItemClick(std::bit_cast<const char*>(&component_data_ptr), ImGuiPopupFlags_MouseButtonLeft);
               if (ImGui::BeginPopup(std::bit_cast<const char*>(&component_data_ptr))) {
-                const auto component_archetype_string =
-                  std::format("located in archetype:\n\tindex: {0}\n\tcomponent hash: {1}\n\tcomponent column: {2}",
-                              entity_archetype_record->second.m_archetype->index(),
-                              entity_archetype_record->second.m_archetype->component_hash(),
-                              archetype_component_index);
+                const auto component_archetype_string
+                  = std::format("located in archetype:\n\tindex: {0}\n\tcomponent hash: {1}\n\tcomponent column: {2}",
+                                entity_archetype_record->second.m_archetype->index(),
+                                entity_archetype_record->second.m_archetype->component_hash(),
+                                archetype_component_index);
                 ImGui::TextUnformatted(component_archetype_string.c_str());
                 ImGui::EndPopup();
               }

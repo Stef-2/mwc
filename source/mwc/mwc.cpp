@@ -19,14 +19,14 @@ namespace mwc {
                                                               vkfw::MouseButton a_button, vkfw::MouseButtonAction a_action,
                                                               [[maybe_unused]] vkfw::ModifierKeyFlags a_modifier_flags) {
       if (a_action == vkfw::MouseButtonAction::ePress)
-        input::input_subsystem_st::cursor_st::key_map.emplace(a_button);
+        input::input_subsystem_st::mouse_st::key_map.emplace(a_button);
       else if (a_action == vkfw::MouseButtonAction::eRelease)
-        input::input_subsystem_st::cursor_st::key_map.erase(a_button);
+        input::input_subsystem_st::mouse_st::key_map.erase(a_button);
     };
     m_window.vkfw_window()->callbacks()->on_cursor_move = []([[maybe_unused]] const vkfw::Window& a_window,
                                                              const float64_t a_x_position, const float64_t a_y_position) {
-      input::input_subsystem_st::cursor_st::x_position = a_x_position;
-      input::input_subsystem_st::cursor_st::y_position = a_y_position;
+      input::input_subsystem_st::mouse_st::x_position = a_x_position;
+      input::input_subsystem_st::mouse_st::y_position = a_y_position;
     };
   }
   mwc_ct::~mwc_ct() {

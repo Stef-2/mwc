@@ -14,6 +14,7 @@ import std;
 
 export namespace mwc {
   namespace input {
+    // mesh using a static vertex model
     template <geometry::vertex_c tp_vertex_model, std::unsigned_integral tp_index = uint32_t>
     struct static_mesh_st : public resource_st {
       using vertex_model_t = tp_vertex_model;
@@ -25,7 +26,7 @@ export namespace mwc {
       vertex_storage_t m_vertex_storage;
       index_storage_t m_index_storage;
     };
-
+    // mesh using a dynamic vertex model
     struct dynamic_mesh_st : public resource_st {
       using vertex_storage_t = vector_t<byte_t>;
       using index_storage_t = vector_t<uint32_t>;

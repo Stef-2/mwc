@@ -3,6 +3,7 @@
 #include "mwc/core/contract/definition.hpp"
 
 #include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/chrono/subsystem.hpp"
 #include "mwc/input/data/scene.hpp"
 #include "mwc/window/subsystem.hpp"
 
@@ -24,22 +25,26 @@ namespace mwc {
       static auto poll_hardware_events() -> decltype(vkfw::pollEvents());
 
       struct keyboard_st {
-        static inline unordered_set_t<vkfw::Key> key_map;
+        static inline auto key_map = unordered_set_t<vkfw::Key> {};
       };
-      struct cursor_st {
-        static inline float64_t x_position;
-        static inline float64_t y_position;
-        static inline unordered_set_t<vkfw::MouseButton> key_map;
+      struct mouse_st {
+        static inline auto x_position = float64_t {};
+        static inline auto y_position = float64_t {};
+        static inline auto key_map = unordered_set_t<vkfw::MouseButton> {};
+      };
+      struct filesystem_st {
+        / / static inline auto resource_registry = ;
       };
     };
 
-    auto read_text_file(const filepath_t& a_filepath) -> string_t;
-    auto read_binary_file(const filepath_t& a_filepath) -> vector_t<byte_t>;
-    auto read_scene_file(const filepath_t& a_filepath) -> scene_st;
+    auto read_text_file(const file_path_t& a_filepath) -> string_t;
+    auto read_binary_file(const file_path_t& a_filepath) -> vector_t<byte_t>;
+    auto read_scene_file(const file_path_t& a_filepath) -> scene_st;
+
     namespace global {
-      inline auto input_subsystem =
-        input_subsystem_st {{&diagnostic::log::global::logging_subsystem, &mwc::global::window_subsystem},
-                            string_view_t {"input subsystem"}};
+      inline auto input_subsystem = input_subsystem_st {
+        {&diagnostic::log::global::logging_subsystem, &mwc::global::window_subsystem, &mwc::chrono::global::chrono_subsystem},
+        string_view_t {"input subsystem"}};
     }
   }
 }

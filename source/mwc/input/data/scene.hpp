@@ -12,7 +12,7 @@ import std;
 
 namespace mwc {
   namespace input {
-    struct scene_st : public resource_st {
+    struct scene_st {
       struct node_data_st {
         using index_t = uint16_t;
 

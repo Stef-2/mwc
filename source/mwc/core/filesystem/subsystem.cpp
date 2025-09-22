@@ -34,10 +34,10 @@ namespace mwc {
         for (const auto& directory : std::filesystem::recursive_directory_iterator(directory_map[e_root])) {
           const auto& path = directory.path();
           const auto directory_enumerator = directory_et {directory_of_interest};
-          const auto directory_present = (directory_enumerator == e_current_working) or (directory_enumerator == e_root) or
-                                         (directory_enumerator == e_temporary);
-          const auto directory_name_match =
-            string_view_t {path.filename().c_str()} == directory_type_string(directory_enumerator);
+          const auto directory_present = (directory_enumerator == e_current_working) or (directory_enumerator == e_root)
+                                      or (directory_enumerator == e_temporary);
+          const auto directory_name_match
+            = string_view_t {path.filename().c_str()} == directory_type_string(directory_enumerator);
           if (directory_name_match and not directory_present) {
             directory_map.m_storage[i] = {directory_enumerator, path};
             ++i;
@@ -62,14 +62,15 @@ namespace mwc {
     auto file_subsystem_st::finalize() -> void {
       m_initialized = false;
     }
-    auto directory(const directory_et a_directory) -> filepath_t {
+    auto directory(const directory_et a_directory) -> file_path_t {
       return file_subsystem_st::directory_map[a_directory];
     }
-    auto directory(const string_view_t a_directory) -> filepath_t {
+    auto directory(const string_view_t a_directory) -> file_path_t {
       for (const auto& directory_iterator : directory(directory_et::e_root))
         if (directory_iterator.filename() == a_directory)
           return directory_iterator;
 
+      std::unreachable();
       contract_assert(false);
     }
   }

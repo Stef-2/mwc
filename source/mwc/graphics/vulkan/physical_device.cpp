@@ -25,8 +25,8 @@ namespace mwc {
           if (physical_device_index == 0)
             physical_device_properties = physical_devices[0].getProperties();
 
-          const auto device_name =
-            string_view_t {physical_device_properties.deviceName, std::strlen(physical_device_properties.deviceName)};
+          const auto device_name
+            = string_view_t {physical_device_properties.deviceName, std::strlen(physical_device_properties.deviceName)};
           information(std::format("selecting physical device {0}" SUB "vulkan api version: {1}",
                                   device_name,
                                   string_t {semantic_version_st {physical_device_properties.apiVersion}}));
@@ -34,8 +34,6 @@ namespace mwc {
         })},
         m_properties {std::invoke([this]([[maybe_unused]] this auto&& a_this) -> properties_st {
           // structure chain type deduction
-          tuple_t<int, float> x;
-          auto [... z] = x;
           [[maybe_unused]] auto& [... default_properties_pack] = m_properties.m_default_properties_chain;
           [[maybe_unused]] auto& [... memory_properties_pack] = m_properties.m_memory_properties_chain;
 

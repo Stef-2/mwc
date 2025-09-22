@@ -16,8 +16,8 @@ namespace mwc {
   }
   auto subsystem_st::depends_on(const subsystem_st& a_subsystem) -> bool_t {
     auto dependency_found = false;
-    auto search_for_dependency = [&dependency_found, &a_subsystem](this auto&& a_this,
-                                                                   const span_t<subsystem_st*> a_dependencies) -> void {
+    auto search_for_dependency
+      = [&dependency_found, &a_subsystem](this auto&& a_this, const span_t<subsystem_st*> a_dependencies) -> void {
       for (const auto& dependency : a_dependencies) {
         if (dependency == &a_subsystem) {
           dependency_found = true;
@@ -30,6 +30,7 @@ namespace mwc {
     return dependency_found;
   }
   auto initialize_subsystems() -> void {
+    // at this point, the logging
     std::println("initializing {0} subsystems", subsystem_st::subsystem_registry.size());
 
     const auto initializer = [](this auto&& a_this) -> void {

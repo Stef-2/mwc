@@ -23,16 +23,30 @@ set(SOURCE_PROJECT_DIR ${SOURCE_DIR}/${PROJECT_NAME})
 set(SOURCE_STD_DIR ${SOURCE_DIR}/std)
 set(MODULE_DIR ${SOURCE_DIR})
 set(LOG_DIR ${ROOT_DIR}/log)
+set(DATA_DIR ${ROOT_DIR}/data)
+set(DATA_IMAGE_DIR ${DATA_DIR}/image)
+set(DATA_MESH_DIR ${DATA_DIR}/mesh)
+set(DATA_SHADER_DIR ${DATA_DIR}/shader)
 
-# if logging is enabled, attempt to find the logging directory, if not present, create one
+# if logging is enabled, attempt to find the logging directory, if not present, generate one
 if (${MWC_LOG})
     message(CHECK_START "logging is enabled, attempting to find the log directory...")
     if (EXISTS ${LOG_DIR})
         message(CHECK_PASS "logging directory found: " ${LOG_DIR})
     else ()
-        message(CHECK_FAIL "logging directory not found, creating one at: " ${LOG_DIR})
+        message(CHECK_FAIL "logging directory not found, generating one at: " ${LOG_DIR})
         make_directory(${LOG_DIR})
     endif ()
+endif ()
+
+if (NOT EXISTS ${DATA_IMAGE_DIR})
+    make_directory(${DATA_IMAGE_DIR})
+endif ()
+if (NOT EXISTS ${DATA_MESH_DIR})
+    make_directory(${DATA_IMAGE_DIR})
+endif ()
+if (NOT EXISTS ${DATA_SHADER_DIR})
+    make_directory(${DATA_SHADER_DIR})
 endif ()
 
 # vulkan library

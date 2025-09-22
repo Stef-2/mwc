@@ -46,7 +46,7 @@ export namespace mwc {
   using any_t = std::any;
 
   // path types
-  using filepath_t = std::filesystem::path;
+  using file_path_t = std::filesystem::path;
 
   // stream types
   using istream_t = std::istream;

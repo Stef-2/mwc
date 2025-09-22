@@ -24,11 +24,11 @@ namespace mwc {
       auto initialize() -> void override final;
       auto finalize() -> void override final;
 
-      static inline static_unordered_bi_map_st<directory_et, filepath_t, directory_track_count> directory_map;
+      static inline static_unordered_bi_map_st<directory_et, file_path_t, directory_track_count> directory_map;
     };
 
-    auto directory(const directory_et a_directory) -> filepath_t pre(a_directory != directory_et::end);
-    auto directory(const string_view_t a_directory) -> filepath_t pre(contract::validate_storage(a_directory));
+    auto directory(const directory_et a_directory) -> file_path_t pre(a_directory != directory_et::end);
+    auto directory(const string_view_t a_directory) -> file_path_t pre(contract::validate_storage(a_directory));
 
     namespace global {
       inline auto file_subsystem = file_subsystem_st {{&diagnostic::log::global::logging_subsystem}, "file subsystem"};

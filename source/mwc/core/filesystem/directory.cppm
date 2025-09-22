@@ -11,7 +11,18 @@ import std;
 
 export namespace mwc {
   namespace filesystem {
-    enum class directory_et { e_root, e_source, e_data, e_log, e_current_working, e_temporary, end };
+    enum class directory_et {
+      e_root,
+      e_source,
+      e_data,
+      e_log,
+      e_current_working,
+      e_temporary,
+      e_image,
+      e_mesh,
+      e_shader,
+      end
+    };
 
     constexpr auto directory_type_string(directory_et a_directory) -> const string_view_t {
       using enum directory_et;
@@ -22,6 +33,9 @@ export namespace mwc {
         case e_log : return "log";
         case e_current_working : return "current working";
         case e_temporary : return "temporary";
+        case e_image : return "image";
+        case e_mesh : return "mesh";
+        case e_shader : return "shader";
         default : contract_assert(false); std::unreachable();
       }
     }
