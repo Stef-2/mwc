@@ -30,14 +30,14 @@ namespace mwc {
           const configuration_st& a_configuration = configuration_st::default_configuration());
 
         template <typename tp>
-        [[nodiscard]] auto request_suballocation(this auto&& a_this, size_t a_virtual_suballocation_size,
-                                                 virtual_allocator_ct::allocation_configuration_st a_a_configuration =
-                                                   virtual_allocator_ct::allocation_configuration_st::default_configuration())
+        [[nodiscard]] auto request_suballocation(this auto&& a_this, const size_t a_virtual_suballocation_size,
+                                                 const virtual_allocator_ct::allocation_configuration_st& a_a_configuration
+                                                 = virtual_allocator_ct::allocation_configuration_st::default_configuration())
           pre(std::modulus<decltype(a_virtual_suballocation_size)> {}(a_virtual_suballocation_size, sizeof(tp)) == 0);
         template <typename tp>
         auto release_suballocation(const suballocation_t<tp>& a_suballocation) -> void;
 
-        [[nodiscard]] auto virtual_allocator() const -> const virtual_allocator_ct&;
+        [[nodiscard]] auto virtual_allocator() -> virtual_allocator_ct&;
         template <typename tp_this>
         [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 
@@ -54,11 +54,11 @@ namespace mwc {
       }
       template <typename tp>
       auto suballocated_memory_mapped_buffer_ct::request_suballocation(
-        this auto&& a_this, size_t a_virtual_suballocation_size,
-        virtual_allocator_ct::allocation_configuration_st a_a_configuration) {
+        this auto&& a_this, const size_t a_virtual_suballocation_size,
+        const virtual_allocator_ct::allocation_configuration_st& a_a_configuration) {
         // request a virtual suballocation, result is validated internally
-        const auto virtual_allocation_offset =
-          a_this.m_virtual_allocator.request_suballocation(a_virtual_suballocation_size, a_a_configuration);
+        const auto virtual_allocation_offset
+          = a_this.m_virtual_allocator.request_suballocation(a_virtual_suballocation_size, a_a_configuration);
 
         const auto physical_data_address = static_cast<byte_t*>(a_this.mapped_data_pointer()) + virtual_allocation_offset;
         const auto element_count = a_virtual_suballocation_size / sizeof(tp);
@@ -67,8 +67,8 @@ namespace mwc {
       }
       template <typename tp>
       auto suballocated_memory_mapped_buffer_ct::release_suballocation(const suballocation_t<tp>& a_suballocation) -> void {
-        const auto suballocation_offset =
-          std::bit_cast<byte_t*>(a_suballocation.data()) - static_cast<byte_t*>(mapped_data_pointer());
+        const auto suballocation_offset
+          = std::bit_cast<byte_t*>(a_suballocation.data()) - static_cast<byte_t*>(mapped_data_pointer());
 
         m_virtual_allocator.release_suballocation(suballocation_offset);
       }

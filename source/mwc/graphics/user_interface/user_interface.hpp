@@ -22,12 +22,19 @@ namespace mwc {
 
       auto generate_debug_interface() const -> void;
 
+      template <typename tp_this>
+      constexpr auto configuration(this tp_this&& a_this) -> decltype(auto);
+
       private:
       dear_imgui_ct m_dear_imgui;
       configuration_st m_configuration;
     };
 
     // implementation
+    template <typename tp_this>
+    constexpr auto user_interface_ct::configuration(this tp_this&& a_this) -> decltype(auto) {
+      return std::forward_like<decltype(a_this)>(a_this.m_configuration);
+    }
     constexpr auto user_interface_ct::configuration_st::default_configuration() -> configuration_st {
       return configuration_st {};
     }

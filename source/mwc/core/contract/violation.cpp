@@ -1,6 +1,6 @@
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+/*#include "mwc/core/diagnostic/log/subsystem.hpp"
 
-#include <contracts>
+//#include <contracts>
 
 import mwc_logging_subsystem_switch;
 
@@ -50,4 +50,4 @@ void handle_contract_violation(const std::contracts::contract_violation& a_viola
   } else {
     std::print("{0}", contract_violation_string);
   }
-}
+}*/

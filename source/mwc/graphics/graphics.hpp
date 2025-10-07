@@ -21,6 +21,7 @@
 #include "mwc/graphics/camera/camera.hpp"
 
 import mwc_definition;
+import mwc_host_mesh;
 
 import vulkan_hpp;
 
@@ -40,6 +41,8 @@ namespace mwc {
                   const configuration_st& a_configuration = configuration_st::default_configuration());
 
       auto render() -> void;
+      auto record_mesh_data_transfer_to_device(const span_t<const input::dynamic_host_mesh_st> a_mesh_data,
+                                               const vk::raii::CommandBuffer& a_command_buffer) -> void;
 
       template <typename tp_this>
       [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
@@ -61,6 +64,8 @@ namespace mwc {
       vulkan::queue_ct m_transfer_queue;
       vulkan::suballocated_memory_mapped_buffer_ct m_common_buffer;
       vulkan::dynamic_rendering_state_ct m_dynamic_rendering_state;
+      vector_t<vulkan::buffer_ct> m_vertex_buffers;
+
       user_interface_ct m_user_interface;
       camera_ct m_camera;
       configuration_st m_configuration;

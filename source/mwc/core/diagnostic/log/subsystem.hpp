@@ -6,10 +6,10 @@
 
 #include "mwc/core/chrono/subsystem.hpp"
 #include "mwc/core/diagnostic/log/log.hpp"
+#include "mwc/core/filesystem/file_type.hpp"
 
 import mwc_logging_subsystem_switch;
 import mwc_event_severity;
-import mwc_file_type;
 import mwc_output_stream;
 import mwc_contract_assertion;
 import mwc_empty_type;

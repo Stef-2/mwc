@@ -1,11 +1,13 @@
 #include "eigen3/Eigen/Dense"
+
+#include "mwc/core/contract/definition.hpp"
+
 #include "mwc/mwc.hpp"
 #include "mwc/ecs/component.hpp"
 #include "mwc/core/filesystem/subsystem.hpp"
 #include "mwc/ecs/subsystem.hpp"
 #include "mwc/ecs/archetype.hpp"
 #include "mwc/input/subsystem.hpp"
-#include "mwc/core/filesystem/subsystem.hpp"
 #include "mwc/ecs/entity.hpp"
 
 import mwc_subsystem;
@@ -18,12 +20,16 @@ import mwc_geometry;
 
 import std;
 
-import vkfw;
+//import vkfw;
 
 int main() {
+  //p("{0}", 33);
+  //std::print("test {0}", std::string_view {"bro pl"});
   using namespace mwc::ecs;
   mwc::initialize_subsystems();
-  const auto scene = mwc::input::read_scene_file("/home/billy/dev/mwc/data/mesh/cube.glb");
+
+  const auto xxx = mwc::input::read_scene_file("/home/billy/dev/mwc/data/mesh/cube.glb");
+  const auto& scene = mwc::input::input_subsystem_st::filesystem_st::scene_registry[0];
   std::cout << scene.m_meshes.back().m_vertex_storage.size() / scene.m_meshes.back().m_vertex_model_size << '\n';
   for (auto i = 0uz; i < scene.m_meshes.back().m_vertex_storage.size(); i += scene.m_meshes.back().m_vertex_model_size) {
     auto pos = std::bit_cast<mwc::array_t<float, 3>*>(scene.m_meshes.back().m_vertex_storage.data() + i);
@@ -44,6 +50,7 @@ int main() {
     std::cout << node.m_data.m_transformation << '\n';
     std::cout << node.m_data.m_mesh_index << '\n';
   }
+
   const auto comp = test0 {};
   const auto e = entity_ct {test2 {.c = 'b'}, comp, test1 {.f = 6.4f}};
   const auto e2 = mwc::ecs::generate_entity<test2, test0, test1>(test2 {.c = 'a'}, test0 {.i = {222, 442}}, test1 {.f = 1.42f});

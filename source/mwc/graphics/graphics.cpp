@@ -1,5 +1,6 @@
 #include "mwc/graphics/graphics.hpp"
 #include "mwc/graphics/vulkan/debug.hpp"
+#include "mwc/input/subsystem.hpp"
 
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
@@ -8,6 +9,51 @@ import mwc_memory_conversion;
 
 namespace mwc {
   namespace graphics {
+    auto graphics_ct::record_mesh_data_transfer_to_device(const span_t<const input::dynamic_host_mesh_st> a_mesh_data,
+                                                          const vk::raii::CommandBuffer& a_command_buffer) -> void {
+      // note: consider writing scene data directly into the memory mapped device buffer
+      auto size = vk::DeviceSize {0};
+
+      // determine the amount of memory required
+      for (const auto& mesh_data : a_mesh_data) {
+        size += mesh_data.m_vertex_storage.size();
+        size += mesh_data.m_index_storage.size() * sizeof(input::dynamic_host_mesh_st::index_storage_t::value_type);
+      }
+
+      const auto suballocation = m_common_buffer.request_suballocation<byte_t>(size);
+
+      const auto suballocation_offset
+        = vk::DeviceSize {pointer_cast(suballocation.m_data) - pointer_cast(m_common_buffer.mapped_data_pointer())};
+
+      // generate a new vertex buffer
+      m_vertex_buffers.emplace_back(
+        m_logical_device, m_memory_allocator,
+        vulkan::buffer_ct::configuration_st {
+        .m_buffer_create_info
+        = vk::BufferCreateInfo {vk::BufferCreateFlags {}, size,
+                                vk::BufferUsageFlagBits::eVertexBuffer bitor vk::BufferUsageFlagBits::eIndexBuffer
+                                  bitor vk::BufferUsageFlagBits::eTransferDst},
+        .m_allocation_create_info = vma::AllocationCreateInfo {vma::AllocationCreateFlags {}, vma::MemoryUsage::eAuto}});
+
+      // copy mesh data into the memory mapped device buffer
+      for (auto offset = 0uz; const auto& mesh_data : a_mesh_data) {
+        const auto index_byte_count
+          = mesh_data.m_index_storage.size() * sizeof(input::dynamic_host_mesh_st::index_storage_t::value_type);
+
+        std::memcpy(suballocation.m_data + offset, mesh_data.m_vertex_storage.data(), mesh_data.m_vertex_storage.size());
+        offset += mesh_data.m_vertex_storage.size();
+
+        std::memcpy(suballocation.m_data + offset, mesh_data.m_index_storage.data(), index_byte_count);
+        offset += index_byte_count;
+      }
+
+      // record transfer to device memory
+      const auto copy_information
+        = vk::BufferCopy2 {/*source_offset*/ suballocation_offset, /*destination_offset*/ vk::DeviceSize {0}, size};
+      a_command_buffer.copyBuffer2(
+        vk::CopyBufferInfo2 {m_common_buffer.native_handle(), m_vertex_buffers.back().native_handle(), copy_information});
+    }
+
     graphics_ct::graphics_ct(const window_ct& a_window, const semantic_version_st& a_engine_version,
                              const configuration_st& a_configuration)
     : m_window {a_window},
@@ -50,10 +96,34 @@ namespace mwc {
         .m_virtual_allocator_configuration
         = virtual_allocator_ct::configuration_st {.m_virtual_block_create_flags = vma::VirtualBlockCreateFlags {}}}},
       m_dynamic_rendering_state {m_surface},
+      m_vertex_buffers {},
       m_user_interface {dear_imgui_ct {a_window, m_context, m_instance, m_physical_device, m_logical_device,
                                        m_queue_families.graphics(), m_graphics_queue, m_swapchain}},
       m_camera {camera_ct::configuration_st<camera_projection_et::e_perspective>::default_configuration()},
-      m_configuration {a_configuration} {}
+      m_configuration {a_configuration} {
+      auto scene_cfg = input::input_subsystem_st::filesystem_st::scene_read_configuration_st::default_configuration();
+      scene_cfg.m_mesh_processing.m_propagate_to_device_memory = &m_common_buffer.virtual_allocator();
+      scene_cfg.m_image_processing.m_propagate_to_device_memory = &m_common_buffer.virtual_allocator();
+
+      input::read_scene_file("/home/billy/dev/mwc/data/mesh/Untitled.glb");
+
+      auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
+      const auto& cmd = frame_data.m_command_buffer;
+
+      const auto scene_count = input::input_subsystem_st::filesystem_st::scene_registry.empty();
+      std::cout << scene_count << '\n';
+      /*const auto it = mwc::input::input_subsystem_st::filesystem_st::scene_registry.find(
+        input::scene_st({"/home/billy/dev/mwc/data/mesh/cube.glb"}, "Scene"));*/
+      const auto it = mwc::input::input_subsystem_st::filesystem_st::scene_registry.begin();
+      if (it != input::input_subsystem_st::filesystem_st::scene_registry.end()) {
+        cmd.begin(vk::CommandBufferBeginInfo {vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+        record_mesh_data_transfer_to_device((*it).m_meshes, cmd);
+        cmd.end();
+        vk::CommandBufferSubmitInfo submit_info {*cmd};
+        m_graphics_queue->submit2(vk::SubmitInfo2 {vk::SubmitFlags {}, {}, submit_info, {}});
+        m_graphics_queue->waitIdle();
+      }
+    }
 
     auto graphics_ct::render() -> void {
       //imgui

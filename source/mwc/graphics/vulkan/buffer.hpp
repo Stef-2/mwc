@@ -23,6 +23,7 @@ namespace mwc {
         };
         buffer_ct(const logical_device_ct& a_logical_device, const memory_allocator_ct& a_memory_allocator,
                   const configuration_st& a_configuration = configuration_st::default_configuration());
+        buffer_ct(buffer_ct&& a_other) noexcept = default;
         ~buffer_ct();
 
         template <typename tp_this>
@@ -44,6 +45,12 @@ namespace mwc {
         vma::AllocationInfo m_allocation_info;
         vma::Allocation m_allocation;
         configuration_st m_configuration;
+      };
+
+      struct buffer_region_st {
+        vk::Buffer m_buffer = {nullptr};
+        vk::DeviceSize m_offset = {0};
+        vk::DeviceSize m_size = {0};
       };
 
       // implementation

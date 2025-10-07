@@ -1,5 +1,7 @@
 module;
 
+#include "mwc/core/contract/definition.hpp"
+
 export module mwc_geometry;
 
 import mwc_definition;
@@ -55,5 +57,10 @@ export namespace mwc {
 
       return a_radians * scalar_t {180} / std::numbers::pi_v<scalar_t>;
     }
+
+    struct aabb_st {
+      position_t<> m_min;
+      position_t<> m_max;
+    };
   }
 }

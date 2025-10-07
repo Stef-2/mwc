@@ -1,5 +1,7 @@
 module;
 
+#include "mwc/core/contract/definition.hpp"
+
 export module mwc_vertex_model;
 
 import mwc_definition;
@@ -8,6 +10,8 @@ import mwc_metaprogramming_utility;
 import mwc_set_bit;
 import mwc_concept;
 import mwc_geometry;
+
+import fastgltf;
 
 import std;
 
@@ -83,9 +87,9 @@ export namespace mwc {
 
     // concept modeling vertex components
     template <typename tp>
-    concept vertex_component_c =
-      mwc::concepts::any_of_c<tp, vertex_position_st, vertex_uv_st, vertex_normal_st, vertex_tangent_st, vertex_color_st,
-                              vertex_joints_st, vertex_weights_st>;
+    concept vertex_component_c
+      = mwc::concepts::any_of_c<tp, vertex_position_st, vertex_uv_st, vertex_normal_st, vertex_tangent_st, vertex_color_st,
+                                vertex_joints_st, vertex_weights_st>;
 
     template <vertex_component_c... tp_vertex_components>
     struct vertex_st : public tp_vertex_components... {};
@@ -93,5 +97,39 @@ export namespace mwc {
     // concept modeling specializations of [vertex_st]
     template <typename tp>
     concept vertex_c = specialization_of_v<tp, vertex_st>;
+
+    // gltf vertex component identification
+    constexpr auto gltf_vertex_component_string(const geometry::vertex_component_bit_mask_et a_component) {
+      switch (a_component) {
+        using enum geometry::vertex_component_bit_mask_et;
+        case e_position : return "POSITION";
+        case e_normal : return "NORMAL";
+        case e_tangent : return "TANGENT";
+        case e_uv : return "TEXCOORD_0";
+        case e_color : return "COLOR_0";
+        case e_joints : return "JOINTS_0";
+        case e_weights : return "WEIGHTS_0";
+        default : contract_assert(false); std::unreachable();
+      }
+    }
   }
+}
+export {
+  // fastgltf vertex component specializations
+  template <>
+  struct fastgltf::ElementTraits<mwc::geometry::vertex_uv_st::array_t>
+  : fastgltf::ElementTraitsBase<mwc::geometry::vertex_uv_st::array_t, AccessorType::Vec2,
+                                mwc::geometry::vertex_uv_st::array_t::value_type> {};
+  template <>
+  struct fastgltf::ElementTraits<mwc::geometry::vertex_position_st::array_t>
+  : fastgltf::ElementTraitsBase<mwc::geometry::vertex_position_st::array_t, AccessorType::Vec3,
+                                mwc::geometry::vertex_position_st::array_t::value_type> {};
+  template <>
+  struct fastgltf::ElementTraits<mwc::geometry::vertex_tangent_st::array_t>
+  : fastgltf::ElementTraitsBase<mwc::geometry::vertex_tangent_st::array_t, AccessorType::Vec4,
+                                mwc::geometry::vertex_tangent_st::array_t::value_type> {};
+  template <>
+  struct fastgltf::ElementTraits<mwc::geometry::vertex_joints_st::array_t>
+  : fastgltf::ElementTraitsBase<mwc::geometry::vertex_joints_st::array_t, AccessorType::Vec4,
+                                mwc::geometry::vertex_joints_st::array_t::value_type> {};
 }

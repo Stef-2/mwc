@@ -10,7 +10,7 @@ namespace mwc {
         a_logical_device, a_memory_allocator, a_configuration.m_memory_mapped_buffer_configuration,
       }, m_virtual_allocator {size(), a_configuration.m_virtual_allocator_configuration} {
       }
-      auto suballocated_memory_mapped_buffer_ct::virtual_allocator() const -> const virtual_allocator_ct& {
+      auto suballocated_memory_mapped_buffer_ct::virtual_allocator() -> virtual_allocator_ct& {
         return m_virtual_allocator;
       }
     }

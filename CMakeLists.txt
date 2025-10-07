@@ -49,6 +49,8 @@ if (NOT EXISTS ${DATA_SHADER_DIR})
     make_directory(${DATA_SHADER_DIR})
 endif ()
 
+set(MWC_ASSERT assert)
+
 # vulkan library
 add_library(VulkanHppModule)
 find_package(Vulkan REQUIRED)
@@ -56,10 +58,13 @@ target_compile_definitions(VulkanHppModule PUBLIC
         VULKAN_HPP_NO_EXCEPTIONS
         VULKAN_HPP_RAII_NO_EXCEPTIONS
         VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
-        #VULKAN_HPP_ENABLE_STD_MODULE
-        #VULKAN_HPP_STD_MODULE=std.compat
-        VULKAN_HPP_ASSERT=contract_assert
+        VULKAN_HPP_ENABLE_STD_MODULE
+
+        VULKAN_HPP_ASSERT=${MWC_ASSERT}
         VULKAN_HPP_ASSERT_ON_RESULT=VULKAN_HPP_ASSERT
+)
+target_compile_definitions(VulkanHppModule PRIVATE
+        VULKAN_HPP_STD_MODULE=std.compat
 )
 target_sources(VulkanHppModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${Vulkan_INCLUDE_DIR} FILES ${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm)
 target_compile_features(VulkanHppModule PUBLIC cxx_std_26)
@@ -77,10 +82,11 @@ target_compile_definitions(vkfw_module PRIVATE
         VKFW_NO_EXCEPTIONS
         VKFW_NO_STRUCT_CONSTRUCTORS
         VKFW_ENABLE_STD_MODULE
-        VKFW_ASSERT=contract_assert
-        VKFW_ASSERT_ON_RESULT=VKFW_ASSERT
-        assert=VKFW_ASSERT
+        #VKFW_ASSERT=${MWC_ASSERT}
+        #VKFW_ASSERT_ON_RESULT=VKFW_ASSERT
+        #assert=VKFW_ASSERT
 )
+
 target_link_libraries(vkfw_module PRIVATE VulkanHppModule)
 
 # vma library
@@ -94,7 +100,7 @@ target_compile_definitions(vma_module PRIVATE
         VULKAN_HPP_STD_MODULE=std
         VMA_ENABLE_VULKAN_HPP_MODULE
         VULKAN_HPP_NO_EXCEPTIONS
-        VMA_ASSERT=contract_assert
+        VMA_ASSERT=${MWC_ASSERT}
         VMA_ASSERT_ON_RESULT=VKFW_ASSERT
         assert=VMA_ASSERT
 )
@@ -109,7 +115,7 @@ target_sources(fast_gltf_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${fastgltf
 target_compile_features(fast_gltf_module PUBLIC cxx_std_26)
 target_compile_definitions(fast_gltf_module PRIVATE
         FASTGLTF_COMPILE_AS_CPP20
-        #FASTGLTF_USE_STD_MODULE
+        FASTGLTF_USE_STD_MODULE
 )
 target_link_libraries(fast_gltf_module PRIVATE fastgltf)
 
@@ -128,6 +134,10 @@ target_sources(${PROJECT_NAME} PRIVATE
 # project compile definitions
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<IF:${MWC_LOG}, MWC_LOG_DIR="${LOG_DIR}", MWC_LOG_DIR="">
+        MWC_DATA_IMAGE_DIR="${DATA_IMAGE_DIR}"
+        MWC_DATA_MESH_DIR="${DATA_MESH_DIR}"
+        MWC_DATA_SHADER_DIR="${DATA_SHADER_DIR}"
+        MWC_ASSERT=${MWC_ASSERT}
 )
 # project libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC

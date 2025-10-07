@@ -4,9 +4,8 @@
 
 import mwc_definition;
 
-import vulkan_hpp;
-
 import std;
+import vulkan_hpp;
 
 namespace mwc {
   struct semantic_version_st {

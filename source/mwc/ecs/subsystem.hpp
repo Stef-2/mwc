@@ -73,7 +73,7 @@ namespace mwc {
           ecs_subsystem_st::component_archetype_map.emplace(
             tp_components... [tp_index] ::index,
             unordered_map_t<obs_ptr_t<archetype_st>, archetype_component_index_t> {
-              pair_t {
+              pair_t<obs_ptr_t<archetype_st>, archetype_component_index_t> {
                 &generated_archetype_iterator->second, tp_index
               }
             });

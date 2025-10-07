@@ -8,10 +8,9 @@ import mwc_contract_assertion;
 import mwc_project_name_string;
 import mwc_type_mobility;
 
+import std;
 import vulkan_hpp;
 import vkfw;
-
-import std;
 
 namespace mwc {
   class window_ct : public irreproducible_st {

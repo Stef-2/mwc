@@ -33,16 +33,16 @@
       "name": "clang_debug",
       "inherits": "base",
       "environment": {
-        "PROJECT_CXX_FEATURE_FLAGS": "-stdlib=libc++ -fcontracts -fno-exceptions -fno-rtti -fstrict-enums --embed-dir=${sourceDir}",
+        "PROJECT_CXX_FEATURE_FLAGS": "-stdlib=libc++ -fno-exceptions -fno-rtti -fstrict-enums --embed-dir=${sourceDir}",
         "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Wdeprecated -Winline -Wextra-semi -Wsuggest-override",
         "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fdiagnostics-show-template-tree -fdiagnostics-color=always",
         "COMPILER_CXX_DEBUG_DEFINITIONS": ""
       },
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "/opt/compiler-explorer/clang-ericwf-contracts-trunk/bin/clang++",
+        "CMAKE_CXX_COMPILER": "/home/billy/Downloads/LLVM-21.1.2-Linux-X64/bin/clang++",
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
-        "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS} $env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
+        "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS} $env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS} -DMWC_DEBUG=1 -DMWC_LOG=1"
       }
     }
   ],

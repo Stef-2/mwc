@@ -63,77 +63,78 @@ namespace mwc {
                                bitor ImGuiTableFlags_ScrollX bitor ImGuiTableFlags_ScrollY bitor ImGuiTableFlags_RowBg
                                bitor ImGuiTableFlags_SizingFixedSame;
         constexpr auto table_size = ImVec2 {0, 480};
-        ImGui::BeginTable("ecs", component_count + 1, table_flags, table_size);
-        ImGui::TableSetupColumn("entity");
-        mwc::static_for_loop<0, component_count>([]<size_t tp_index> {
-          constexpr auto header_string = string_t {std::tuple_element_t<tp_index, component_tuple_t>::type_name(false)};
-          ImGui::TableSetupColumn(header_string.c_str());
-        });
-        ImGui::TableHeadersRow();
+        if (ImGui::BeginTable("ecs", component_count + 1, table_flags, table_size)) {
+          ImGui::TableSetupColumn("entity");
+          mwc::static_for_loop<0, component_count>([]<size_t tp_index> {
+            constexpr auto header_string = string_t {std::tuple_element_t<tp_index, component_tuple_t>::type_name(false)};
+            ImGui::TableSetupColumn(header_string.c_str());
+          });
+          ImGui::TableHeadersRow();
 
-        const auto lambda = []<size_t tp_index, size_t... tp_indices>(this auto&& a_this,
-                                                                      std::index_sequence<tp_index, tp_indices...>) {
-          const auto row_index = ImGui::TableGetRowIndex() - 1;
-          auto entity_archetype_record = ecs::ecs_subsystem_st::entity_archetype_map.begin();
-          std::advance(entity_archetype_record, row_index);
+          const auto lambda = []<size_t tp_index, size_t... tp_indices>(this auto&& a_this,
+                                                                        std::index_sequence<tp_index, tp_indices...>) {
+            const auto row_index = ImGui::TableGetRowIndex() - 1;
+            auto entity_archetype_record = ecs::ecs_subsystem_st::entity_archetype_map.begin();
+            std::advance(entity_archetype_record, row_index);
 
-          if constexpr (tp_index == 0) {
-            ImGui::TableSetColumnIndex(0);
-            const auto entity_index_string = std::format("{0}", entity_archetype_record->first);
-            dear_imgui_ct::centered_text(entity_index_string);
-            ImGui::OpenPopupOnItemClick(std::bit_cast<const char*>(&entity_archetype_record->first),
-                                        ImGuiPopupFlags_MouseButtonLeft);
-            if (ImGui::BeginPopup(std::bit_cast<const char*>(&entity_archetype_record->first))) {
-              const auto entity_archetype_string
-                = std::format("located in archetype:\n\tindex: {0}\n\tcomponent hash: {1}\n\tentity row: {2}",
-                              entity_archetype_record->second.m_archetype->index(),
-                              entity_archetype_record->second.m_archetype->component_hash(),
-                              entity_archetype_record->second.m_entity_index);
-              ImGui::TextUnformatted(entity_archetype_string.c_str());
-              ImGui::EndPopup();
-            }
-            if constexpr (sizeof...(tp_indices) > 0)
-              a_this(std::index_sequence<tp_indices...> {});
-            else
-              return;
-          } else {
-            if (entity_archetype_record == ecs::ecs_subsystem_st::entity_archetype_map.end())
-              return;
-
-            using component_t = std::tuple_element_t<tp_index - 1, component_tuple_t>;
-
-            ImGui::TableSetColumnIndex(tp_index);
-
-            const auto archetype_component_index
-              = entity_archetype_record->second.m_archetype->component_index(component_t::index);
-            if (archetype_component_index != ecs::null_archetype_component_index) {
-              const auto component_vector_ptr = std::bit_cast<vector_t<component_t>*>(
-                &entity_archetype_record->second.m_archetype->m_component_data[archetype_component_index].m_data);
-              const auto component_data_ptr = component_vector_ptr->operator[](entity_archetype_record->second.m_entity_index);
-              const auto component_data_string = format_component_data(component_data_ptr);
-              dear_imgui_ct::centered_text(component_data_string);
-              ImGui::OpenPopupOnItemClick(std::bit_cast<const char*>(&component_data_ptr), ImGuiPopupFlags_MouseButtonLeft);
-              if (ImGui::BeginPopup(std::bit_cast<const char*>(&component_data_ptr))) {
-                const auto component_archetype_string
-                  = std::format("located in archetype:\n\tindex: {0}\n\tcomponent hash: {1}\n\tcomponent column: {2}",
+            if constexpr (tp_index == 0) {
+              ImGui::TableSetColumnIndex(0);
+              const auto entity_index_string = std::format("{0}", entity_archetype_record->first);
+              dear_imgui_ct::centered_text(entity_index_string);
+              ImGui::OpenPopupOnItemClick(std::bit_cast<const char*>(&entity_archetype_record->first),
+                                          ImGuiPopupFlags_MouseButtonLeft);
+              if (ImGui::BeginPopup(std::bit_cast<const char*>(&entity_archetype_record->first))) {
+                const auto entity_archetype_string
+                  = std::format("located in archetype:\n\tindex: {0}\n\tcomponent hash: {1}\n\tentity row: {2}",
                                 entity_archetype_record->second.m_archetype->index(),
                                 entity_archetype_record->second.m_archetype->component_hash(),
-                                archetype_component_index);
-                ImGui::TextUnformatted(component_archetype_string.c_str());
+                                entity_archetype_record->second.m_entity_index);
+                ImGui::TextUnformatted(entity_archetype_string.c_str());
                 ImGui::EndPopup();
               }
+              if constexpr (sizeof...(tp_indices) > 0)
+                a_this(std::index_sequence<tp_indices...> {});
+              else
+                return;
+            } else {
+              if (entity_archetype_record == ecs::ecs_subsystem_st::entity_archetype_map.end())
+                return;
+
+              using component_t = std::tuple_element_t<tp_index - 1, component_tuple_t>;
+
+              ImGui::TableSetColumnIndex(tp_index);
+
+              const auto archetype_component_index
+                = entity_archetype_record->second.m_archetype->component_index(component_t::index);
+              if (archetype_component_index != ecs::null_archetype_component_index) {
+                const auto component_vector_ptr = std::bit_cast<vector_t<component_t>*>(
+                  &entity_archetype_record->second.m_archetype->m_component_data[archetype_component_index].m_data);
+                const auto component_data_ptr = component_vector_ptr->operator[](entity_archetype_record->second.m_entity_index);
+                const auto component_data_string = format_component_data(component_data_ptr);
+                dear_imgui_ct::centered_text(component_data_string);
+                ImGui::OpenPopupOnItemClick(std::bit_cast<const char*>(&component_data_ptr), ImGuiPopupFlags_MouseButtonLeft);
+                if (ImGui::BeginPopup(std::bit_cast<const char*>(&component_data_ptr))) {
+                  const auto component_archetype_string
+                    = std::format("located in archetype:\n\tindex: {0}\n\tcomponent hash: {1}\n\tcomponent column: {2}",
+                                  entity_archetype_record->second.m_archetype->index(),
+                                  entity_archetype_record->second.m_archetype->component_hash(),
+                                  archetype_component_index);
+                  ImGui::TextUnformatted(component_archetype_string.c_str());
+                  ImGui::EndPopup();
+                }
+              }
+
+              if constexpr (sizeof...(tp_indices) > 0)
+                a_this(std::index_sequence<tp_indices...> {});
             }
-
-            if constexpr (sizeof...(tp_indices) > 0)
-              a_this(std::index_sequence<tp_indices...> {});
+          };
+          for (auto i = ecs::archetype_entity_index_t {0}; i < ecs::ecs_subsystem_st::entity_archetype_map.size(); ++i) {
+            ImGui::TableNextRow();
+            lambda(std::make_index_sequence<component_count + 1> {});
           }
-        };
-        for (auto i = ecs::archetype_entity_index_t {0}; i < ecs::ecs_subsystem_st::entity_archetype_map.size(); ++i) {
-          ImGui::TableNextRow();
-          lambda(std::make_index_sequence<component_count + 1> {});
-        }
 
-        ImGui::EndTable();
+          ImGui::EndTable();
+        }
       }
       ImGui::EndChild();
 
