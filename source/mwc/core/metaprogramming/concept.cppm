@@ -18,17 +18,18 @@ export namespace mwc {
 
     // concept modeling [end] terminated enumerator types with strictly and steadily increasing monotonic values
     template <typename tp>
-    concept steady_monotonic_enum_c =
-      end_terminated_enum_c<tp> and requires {
-                                      std::invoke([] {
-                                        for (auto i = std::underlying_type_t<tp> {0}; i < std::to_underlying(tp::end); ++i)
-                                          [[maybe_unused]]
-                                          const auto enumerator = tp {i};
-                                      });
-                                    };
+    concept steady_monotonic_enum_c
+      = end_terminated_enum_c<tp> and requires {
+                                        std::invoke([] {
+                                          for (auto i = std::underlying_type_t<tp> {0}; i < std::to_underlying(tp::end); ++i)
+                                            [[maybe_unused]]
+                                            const auto enumerator = tp {i};
+                                        });
+                                      };
     // concept modeling boolean or boolean convertible types
     template <typename tp>
-    concept boolean_c = std::is_same_v<tp, bool_t> or std::is_convertible_v<tp, bool_t>;
+    concept boolean_c = std::is_same_v<tp, bool_t> or std::is_convertible_v<tp, bool_t> or std::convertible_to<tp, bool_t>
+                     or std::is_same_v<decltype(std::declval<tp>().operator()), bool_t> or std::declval<tp>().operator bool();
 
     // concept modeling standard ratios
     template <typename tp>

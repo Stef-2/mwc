@@ -17,11 +17,11 @@ namespace mwc {
           const auto& device = a_vulkan_object.getDevice();
           const auto handle_id = reinterpret_cast<uintptr_t>(static_cast<tp::CType>(*a_vulkan_object));
 
-          const auto debug_utils_object_name_info =
-            vk::DebugUtilsObjectNameInfoEXT {tp::objectType, handle_id, a_debug_name.data()};
+          const auto debug_utils_object_name_info
+            = vk::DebugUtilsObjectNameInfoEXT {tp::objectType, handle_id, a_debug_name.data()};
 
           const auto result = device.setDebugUtilsObjectNameEXT(debug_utils_object_name_info);
-          contract_assert(result == vk::Result::eSuccess);
+          contract_assert(bool {result == vk::Result::eSuccess});
         }
       }
     }

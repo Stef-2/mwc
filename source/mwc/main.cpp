@@ -27,7 +27,7 @@ int main() {
   //std::print("test {0}", std::string_view {"bro pl"});
   using namespace mwc::ecs;
   mwc::initialize_subsystems();
-
+  /*
   const auto xxx = mwc::input::read_scene_file("/home/billy/dev/mwc/data/mesh/cube.glb");
   const auto& scene = mwc::input::input_subsystem_st::filesystem_st::scene_registry[0];
   std::cout << scene.m_meshes.back().m_vertex_storage.size() / scene.m_meshes.back().m_vertex_model_size << '\n';
@@ -50,7 +50,7 @@ int main() {
     std::cout << node.m_data.m_transformation << '\n';
     std::cout << node.m_data.m_mesh_index << '\n';
   }
-
+*/
   const auto comp = test0 {};
   const auto e = entity_ct {test2 {.c = 'b'}, comp, test1 {.f = 6.4f}};
   const auto e2 = mwc::ecs::generate_entity<test2, test0, test1>(test2 {.c = 'a'}, test0 {.i = {222, 442}}, test1 {.f = 1.42f});

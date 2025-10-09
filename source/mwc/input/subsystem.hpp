@@ -3,17 +3,15 @@
 #include "mwc/core/contract/definition.hpp"
 
 #include "mwc/core/diagnostic/log/subsystem.hpp"
-#include "mwc/core/chrono/subsystem.hpp"
-#include "mwc/core/memory/virtual_allocator.hpp"
-#include "mwc/core/container/data_span.hpp"
-#include "data/scene/scene.hpp"
 #include "mwc/window/subsystem.hpp"
-
-#include <stb/stb_image.h>
+#include "mwc/core/chrono/subsystem.hpp"
+#include "mwc/core/container/data_span.hpp"
+#include "mwc/graphics/vulkan/suballocated_memory_mapped_buffer.hpp"
+#include "mwc/input/data/scene/scene.hpp"
 
 import mwc_definition;
 import mwc_subsystem;
-//import mwc_enum_bitwise_operators;
+import mwc_input_resource;
 import mwc_optional;
 import mwc_host_mesh;
 import mwc_geometry;
@@ -55,20 +53,15 @@ namespace mwc {
 
           resource_processing_configuration_st m_mesh_processing;
           resource_processing_configuration_st m_image_processing;
-          obs_ptr_t<virtual_allocator_ct> m_virtual_allocator;
+          obs_ptr_t<graphics::vulkan::suballocated_memory_mapped_buffer_ct> m_device_buffer;
         };
-        struct processed_resources_st {
-          struct resource_data_t {
-            void_data_span_st m_memory_mapped_device_data;
-            obs_ptr_t<resource_st> m_resource;
-          };
+        struct resource_device_memory_st {
+          using suballocation_t = graphics::vulkan::suballocated_memory_mapped_buffer_ct::suballocation_t<byte_t>;
 
-          resource_data_t m_mesh_data;
-          resource_data_t m_image_data;
+          suballocation_t m_memory_mapped_device_mesh_data;
+          suballocation_t m_memory_mapped_device_image_data;
+          size_t m_source_scene_index;
         };
-        using scene_hash_t = decltype([](const scene_st& a_scene) { return std::hash<resource_name_t> {}(a_scene.m_name); });
-        using scene_equality_t
-          = decltype([](const scene_st& a_scene_x, const scene_st& a_scene_y) { return a_scene_x.m_name == a_scene_y.m_name; });
         static inline auto gltf_parser = fastgltf::Parser {};
         static inline auto scene_registry = vector_t<scene_st> {};
         //static inline auto shader_registry = unordered_set_t<shader_source_st> {};
@@ -80,7 +73,7 @@ namespace mwc {
     auto read_scene_file(const file_path_t& a_filepath,
                          const input_subsystem_st::filesystem_st::scene_read_configuration_st& a_configuration
                          = input_subsystem_st::filesystem_st::scene_read_configuration_st::default_configuration())
-      -> std::optional<input_subsystem_st::filesystem_st::processed_resources_st>;
+      -> optional_t<input_subsystem_st::filesystem_st::resource_device_memory_st>;
 
     namespace global {
       inline auto input_subsystem = input_subsystem_st {

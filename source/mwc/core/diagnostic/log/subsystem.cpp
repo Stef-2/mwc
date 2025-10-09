@@ -1,5 +1,9 @@
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 
+import mwc_event_severity;
+import mwc_output_stream;
+import mwc_chrono;
+
 namespace mwc {
   namespace diagnostic {
     namespace log {

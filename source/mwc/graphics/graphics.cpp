@@ -105,7 +105,8 @@ namespace mwc {
       scene_cfg.m_mesh_processing.m_propagate_to_device_memory = &m_common_buffer.virtual_allocator();
       scene_cfg.m_image_processing.m_propagate_to_device_memory = &m_common_buffer.virtual_allocator();
 
-      input::read_scene_file("/home/billy/dev/mwc/data/mesh/Untitled.glb");
+      input::read_scene_file("/home/billy/dev/mwc/data/mesh/Untitled.glb",
+                             {{false, true, true}, {false, true, true}, &m_common_buffer});
 
       auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
       const auto& cmd = frame_data.m_command_buffer;

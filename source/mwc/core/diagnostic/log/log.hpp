@@ -53,7 +53,11 @@ namespace mwc {
       // type erased internal sink structure
       struct sink_st {
         // note: consider using std::variant instead of type erasure
-        enum class sink_et : uint8_t { e_ostream, e_string, e_file };
+        enum class sink_et : uint8_t {
+          e_ostream,
+          e_string,
+          e_file
+        };
 
         constexpr sink_st(const sink_c auto a_sink,
                           optional_t<event_severity_et> a_event_severity = configuration_st::default_severity_level,
