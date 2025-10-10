@@ -12,7 +12,6 @@ export namespace mwc {
       using storage_t = vector_t<spir_v_bytecode_t>;
 
       storage_t m_data;
-      shader_source_st::shader_stage_t m_stage;
     };
   }
 }

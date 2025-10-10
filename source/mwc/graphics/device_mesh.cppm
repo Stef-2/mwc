@@ -2,21 +2,19 @@ module;
 
 #include "mwc/graphics/vulkan/buffer.hpp"
 
-export module mwc_mesh;
+export module mwc_device_mesh;
 
+import mwc_observer_ptr;
 import mwc_vertex_model;
-import mwc_bit_mask;
+import mwc_host_mesh;
 
 import vulkan_hpp;
 
 export namespace mwc {
   namespace graphics {
-    struct mesh_st {
+    struct device_mesh_st {
       vulkan::buffer_region_st m_vertex_buffer;
-      bit_mask_t<geometry::vertex_component_bit_mask_et> m_vertex_component_bit_mask;
-      size_t m_vertex_model_size;
       vulkan::buffer_region_st m_index_buffer;
-      vk::IndexType m_index_type;
     };
   }
 }

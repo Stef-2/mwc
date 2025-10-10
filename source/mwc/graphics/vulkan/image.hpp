@@ -25,6 +25,7 @@ namespace mwc {
           vma::AllocationCreateInfo m_allocation_create_info;
         };
 
+        using handle_ct::handle_ct;
         image_ct(const logical_device_ct& a_logical_device, const memory_allocator_ct& a_memory_allocator,
                  const configuration_st& a_configuration = configuration_st::default_configuration());
 

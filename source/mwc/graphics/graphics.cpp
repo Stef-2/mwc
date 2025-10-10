@@ -102,11 +102,10 @@ namespace mwc {
       m_camera {camera_ct::configuration_st<camera_projection_et::e_perspective>::default_configuration()},
       m_configuration {a_configuration} {
       auto scene_cfg = input::input_subsystem_st::filesystem_st::scene_read_configuration_st::default_configuration();
-      scene_cfg.m_mesh_processing.m_propagate_to_device_memory = &m_common_buffer.virtual_allocator();
-      scene_cfg.m_image_processing.m_propagate_to_device_memory = &m_common_buffer.virtual_allocator();
+      scene_cfg.m_device_buffer = &m_common_buffer;
 
-      input::read_scene_file("/home/billy/dev/mwc/data/mesh/Untitled.glb",
-                             {{false, true, true}, {false, true, true}, &m_common_buffer});
+      const auto suballocations = input::read_scene_file("/home/billy/dev/mwc/data/mesh/Untitled.glb",
+                                                         {{false, true, true}, {false, true, true}, &m_common_buffer});
 
       auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
       const auto& cmd = frame_data.m_command_buffer;
@@ -118,7 +117,7 @@ namespace mwc {
       const auto it = mwc::input::input_subsystem_st::filesystem_st::scene_registry.begin();
       if (it != input::input_subsystem_st::filesystem_st::scene_registry.end()) {
         cmd.begin(vk::CommandBufferBeginInfo {vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-        record_mesh_data_transfer_to_device((*it).m_meshes, cmd);
+        //record_mesh_data_transfer_to_device((*it).m_meshes[0].m_host_mesh, cmd);
         cmd.end();
         vk::CommandBufferSubmitInfo submit_info {*cmd};
         m_graphics_queue->submit2(vk::SubmitInfo2 {vk::SubmitFlags {}, {}, submit_info, {}});

@@ -64,15 +64,14 @@ namespace mwc {
         };
         static inline auto gltf_parser = fastgltf::Parser {};
         static inline auto scene_registry = vector_t<scene_st> {};
-        //static inline auto shader_registry = unordered_set_t<shader_source_st> {};
       };
     };
 
-    auto read_text_file(const file_path_t& a_filepath) -> string_t;
-    auto read_binary_file(const file_path_t& a_filepath) -> vector_t<byte_t>;
-    auto read_scene_file(const file_path_t& a_filepath,
-                         const input_subsystem_st::filesystem_st::scene_read_configuration_st& a_configuration
-                         = input_subsystem_st::filesystem_st::scene_read_configuration_st::default_configuration())
+    [[nodiscard]] auto read_text_file(const file_path_t& a_filepath) -> string_t;
+    [[nodiscard]] auto read_binary_file(const file_path_t& a_filepath) -> vector_t<byte_t>;
+    [[nodiscard]] auto read_scene_file(const file_path_t& a_filepath,
+                                       const input_subsystem_st::filesystem_st::scene_read_configuration_st& a_configuration
+                                       = input_subsystem_st::filesystem_st::scene_read_configuration_st::default_configuration())
       -> optional_t<input_subsystem_st::filesystem_st::resource_device_memory_st>;
 
     namespace global {
@@ -89,7 +88,8 @@ namespace mwc {
                                                 .m_preserve_in_host_memory = true,
                                                 .m_propagate_to_device_memory = true};
       return scene_read_configuration_st {.m_mesh_processing = resource_processing_configuration,
-                                          .m_image_processing = resource_processing_configuration};
+                                          .m_image_processing = resource_processing_configuration,
+                                          .m_device_buffer = nullptr};
     }
   }
 }

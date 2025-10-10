@@ -36,14 +36,21 @@ export namespace mwc {
     struct static_resource_information_st {};
 
     struct resource_st {
-      resource_st(const file_path_t& a_filepath, const string_view_t a_name = "",
+      static constexpr auto null_resource_index = resource_index_t {0};
+      static inline constinit auto index = resource_index_t {null_resource_index + 1};
+      static constexpr auto next_index() -> resource_index_t {
+        return index++;
+      }
+
+      resource_st(const file_path_t& a_filepath, const string_view_t a_name = {""}, const resource_index_t a_index = next_index(),
                   const resource_linkage_et a_linkage = resource_linkage_et::e_internal,
                   const bit_mask_t<resource_bit_flags_et> a_bit_flags = {})
       : m_source_filepath {a_filepath},
         m_name {a_name.empty() ? a_filepath.filename().string() : a_name},
         m_modification_time {std::filesystem::last_write_time(a_filepath).time_since_epoch()},
         m_linkage {a_linkage},
-        m_bit_flags {a_bit_flags} {}
+        m_bit_flags {a_bit_flags},
+        m_index {a_index} {}
 
       auto operator<=>(const resource_st& a_other) const {
         return m_name <=> a_other.m_name;
@@ -54,10 +61,7 @@ export namespace mwc {
       resource_modification_time_t m_modification_time;
       resource_linkage_et m_linkage;
       bit_mask_t<resource_bit_flags_et> m_bit_flags;
+      resource_index_t m_index;
     };
-
-    void test(file_path_t a_filepath) {
-      std::format("{0}", a_filepath.string());
-    }
   }
 }

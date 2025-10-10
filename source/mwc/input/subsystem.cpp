@@ -53,6 +53,7 @@ namespace mwc {
           and not a_configuration.m_image_processing.m_propagate_to_device_memory)
         warning(std::format("scene read from {0} is not configured for image processing", a_filepath.c_str()));
 
+      // scene configured for device memory processing should have a virtual memory suballocator provided and vice versa
       const auto device_memory_processing_requested = a_configuration.m_mesh_processing.m_propagate_to_device_memory
                                                    or a_configuration.m_image_processing.m_propagate_to_device_memory;
       if (device_memory_processing_requested and not a_configuration.m_device_buffer)
@@ -80,13 +81,13 @@ namespace mwc {
       native_scene.m_meshes.reserve(asset.meshes.size());
       native_scene.m_images.reserve(asset.images.size());
 
-      auto resources_device_memory = optional_t<input_subsystem_st::filesystem_st::resource_device_memory_st> {};
+      auto scene_resources_device_memory = optional_t<input_subsystem_st::filesystem_st::resource_device_memory_st> {};
       if (device_memory_processing_requested)
-        resources_device_memory = input_subsystem_st::filesystem_st::resource_device_memory_st {};
+        scene_resources_device_memory = input_subsystem_st::filesystem_st::resource_device_memory_st {};
 
       // initial mesh processing
-      constexpr auto index_byte_size
-        = sizeof(typename decltype(native_scene)::mesh_storage_t::value_type::index_storage_t::value_type);
+      using index_t = std::remove_cvref_t<decltype(native_scene.m_meshes.front().m_host_mesh.m_index_storage.front())>;
+      constexpr auto index_byte_count = sizeof(index_t);
       auto mesh_accessor_offset_pairs = vector_t<pair_t<const fastgltf::Accessor*, size_t>> {};
       mesh_accessor_offset_pairs.reserve(
         utility::enum_range<geometry::vertex_component_bit_mask_et>().size() * asset.meshes.size());
@@ -107,27 +108,30 @@ namespace mwc {
             if (attribute == primitive.attributes.cend())
               continue;
 
-            mesh_accessor_offset_pairs.emplace_back(&asset.accessors[attribute->accessorIndex], native_mesh.m_vertex_model_size);
-            native_mesh.m_vertex_model_size += geometry::vertex_component_size(native_vertex_component);
-            native_mesh.m_vertex_component_bit_mask |= component;
+            mesh_accessor_offset_pairs.emplace_back(&asset.accessors[attribute->accessorIndex],
+                                                    native_mesh.m_host_mesh.m_vertex_model_size);
+            native_mesh.m_host_mesh.m_vertex_model_size += geometry::vertex_component_size(native_vertex_component);
+            native_mesh.m_host_mesh.m_vertex_component_bit_mask |= component;
           }
         }
-        native_mesh.m_vertex_count = mesh_accessor_offset_pairs.back().first->count;
-        native_mesh.m_index_count = asset.accessors[mesh.primitives.front().indicesAccessor.value()].count;
+        native_mesh.m_host_mesh.m_vertex_count = mesh_accessor_offset_pairs.back().first->count;
+        native_mesh.m_host_mesh.m_index_count = asset.accessors[mesh.primitives.front().indicesAccessor.value()].count;
 
         if (a_configuration.m_mesh_processing.m_preserve_in_host_memory) {
-          native_mesh.m_vertex_storage.resize(native_mesh.m_vertex_model_size * native_mesh.m_vertex_count);
-          native_mesh.m_index_storage.resize(native_mesh.m_index_count);
+          native_mesh.m_host_mesh.m_vertex_storage.resize(
+            native_mesh.m_host_mesh.m_vertex_model_size * native_mesh.m_host_mesh.m_vertex_count);
+          native_mesh.m_host_mesh.m_index_storage.resize(native_mesh.m_host_mesh.m_index_count);
 
-          static_assert(sizeof(typename std::remove_cvref_t<decltype(native_mesh)>::vertex_storage_t::value_type)
+          static_assert(sizeof(typename std::remove_cvref_t<decltype(native_mesh.m_host_mesh)>::vertex_storage_t::value_type)
                         == sizeof(byte_t));
-          mesh_data_byte_count += native_mesh.m_vertex_storage.size() + native_mesh.m_index_storage.size() * index_byte_size;
+          mesh_data_byte_count += native_mesh.m_host_mesh.m_vertex_storage.size()
+                                + native_mesh.m_host_mesh.m_index_storage.size() * index_byte_count;
         }
-        native_mesh.m_aabb = geometry::aabb_st {.m_min = {0.0, 0.0, 0.0}, .m_max = {0.0, 0.0, 0.0}};
+        native_mesh.m_host_mesh.m_aabb = geometry::aabb_st {.m_min = {0.0, 0.0, 0.0}, .m_max = {0.0, 0.0, 0.0}};
       }
       // generate a virtual suballocation for transfer to device memory
       if (a_configuration.m_mesh_processing.m_propagate_to_device_memory) {
-        resources_device_memory.value().m_memory_mapped_device_mesh_data
+        scene_resources_device_memory.value().m_memory_mapped_device_mesh_data
           = a_configuration.m_device_buffer->request_suballocation<byte_t>(mesh_data_byte_count);
       }
       // transfer mesh data
@@ -139,34 +143,36 @@ namespace mwc {
         // write vertex component data
         static_for_loop<0, std::tuple_size_v<vertex_component_tuple_t>>([&a_configuration,
                                                                          &asset,
-                                                                         &resources_device_memory,
+                                                                         &scene_resources_device_memory,
                                                                          &mesh_accessor_offset_pairs,
                                                                          &native_mesh,
                                                                          &accessor_index,
                                                                          &device_memory_offset]<size_t tp_index> {
-          if (native_mesh.m_vertex_component_bit_mask bitand utility::set_bit<tp_index + 1>()) {
-            fastgltf::iterateAccessorWithIndex<typename std::tuple_element_t<tp_index, vertex_component_tuple_t>::array_t>(
+          if (native_mesh.m_host_mesh.m_vertex_component_bit_mask bitand utility::set_bit<tp_index + 1>()) {
+            using component_t = typename std::tuple_element_t<tp_index, vertex_component_tuple_t>::array_t;
+            fastgltf::iterateAccessorWithIndex<component_t>(
               asset,
               *mesh_accessor_offset_pairs[accessor_index].first,
               [&](const auto& a_component, const size_t a_index) {
                 const auto data_offset
-                  = a_index * native_mesh.m_vertex_model_size + mesh_accessor_offset_pairs[accessor_index].second;
+                  = a_index * native_mesh.m_host_mesh.m_vertex_model_size + mesh_accessor_offset_pairs[accessor_index].second;
                 // transfer to host memory
                 if (a_configuration.m_mesh_processing.m_preserve_in_host_memory) {
-                  std::memcpy(native_mesh.m_vertex_storage.data() + data_offset, &a_component, sizeof(a_component));
+                  std::memcpy(native_mesh.m_host_mesh.m_vertex_storage.data() + data_offset, &a_component, sizeof(a_component));
                 }
                 // transfer to device memory
                 if (a_configuration.m_mesh_processing.m_propagate_to_device_memory) {
-
-                  std::memcpy(resources_device_memory.value().m_memory_mapped_device_mesh_data.data() + data_offset
+                  std::memcpy(scene_resources_device_memory.value().m_memory_mapped_device_mesh_data.data() + data_offset
                                 + device_memory_offset,
                               &a_component,
                               sizeof(a_component));
                 }
                 // generate bounding boxes
                 if constexpr (std::is_same_v<std::tuple_element_t<tp_index, vertex_component_tuple_t>, vertex_position_st>) {
-                  native_mesh.m_aabb.m_min = native_mesh.m_aabb.m_min.cwiseMin(position_t<> {a_component.data()});
-                  native_mesh.m_aabb.m_max = native_mesh.m_aabb.m_max.cwiseMax(position_t<> {a_component.data()});
+                  native_mesh.m_host_mesh.m_aabb.m_min
+                    = native_mesh.m_host_mesh.m_aabb.m_min.cwiseMin(position_t<> {a_component.data()});
+                  native_mesh.m_host_mesh.m_aabb.m_max
+                    = native_mesh.m_host_mesh.m_aabb.m_max.cwiseMax(position_t<> {a_component.data()});
                 }
               });
             ++accessor_index;
@@ -174,19 +180,18 @@ namespace mwc {
         });
         // write vertex index data
         if (a_configuration.m_mesh_processing.m_preserve_in_host_memory) {
-          fastgltf::copyFromAccessor<decltype(native_scene)::mesh_storage_t::value_type::index_storage_t::value_type>(
-            asset,
-            asset.accessors[asset.meshes[i].primitives.front().indicesAccessor.value()],
-            native_mesh.m_index_storage.data());
+          fastgltf::copyFromAccessor<index_t>(asset,
+                                              asset.accessors[asset.meshes[i].primitives.front().indicesAccessor.value()],
+                                              native_mesh.m_host_mesh.m_index_storage.data());
         }
         if (a_configuration.m_mesh_processing.m_propagate_to_device_memory) {
-          device_memory_offset += native_mesh.m_vertex_count * native_mesh.m_vertex_model_size;
-          const auto destination = resources_device_memory.value().m_memory_mapped_device_mesh_data.data() + device_memory_offset;
-          fastgltf::copyFromAccessor<decltype(native_scene)::mesh_storage_t::value_type::index_storage_t::value_type>(
-            asset,
-            asset.accessors[asset.meshes[i].primitives.front().indicesAccessor.value()],
-            destination);
-          device_memory_offset += native_mesh.m_index_count * index_byte_size;
+          device_memory_offset += native_mesh.m_host_mesh.m_vertex_count * native_mesh.m_host_mesh.m_vertex_model_size;
+          const auto destination
+            = scene_resources_device_memory.value().m_memory_mapped_device_mesh_data.data() + device_memory_offset;
+          fastgltf::copyFromAccessor<index_t>(asset,
+                                              asset.accessors[asset.meshes[i].primitives.front().indicesAccessor.value()],
+                                              destination);
+          device_memory_offset += native_mesh.m_host_mesh.m_index_count * index_byte_count;
         }
       }
 
@@ -201,10 +206,10 @@ namespace mwc {
         for (const auto& child_index : asset.nodes[a_parent_index].children) {
           const auto& child_node = asset.nodes[child_index];
           const auto transformation_matrix = fastgltf::getTransformMatrix(child_node);
-          const auto mesh_index = child_node.meshIndex ? child_node.meshIndex.value() : scene_st::node_data_st::null_mesh_index;
+          const auto mesh_index = child_node.meshIndex ? child_node.meshIndex.value() : resource_st::null_resource_index;
           native_scene.m_nodes.insert_node(
             scene_st::node_data_st {.m_transformation = *std::bit_cast<geometry::transformation_t<>*>(&transformation_matrix),
-                                    .m_mesh_index = static_cast<scene_st::node_data_st::index_t>(mesh_index)},
+                                    .m_resource_index = static_cast<resource_index_t>(mesh_index)},
             a_parent_index);
 
           // call recursively
@@ -215,18 +220,18 @@ namespace mwc {
       for (auto i = 0uz; i < root_node_count; ++i) {
         const auto& root_node = asset.nodes[gltf_scene.nodeIndices[i]];
         const auto transformation_matrix = fastgltf::getTransformMatrix(root_node);
-        const auto mesh_index = root_node.meshIndex ? root_node.meshIndex.value() : scene_st::node_data_st::null_mesh_index;
+        const auto mesh_index = root_node.meshIndex ? root_node.meshIndex.value() : resource_st::null_resource_index;
         native_scene.m_nodes.insert_node(
           scene_st::node_data_st {.m_transformation = *std::bit_cast<geometry::transformation_t<>*>(&transformation_matrix),
-                                  .m_mesh_index = static_cast<scene_st::node_data_st::index_t>(mesh_index)},
+                                  .m_resource_index = static_cast<resource_index_t>(mesh_index)},
           gltf_scene.nodeIndices[i]);
         iterate_node_hierarchy(gltf_scene.nodeIndices[i]);
       }
       contract_assert(native_scene.m_nodes.node_count() == asset.nodes.size());
 
-      auto raw_image_data = vector_t<span_t<byte_t>> {};
-      auto raw_image_data_byte_count = size_t {0};
-      raw_image_data.reserve(asset.images.size());
+      auto processed_image_data = vector_t<span_t<byte_t>> {};
+      auto processed_image_data_byte_count = size_t {0};
+      processed_image_data.reserve(asset.images.size());
 
       // initial image processing
       for (auto& gltf_image : asset.images) {
@@ -237,48 +242,57 @@ namespace mwc {
 
         auto& gltf_buffer = asset.buffers[gltf_buffer_view.bufferIndex].data;
         contract_assert(std::holds_alternative<fastgltf::sources::Array>(gltf_buffer));
-        auto& byte_array = std::get<fastgltf::sources::Array>(gltf_buffer).bytes;
 
-        auto data = span_t<byte_t> {byte_array.begin() + gltf_buffer_view.byteOffset, gltf_buffer_view.byteLength};
+        auto& gltf_byte_array = std::get<fastgltf::sources::Array>(gltf_buffer).bytes;
+        auto crude_image_data
+          = span_t<byte_t> {gltf_byte_array.begin() + gltf_buffer_view.byteOffset, gltf_buffer_view.byteLength};
+        auto native_image = image_st {resource_st {a_filepath, gltf_image.name}};
+        native_image.m_host_image.m_data_byte_count = crude_image_data.size_bytes();
 
-        auto image = dynamic_image_st {resource_st {a_filepath, gltf_image.name}};
+        const auto processed_image_bytes = std::bit_cast<obs_ptr_t<byte_t>>(
+          stbi_load_from_memory(std::bit_cast<const stbi_uc*>(crude_image_data.data()),
+                                crude_image_data.size(),
+                                std::bit_cast<int*>(&native_image.m_host_image.m_width),
+                                std::bit_cast<int*>(&native_image.m_host_image.m_height),
+                                std::bit_cast<int*>(&native_image.m_host_image.m_channel_count),
+                                requested_channel_count));
 
-        const auto image_bytes
-          = std::bit_cast<obs_ptr_t<byte_t>>(stbi_load_from_memory(std::bit_cast<const stbi_uc*>(data.data()),
-                                                                   data.size(),
-                                                                   std::bit_cast<int*>(&image.m_width),
-                                                                   std::bit_cast<int*>(&image.m_height),
-                                                                   std::bit_cast<int*>(&image.m_channel_count),
-                                                                   requested_channel_count));
+        contract_assert(processed_image_bytes);
+        processed_image_data.emplace_back(processed_image_bytes, crude_image_data.size_bytes());
+        processed_image_data_byte_count += crude_image_data.size_bytes();
 
-        contract_assert(image_bytes);
-        raw_image_data.emplace_back(image_bytes, data.size_bytes());
-        raw_image_data_byte_count += data.size_bytes();
-
-        //stbi_image_free(image_bytes);
-
-        native_scene.m_images.emplace_back(resource_st {a_filepath, gltf_image.name});
+        native_scene.m_images.emplace_back(std::move(native_image));
       }
       // generate a virtual suballocation for transfer to device memory
       if (a_configuration.m_image_processing.m_propagate_to_device_memory) {
-        resources_device_memory.value().m_memory_mapped_device_image_data
-          = a_configuration.m_device_buffer->request_suballocation<byte_t>(raw_image_data_byte_count);
+        scene_resources_device_memory.value().m_memory_mapped_device_image_data
+          = a_configuration.m_device_buffer->request_suballocation<byte_t>(processed_image_data_byte_count);
       }
       // transfer image data
-      for (auto i = 0uz; i < native_scene.m_images.size(); ++i) {
+      for (auto i = 0uz, device_memory_offset = 0uz; i < native_scene.m_images.size(); ++i) {
         // transfer to host memory
         if (a_configuration.m_image_processing.m_preserve_in_host_memory) {
-          native_scene.m_images[i].m_data.resize(raw_image_data[i].size_bytes());
-          std::memcpy(native_scene.m_images[i].m_data.data(), raw_image_data[i].data(), raw_image_data[i].size_bytes());
+          native_scene.m_images[i].m_host_image.m_data.resize(native_scene.m_images[i].m_host_image.m_data_byte_count);
+          std::memcpy(native_scene.m_images[i].m_host_image.m_data.data(),
+                      processed_image_data[i].data(),
+                      processed_image_data[i].size_bytes());
         }
+        // transfer to device memory
         if (a_configuration.m_image_processing.m_propagate_to_device_memory) {
+          std::memcpy(scene_resources_device_memory.value().m_memory_mapped_device_image_data.data() + device_memory_offset,
+                      processed_image_data[i].data(),
+                      processed_image_data[i].size_bytes());
+          device_memory_offset += processed_image_data[i].size_bytes();
         }
-        stbi_image_free(raw_image_data[i].data());
+        stbi_image_free(processed_image_data[i].data());
       }
 
-      input_subsystem_st::filesystem_st::scene_registry.emplace_back(native_scene);
+      input_subsystem_st::filesystem_st::scene_registry.emplace_back(std::move(native_scene));
+      if (device_memory_processing_requested) {
+        scene_resources_device_memory.value().m_source_scene_index = input_subsystem_st::filesystem_st::scene_registry.size() - 1;
+      }
 
-      return {};
+      return scene_resources_device_memory;
     }
   }
 }

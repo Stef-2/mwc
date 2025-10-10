@@ -1,12 +1,11 @@
 #pragma once
 
 #include "mwc/core/container/contiguous_node_tree.hpp"
-#include "mwc/ecs/definition.hpp"
+#include "mwc/input/data/scene/mesh.hpp"
+#include "mwc/input/data/scene/image/image.hpp"
 
 import mwc_definition;
 import mwc_geometry;
-import mwc_host_mesh;
-import mwc_input_image;
 
 import std;
 
@@ -14,16 +13,12 @@ namespace mwc {
   namespace input {
     struct scene_st {
       struct node_data_st {
-        using index_t = uint16_t;
-
-        static constexpr auto null_mesh_index = std::numeric_limits<index_t>::max();
-
         geometry::transformation_t<> m_transformation;
-        index_t m_mesh_index;
+        resource_index_t m_resource_index;
       };
-      using mesh_storage_t = vector_t<dynamic_host_mesh_st>;
-      using node_storage_t = contiguous_node_tree_ct<node_data_st, node_data_st::index_t>;
-      using image_storage_t = vector_t<dynamic_image_st>;
+      using mesh_storage_t = vector_t<mesh_st>;
+      using node_storage_t = contiguous_node_tree_ct<node_data_st, resource_index_t>;
+      using image_storage_t = vector_t<image_st>;
 
       mesh_storage_t m_meshes;
       node_storage_t m_nodes;
