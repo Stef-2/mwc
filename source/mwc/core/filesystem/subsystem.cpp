@@ -62,7 +62,7 @@ namespace mwc {
     auto file_subsystem_st::finalize() -> void {
       m_initialized = false;
     }
-    auto directory(const directory_et a_directory) -> file_path_t {
+    auto directory(const directory_et a_directory) -> const file_path_t& {
       return file_subsystem_st::directory_map[a_directory];
     }
     auto directory(const string_view_t a_directory) -> file_path_t {
@@ -72,6 +72,12 @@ namespace mwc {
 
       std::unreachable();
       contract_assert(false);
+    }
+    auto last_write_time(const file_path_t& a_filepath) -> time_point_t {
+      const auto duration
+        = std::chrono::duration_cast<time_point_t::duration>(std::filesystem::last_write_time(a_filepath).time_since_epoch());
+
+      return time_point_t {} + duration;
     }
   }
 }

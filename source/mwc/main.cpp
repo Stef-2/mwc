@@ -8,6 +8,7 @@
 #include "mwc/ecs/subsystem.hpp"
 #include "mwc/ecs/archetype.hpp"
 #include "mwc/input/subsystem.hpp"
+#include "mwc/output/output.hpp"
 #include "mwc/ecs/entity.hpp"
 
 import mwc_subsystem;
@@ -25,8 +26,13 @@ import std;
 int main() {
   //p("{0}", 33);
   //std::print("test {0}", std::string_view {"bro pl"});
+  mwc::output::write_text_file("/home/billy/new_file_bro.txt", "hello world bro hello there o/");
   using namespace mwc::ecs;
   mwc::initialize_subsystems();
+  /*
+  mwc::file_path_t shader_path = mwc::filesystem::directory(mwc::filesystem::directory_et::e_shader);
+  shader_path /= "hello_world.slang";
+  mwc::input::read_shader_file(shader_path);*/
   /*
   const auto xxx = mwc::input::read_scene_file("/home/billy/dev/mwc/data/mesh/cube.glb");
   const auto& scene = mwc::input::input_subsystem_st::filesystem_st::scene_registry[0];

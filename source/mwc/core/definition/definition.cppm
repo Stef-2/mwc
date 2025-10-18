@@ -58,9 +58,9 @@ export namespace mwc {
   using high_resolution_clock_t = std::chrono::high_resolution_clock;
   using system_clock_t = std::chrono::system_clock;
   using time_point_t = std::chrono::time_point<high_resolution_clock_t>;
-  using precision_t = std::nano;
-  using integral_duration_t = std::chrono::duration<uint64_t, precision_t>;
-  using floating_duration_t = std::chrono::duration<float64_t, precision_t>;
+  using clock_precision_t = std::nano;
+  using integral_duration_t = std::chrono::duration<uint64_t, clock_precision_t>;
+  using floating_duration_t = std::chrono::duration<float64_t, clock_precision_t>;
   using default_duration_t = std::chrono::nanoseconds;
 
   // container types

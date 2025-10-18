@@ -4,8 +4,8 @@
 namespace {
   auto clamp_image_count(const mwc::graphics::vulkan::swapchain_ct::image_index_t a_image_count,
                          const mwc::graphics::vulkan::surface_ct& a_surface) {
-    const auto& surface_capabilities =
-      a_surface.capabilities().m_capabilities_chain.get<vk::SurfaceCapabilities2KHR>().surfaceCapabilities;
+    const auto& surface_capabilities
+      = a_surface.capabilities().m_capabilities_chain.get<vk::SurfaceCapabilities2KHR>().surfaceCapabilities;
 
     return std::clamp(a_image_count, surface_capabilities.minImageCount, surface_capabilities.maxImageCount);
   }
@@ -34,43 +34,45 @@ namespace mwc {
                         vk::to_string(surface_configuration.m_surface_format.surfaceFormat.colorSpace), a_surface.extent().width,
                         a_surface.extent().height, vk::to_string(surface_configuration.m_present_mode)));
 
-          const auto swapchain_create_info =
-            vk::SwapchainCreateInfoKHR {vk::SwapchainCreateFlagsKHR {},
-                                        a_surface.native_handle(),
-                                        image_count,
-                                        surface_configuration.m_surface_format.surfaceFormat.format,
-                                        surface_configuration.m_surface_format.surfaceFormat.colorSpace,
-                                        a_surface.extent(),
-                                        /*imageArrayLayers_*/ 1,
-                                        vk::ImageUsageFlags {vk::ImageUsageFlagBits::eColorAttachment},
-                                        a_configuration.m_sharing_mode,
-                                        queue_family_indices,
-                                        a_configuration.m_transform,
-                                        a_configuration.m_alpha,
-                                        surface_configuration.m_present_mode};
+          const auto swapchain_create_info
+            = vk::SwapchainCreateInfoKHR {vk::SwapchainCreateFlagsKHR {},
+                                          a_surface.native_handle(),
+                                          image_count,
+                                          surface_configuration.m_surface_format.surfaceFormat.format,
+                                          surface_configuration.m_surface_format.surfaceFormat.colorSpace,
+                                          a_surface.extent(),
+                                          /*imageArrayLayers_*/ 1,
+                                          vk::ImageUsageFlags {vk::ImageUsageFlagBits::eColorAttachment},
+                                          a_configuration.m_sharing_mode,
+                                          queue_family_indices,
+                                          a_configuration.m_transform,
+                                          a_configuration.m_alpha,
+                                          surface_configuration.m_present_mode};
 
-          auto expected = a_logical_device->createSwapchainKHR(swapchain_create_info);
-          contract_assert(expected);
+          auto swapchain = a_logical_device->createSwapchainKHR(swapchain_create_info);
+          contract_assert(swapchain.result == vk::Result::eSuccess);
 
-          return std::move(expected.value());
+          return std::move(swapchain.value);
         })},
         m_surface {a_surface},
         m_image_views {std::invoke([this, &a_surface, &a_logical_device] -> decltype(m_image_views) {
           const auto images = this->unique_handle().getImages();
+          contract_assert(images.result == vk::Result::eSuccess and not images.value.empty());
 
           auto result = decltype(m_image_views) {};
-          result.reserve(images.size());
-          m_image_views.reserve(images.size());
+          result.reserve(images.value.size());
+          m_image_views.reserve(images.value.size());
 
           // for each image in the swapchain, create image views
-          for (const auto& image : images) {
-            auto image_view_expected = a_logical_device->createImageView(
+          for (const auto& image : images.value) {
+            auto image_view = a_logical_device->createImageView(
               vk::ImageViewCreateInfo {vk::ImageViewCreateFlags {}, image, vk::ImageViewType::e2D,
                                        a_surface.configuration().m_surface_format.surfaceFormat.format, vk::ComponentMapping {},
                                        vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eColor, 0, vk::RemainingMipLevels, 0,
                                                                   vk::RemainingArrayLayers}});
 
-            result.emplace_back(std::move(image_view_expected.value()));
+            contract_assert(image_view.result == vk::Result::eSuccess);
+            result.emplace_back(std::move(image_view.value));
           }
 
           return result;
@@ -91,7 +93,7 @@ namespace mwc {
                                 a_configuration.m_depth_stencil_attachment_configuration.m_format, vk::ComponentMapping {},
                                 vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eDepth bitor vk::ImageAspectFlagBits::eStencil,
                                                            0, vk::RemainingMipLevels, 0, vk::RemainingArrayLayers}})
-                                .value()},
+                                .value},
         m_color_attachment {vk::ImageView {/*imageView_*/},
                             a_configuration.m_color_attachment_configuration.m_layout,
                             vk::ResolveModeFlagBits {},

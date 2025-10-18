@@ -25,8 +25,8 @@ namespace mwc {
       std::ranges::copy(a_initializer_list, m_storage.begin());
     }
     template <typename tp>
-    [[nodiscard]] constexpr auto operator[](this tp&& a_this, const auto a_value) -> decltype(auto)
-      requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t>;
+    [[nodiscard]] constexpr auto operator[](this tp&& a_this, const auto& a_value) -> decltype(auto)
+      requires concepts::any_of_c<std::remove_cvref_t<decltype(a_value)>, key_t, value_t>;
 
     storage_t m_storage;
   };
@@ -45,18 +45,18 @@ namespace mwc {
   }
   template <typename tp_key, typename tp_value, size_t tp_size>
   [[nodiscard]] constexpr auto
-  static_unordered_bi_map_st<tp_key, tp_value, tp_size>::operator[](this auto&& a_this, const auto a_value) -> decltype(auto)
-    requires concepts::any_of_c<decltype(a_value), const_key_t, const_value_t> {
-    if constexpr (std::is_same_v<decltype(a_value), const_key_t>) {
+  static_unordered_bi_map_st<tp_key, tp_value, tp_size>::operator[](this auto&& a_this, const auto& a_value) -> decltype(auto)
+    requires concepts::any_of_c<std::remove_cvref_t<decltype(a_value)>, key_t, value_t> {
+    if constexpr (std::is_same_v<std::remove_cvref_t<decltype(a_value)>, key_t>) {
       for (const auto& kv_pair : a_this.m_storage)
         if (kv_pair.first == a_value)
-          return kv_pair.second;
+          return std::forward_like<decltype(a_value)>(kv_pair.second);
     }
 
-    if constexpr (std::is_same_v<decltype(a_value), const_value_t>) {
+    if constexpr (std::is_same_v<std::remove_cvref_t<decltype(a_value)>, value_t>) {
       for (const auto& kv_pair : a_this.m_storage)
         if (kv_pair.second == a_value)
-          return kv_pair.first;
+          return std::forward_like<decltype(a_value)>(kv_pair.first);
     }
 
     contract_assert(false);

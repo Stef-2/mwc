@@ -5,9 +5,10 @@ namespace {
   auto select_surface_present_mode(const mwc::graphics::vulkan::physical_device_ct& a_physical_device,
                                    const mwc::graphics::vulkan::surface_ct& a_surface,
                                    vk::PresentModeKHR a_requested_present_mode) {
-    const auto available_present_modes = a_physical_device->getSurfacePresentModesKHR(a_surface.native_handle());
-    if (not std::ranges::contains(available_present_modes, a_requested_present_mode)) [[unlikely]]
-      return available_present_modes.front();
+    const auto surface_present_modes = a_physical_device->getSurfacePresentModesKHR(a_surface.native_handle());
+    contract_assert(surface_present_modes.result == vk::Result::eSuccess);
+    if (not std::ranges::contains(surface_present_modes.value, a_requested_present_mode)) [[unlikely]]
+      return surface_present_modes.value.front();
     else
       return a_requested_present_mode;
   }
@@ -32,23 +33,25 @@ namespace mwc {
           // structure chain type deduction
           auto& [... capabilities_pack] = m_capabilities.m_capabilities_chain;
           surface_information_chain.get<vk::PhysicalDeviceSurfaceInfo2KHR>().surface = this->native_handle();
-          surface_information_chain.get<vk::SurfacePresentModeEXT>().presentMode =
-            select_surface_present_mode(a_physical_device, *this, a_configuration.m_present_mode);
+          surface_information_chain.get<vk::SurfacePresentModeEXT>().presentMode
+            = select_surface_present_mode(a_physical_device, *this, a_configuration.m_present_mode);
 
-          return a_physical_device->getSurfaceCapabilities2KHR<decltype(capabilities_pack)...>(
-            surface_information_chain.get<vk::PhysicalDeviceSurfaceInfo2KHR>());
+          return a_physical_device
+            ->getSurfaceCapabilities2KHR<decltype(capabilities_pack)...>(
+              surface_information_chain.get<vk::PhysicalDeviceSurfaceInfo2KHR>())
+            .value;
         })},
         m_configuration {std::invoke([this, &a_physical_device, &a_configuration] -> configuration_st {
           const auto available_formats = a_physical_device->getSurfaceFormats2KHR(this->native_handle());
-          contract_assert(not available_formats.empty());
+          contract_assert(available_formats.result == vk::Result::eSuccess and not available_formats.value.empty());
           const auto available_present_modes = a_physical_device->getSurfacePresentModesKHR(this->native_handle());
-          contract_assert(not available_present_modes.empty());
+          contract_assert(available_present_modes.result == vk::Result::eSuccess and not available_present_modes.value.empty());
 
           auto configuration = configuration_st {a_configuration};
           // determine if the preferred surface format is supported by the physical device
           // if not, use the first available one
-          if (not std::ranges::contains(available_formats, a_configuration.m_surface_format)) {
-            const auto& first_avilable_format = available_formats.front();
+          if (not std::ranges::contains(available_formats.value, a_configuration.m_surface_format)) {
+            const auto& first_avilable_format = available_formats.value.front();
             warning(std::format("generated vulkan surface does not support the requested surface format:" SUB "format: {0}" SUB
                                 "color "
                                 "space: {1}" SUB "selecting:" SUB "format: {2}" SUB "color space: {3}",
@@ -61,8 +64,8 @@ namespace mwc {
 
           // determine if the preferred surface present mode is supported by the physical device
           // if not, use the first available one
-          const auto selected_present_mode =
-            select_surface_present_mode(a_physical_device, *this, a_configuration.m_present_mode);
+          const auto selected_present_mode
+            = select_surface_present_mode(a_physical_device, *this, a_configuration.m_present_mode);
           if (selected_present_mode != a_configuration.m_present_mode) {
             warning(std::format("generated vulkan surface does not support the requested surface present mode:" SUB ""
                                 "{0}" SUB "selecting:" SUB "{1}",

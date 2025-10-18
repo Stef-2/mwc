@@ -38,9 +38,9 @@ namespace mwc {
 
           auto expected = a_logical_device->createCommandPool(
             vk::CommandPoolCreateInfo {a_configuration.m_command_pool_create_flags, m_queue_family_index});
-          contract_assert(expected);
+          contract_assert(expected.result == vk::Result::eSuccess);
 
-          return std::move(expected.value());
+          return std::move(expected.value);
         })},
         // m_queue_family_index set by the handle constructor
         m_configuration {a_configuration} {}

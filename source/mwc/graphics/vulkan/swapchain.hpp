@@ -21,10 +21,13 @@ namespace mwc {
     namespace vulkan {
       class swapchain_ct : public handle_ct<vk::raii::SwapchainKHR> {
         public:
-        using image_index_t = decltype(std::declval<handle_t>().acquireNextImage({}).second);
+        using image_index_t = decltype(std::declval<handle_t>().acquireNextImage({}).value);
         using image_timeout_t = uint64_t;
 
-        enum class layout_state_et { e_rendering, e_presentation };
+        enum class layout_state_et {
+          e_rendering,
+          e_presentation
+        };
 
         struct configuration_st {
           static constexpr auto default_configuration() -> configuration_st;
@@ -110,12 +113,12 @@ namespace mwc {
                                                                            .m_store_operation = vk::AttachmentStoreOp::eStore},
                                                .m_layout = vk::ImageLayout::eAttachmentOptimal,
                                                .m_clear_color = vk::ClearColorValue {float32_t {1.0}, 1.0, 1.0, 1.0}},
-          .m_depth_stencil_attachment_configuration = {.m_attachment_operations = {.m_load_operation = vk::AttachmentLoadOp::eClear,
-                                                                                   .m_store_operation =
-                                                                                     vk::AttachmentStoreOp::eDontCare},
-                                                       .m_format = vk::Format::eD24UnormS8Uint,
-                                                       .m_layout = vk::ImageLayout::eAttachmentOptimal,
-                                                       .m_clear_value = vk::ClearDepthStencilValue {1.0, 1u}},
+          .m_depth_stencil_attachment_configuration
+          = {.m_attachment_operations
+             = {.m_load_operation = vk::AttachmentLoadOp::eClear, .m_store_operation = vk::AttachmentStoreOp::eDontCare},
+             .m_format = vk::Format::eD24UnormS8Uint,
+             .m_layout = vk::ImageLayout::eAttachmentOptimal,
+             .m_clear_value = vk::ClearDepthStencilValue {1.0, 1u}},
           .m_image_count = 2,
           .m_sharing_mode = vk::SharingMode::eExclusive,
           .m_transform = vk::SurfaceTransformFlagBitsKHR::eIdentity,
@@ -134,20 +137,21 @@ namespace mwc {
         constexpr auto pipeline_stage = (tp_state == layout_state_et::e_rendering) ? vk::PipelineStageFlagBits2::eTopOfPipe
                                                                                    : vk::PipelineStageFlagBits2::eBottomOfPipe;
 
-        constexpr auto color_transition_to_rendering =
-          (tp_state == layout_state_et::e_rendering) ? undefined_layout : color_layout;
-        constexpr auto depth_stencil_transition_to_rendering =
-          (tp_state == layout_state_et::e_rendering) ? undefined_layout : depth_stencil_layout;
+        constexpr auto color_transition_to_rendering
+          = (tp_state == layout_state_et::e_rendering) ? undefined_layout : color_layout;
+        constexpr auto depth_stencil_transition_to_rendering
+          = (tp_state == layout_state_et::e_rendering) ? undefined_layout : depth_stencil_layout;
 
-        constexpr auto color_transition_to_presentation =
-          (tp_state == layout_state_et::e_presentation) ? present_layout : color_layout;
-        constexpr auto depth_stencil_transition_to_presentation =
-          (tp_state == layout_state_et::e_presentation) ? present_layout : depth_stencil_layout;
+        constexpr auto color_transition_to_presentation
+          = (tp_state == layout_state_et::e_presentation) ? present_layout : color_layout;
+        constexpr auto depth_stencil_transition_to_presentation
+          = (tp_state == layout_state_et::e_presentation) ? present_layout : depth_stencil_layout;
 
         const auto barriers = array_t<vk::ImageMemoryBarrier2, 2> {
           vk::ImageMemoryBarrier2 {pipeline_stage, vk::AccessFlags2 {}, vk::PipelineStageFlagBits2::eColorAttachmentOutput,
                                    vk::AccessFlags2 {}, color_transition_to_rendering, color_transition_to_presentation,
-                                   queue_ownership, queue_ownership, this->unique_handle().getImages()[m_current_image_index],
+                                   queue_ownership, queue_ownership,
+                                   this->unique_handle().getImages().value[m_current_image_index],
                                    vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}},
           vk::ImageMemoryBarrier2 {
           pipeline_stage, vk::AccessFlags2 {},
@@ -156,8 +160,8 @@ namespace mwc {
           **m_depth_stencil_buffer,
           vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eDepth bitor vk::ImageAspectFlagBits::eStencil, 0, 1, 0, 1}}};
 
-        const auto dependency_info =
-          vk::DependencyInfo {vk::DependencyFlags {}, /*vk::MemoryBarrier2*/ {}, /*vk::BufferMemoryBarrier2*/ {}, barriers};
+        const auto dependency_info
+          = vk::DependencyInfo {vk::DependencyFlags {}, /*vk::MemoryBarrier2*/ {}, /*vk::BufferMemoryBarrier2*/ {}, barriers};
 
         a_command_buffer.pipelineBarrier2(dependency_info);
       }

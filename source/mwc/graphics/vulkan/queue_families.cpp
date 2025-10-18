@@ -27,7 +27,7 @@ namespace mwc {
           ++i;
         }
         for (auto i = family_st::index_t {0}; i < std::numeric_limits<family_st::index_t>::max(); ++i)
-          if (a_physical_device->getSurfaceSupportKHR(i, a_surface.native_handle())) {
+          if (a_physical_device->getSurfaceSupportKHR(i, a_surface.native_handle()).value) {
             m_present.m_index = i;
             break;
           }

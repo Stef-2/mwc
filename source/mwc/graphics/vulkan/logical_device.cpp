@@ -9,8 +9,8 @@ namespace {
 
     auto buffer = mwc::string_t {"initializing device queues:" SUB ""};
     constexpr auto queue_family_educated_guess_count = 4;
-    buffer.reserve(buffer.size() +
-                   queue_family_educated_guess_count * mwc::string_view_t {"generating x queues for family_count_name"}.size());
+    buffer.reserve(buffer.size()
+                   + queue_family_educated_guess_count * mwc::string_view_t {"generating x queues for family_count_name"}.size());
 
     auto queue_family_count = 0;
     // graphics queue is mandatory
@@ -60,8 +60,9 @@ namespace mwc {
                                            const queue_families_ct& a_queue_families, const configuration_st& a_configuration)
       : handle_ct {std::invoke([&a_physical_device, &a_queue_families, &a_configuration] -> handle_t {
           auto buffer = string_t {"initializing vulkan logical device:" SUB "required extensions:"};
-          buffer.reserve(buffer.size() + a_configuration.m_required_extensions.size() *
-                                           string_view_t {"[x] VK_KHR_AverageExtensionName"}.size());
+          buffer.reserve(
+            buffer.size()
+            + a_configuration.m_required_extensions.size() * string_view_t {"[x] VK_KHR_AverageExtensionName"}.size());
 
           for (auto i = 0; const auto& extension : a_configuration.m_required_extensions) {
             const auto promoted_extension = vk::isPromotedExtension(extension);
@@ -76,9 +77,11 @@ namespace mwc {
           const auto device_queue_information = generate_device_queue_information(a_queue_families);
           // assert that the device supports all of the required extensions
           const auto available_extensions = a_physical_device->enumerateDeviceExtensionProperties();
+          contract_assert(available_extensions.result == vk::Result::eSuccess and not available_extensions.value.empty());
+
           for (const auto& required_extension : a_configuration.m_required_extensions) {
             auto required_extensions_supported = false;
-            for (const auto& available_extension : available_extensions)
+            for (const auto& available_extension : available_extensions.value)
               if (std::strcmp(available_extension.extensionName, required_extension) == 0) {
                 required_extensions_supported = true;
                 break;
@@ -88,20 +91,20 @@ namespace mwc {
           }
 
           const auto& device_features = a_physical_device.features();
-          const auto logical_device_create_info =
-            vk::DeviceCreateInfo {vk::DeviceCreateFlags {},
-                                  device_queue_information,
-                                  {/* device layers are deprecated */},
-                                  a_configuration.m_required_extensions,
-                                  {/* features field is deprecated */},
-                                  std::addressof(device_features.m_default_features_chain.get<vk::PhysicalDeviceFeatures2>())};
-          auto expected = a_physical_device->createDevice(logical_device_create_info);
-          contract_assert(expected);
+          const auto logical_device_create_info
+            = vk::DeviceCreateInfo {vk::DeviceCreateFlags {},
+                                    device_queue_information,
+                                    {/* device layers are deprecated */},
+                                    a_configuration.m_required_extensions,
+                                    {/* features field is deprecated */},
+                                    std::addressof(device_features.m_default_features_chain.get<vk::PhysicalDeviceFeatures2>())};
+          auto logical_device = a_physical_device->createDevice(logical_device_create_info);
+          contract_assert(logical_device.result == vk::Result::eSuccess);
 
           // initialize vulkan dynamic dispatcher with device level function pointers
-          VULKAN_HPP_DEFAULT_DISPATCHER.init(*expected.value());
+          VULKAN_HPP_DEFAULT_DISPATCHER.init(*logical_device.value);
 
-          return handle_t {std::move(expected.value())};
+          return handle_t {std::move(logical_device.value)};
         })},
         m_configuration {a_configuration} {}
     }

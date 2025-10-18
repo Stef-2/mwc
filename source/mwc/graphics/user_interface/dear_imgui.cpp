@@ -21,15 +21,15 @@ namespace mwc {
                                  const vulkan::queue_families_ct::family_st& a_queue_family, const vulkan::queue_ct& a_queue,
                                  const vulkan::swapchain_ct& a_swapchain, const configuration_st& a_configuration)
     : m_descriptor_pool {std::invoke([&a_logical_device, &a_configuration] -> decltype(m_descriptor_pool) {
-        const auto descriptor_pool_size =
-          vk::DescriptorPoolSize {vk::DescriptorType::eCombinedImageSampler, a_configuration.m_descriptor_count};
+        const auto descriptor_pool_size
+          = vk::DescriptorPoolSize {vk::DescriptorType::eCombinedImageSampler, a_configuration.m_descriptor_count};
 
-        auto expected =
-          a_logical_device->createDescriptorPool(vk::DescriptorPoolCreateInfo {vk::DescriptorPoolCreateFlags {},
-                                                                               /*maxSets*/ 1, descriptor_pool_size});
-        contract_assert(expected);
+        auto descriptor_pool
+          = a_logical_device->createDescriptorPool(vk::DescriptorPoolCreateInfo {vk::DescriptorPoolCreateFlags {},
+                                                                                 /*maxSets*/ 1, descriptor_pool_size});
+        contract_assert(descriptor_pool.result == vk::Result::eSuccess);
 
-        return std::move(expected.value());
+        return std::move(descriptor_pool.value);
       })},
       m_imgui_context {ImGui::CreateContext()} {
       information("initializing dear imgui");
@@ -41,24 +41,24 @@ namespace mwc {
       const auto glfw_initialization = ImGui_ImplGlfw_InitForVulkan(*a_window.vkfw_window(), /*install_callbacks*/ true);
 
       contract_assert(glfw_initialization);
-      auto imgui_vulkan_initialization_info =
-        ImGui_ImplVulkan_InitInfo {a_context.m_vulkan_api_version.m_version,
-                                   a_instance.native_handle(),
-                                   a_physical_device.native_handle(),
-                                   a_logical_device.native_handle(),
-                                   a_queue_family.m_index,
-                                   a_queue.native_handle(),
-                                   *m_descriptor_pool,
-                                   /*render_pass*/ nullptr,
-                                   a_swapchain.image_count(),
-                                   a_swapchain.image_count(),
-                                   static_cast<VkSampleCountFlagBits>(a_configuration.m_sample_count),
-                                   /*pipeline_cache*/ nullptr,
-                                   /*subpass*/ 0,
-                                   /*internal_descriptor_pool_size*/ 0,
-                                   /*use_dynamic_rendering*/ true,
-                                   pipeline_rendering_create_info,
-                                   /*allocator*/ nullptr};
+      auto imgui_vulkan_initialization_info
+        = ImGui_ImplVulkan_InitInfo {a_context.m_vulkan_api_version.m_version,
+                                     a_instance.native_handle(),
+                                     a_physical_device.native_handle(),
+                                     a_logical_device.native_handle(),
+                                     a_queue_family.m_index,
+                                     a_queue.native_handle(),
+                                     *m_descriptor_pool,
+                                     /*render_pass*/ nullptr,
+                                     a_swapchain.image_count(),
+                                     a_swapchain.image_count(),
+                                     static_cast<VkSampleCountFlagBits>(a_configuration.m_sample_count),
+                                     /*pipeline_cache*/ nullptr,
+                                     /*subpass*/ 0,
+                                     /*internal_descriptor_pool_size*/ 0,
+                                     /*use_dynamic_rendering*/ true,
+                                     pipeline_rendering_create_info,
+                                     /*allocator*/ nullptr};
 
       const auto vulkan_initialization = ImGui_ImplVulkan_Init(&imgui_vulkan_initialization_info);
       contract_assert(vulkan_initialization);

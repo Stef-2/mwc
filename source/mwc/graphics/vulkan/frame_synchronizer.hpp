@@ -93,17 +93,17 @@ namespace mwc {
         if constexpr (tp_frame_count == std::dynamic_extent)
           m_synchronization_data.resize(m_frame_count);
 
-        auto command_buffers_expected = a_logical_device->allocateCommandBuffers(
+        auto command_buffers = a_logical_device->allocateCommandBuffers(
           vk::CommandBufferAllocateInfo {a_command_pool.native_handle(), vk::CommandBufferLevel::ePrimary, m_frame_count});
-        contract_assert(command_buffers_expected);
+        contract_assert(command_buffers.result == vk::Result::eSuccess);
 
         for (auto i = frame_index_t {0}; i < m_frame_count; ++i) {
           m_synchronization_data[i] = synchronization_st {
-            .m_image_acquired_semaphore =
-              a_logical_device->createSemaphore(vk::SemaphoreCreateInfo {vk::SemaphoreCreateFlags {}}).value(),
-            .m_render_complete_semaphore =
-              a_logical_device->createSemaphore(vk::SemaphoreCreateInfo {vk::SemaphoreCreateFlags {}}).value(),
-            .m_command_buffer = std::move(command_buffers_expected.value()[i])};
+            .m_image_acquired_semaphore
+            = a_logical_device->createSemaphore(vk::SemaphoreCreateInfo {vk::SemaphoreCreateFlags {}}).value,
+            .m_render_complete_semaphore
+            = a_logical_device->createSemaphore(vk::SemaphoreCreateInfo {vk::SemaphoreCreateFlags {}}).value,
+            .m_command_buffer = std::move(command_buffers.value[i])};
 
           if constexpr (diagnostic::debugging()) {
             const auto image_acquired_string = std::format("IA [{0}]", i);

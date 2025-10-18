@@ -147,4 +147,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         vma_module
         imgui
         fast_gltf_module
+        shader-slang
 )

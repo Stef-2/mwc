@@ -7,7 +7,9 @@ import mwc_definition;
 export namespace mwc {
   namespace input {
     struct shader_source_st {
-      string_t m_source_code;
+      using storage_t = string_t;
+
+      storage_t m_source_code;
     };
   }
 }

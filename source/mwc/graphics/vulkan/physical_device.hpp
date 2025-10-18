@@ -26,10 +26,10 @@ namespace mwc {
           using default_chain_t = vk::StructureChain<vk::PhysicalDeviceProperties2,
                                                      vk::PhysicalDeviceShaderObjectPropertiesEXT,
                                                      vk::PhysicalDeviceDescriptorIndexingProperties>;
-          using memory_chain_t =
-            vk::StructureChain<vk::PhysicalDeviceMemoryProperties2, vk::PhysicalDeviceMemoryBudgetPropertiesEXT>;
-          using queue_family_chain_t =
-            vk::StructureChain<vk::QueueFamilyProperties2 /*, vk::QueueFamilyOwnershipTransferPropertiesKHR*/>;
+          using memory_chain_t
+            = vk::StructureChain<vk::PhysicalDeviceMemoryProperties2, vk::PhysicalDeviceMemoryBudgetPropertiesEXT>;
+          using queue_family_chain_t
+            = vk::StructureChain<vk::QueueFamilyProperties2 /*, vk::QueueFamilyOwnershipTransferPropertiesKHR*/>;
 
           default_chain_t m_default_properties_chain;
           memory_chain_t m_memory_properties_chain;
@@ -41,7 +41,8 @@ namespace mwc {
                                                      vk::PhysicalDeviceVulkan11Features,
                                                      vk::PhysicalDeviceVulkan12Features,
                                                      vk::PhysicalDeviceVulkan13Features,
-                                                     vk::PhysicalDeviceVulkan14Features>;
+                                                     vk::PhysicalDeviceVulkan14Features,
+                                                     vk::PhysicalDeviceShaderObjectFeaturesEXT>;
 
           default_chain_t m_default_features_chain;
         };

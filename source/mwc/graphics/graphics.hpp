@@ -2,6 +2,7 @@
 
 #include "mwc/core/contract/definition.hpp"
 
+#include "mwc/input/subsystem.hpp"
 #include "mwc/window/window.hpp"
 #include "mwc/graphics/vulkan/context.hpp"
 #include "mwc/graphics/vulkan/instance.hpp"
@@ -17,6 +18,7 @@
 #include "mwc/graphics/vulkan/queue.hpp"
 #include "mwc/graphics/vulkan/suballocated_memory_mapped_buffer.hpp"
 #include "mwc/graphics/vulkan/dynamic_rendering_state.hpp"
+#include "mwc/graphics/vulkan/shader_object.hpp"
 #include "mwc/graphics/user_interface/user_interface.hpp"
 #include "mwc/graphics/camera/camera.hpp"
 
@@ -41,8 +43,8 @@ namespace mwc {
                   const configuration_st& a_configuration = configuration_st::default_configuration());
 
       auto render() -> void;
-      auto record_mesh_data_transfer_to_device(const span_t<const input::dynamic_host_mesh_st> a_mesh_data,
-                                               const vk::raii::CommandBuffer& a_command_buffer) -> void;
+      auto record_mesh_data_transfer_to_device_memory(const input::scene_st& a_scene,
+                                                      const vk::raii::CommandBuffer& a_command_buffer) -> void;
 
       template <typename tp_this>
       [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
