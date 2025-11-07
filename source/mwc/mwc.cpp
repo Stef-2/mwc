@@ -26,11 +26,16 @@ namespace mwc {
           else if (a_action == vkfw::MouseButtonAction::eRelease)
             input::input_subsystem_st::mouse_st::key_map.erase(a_button);
         };
+
+    /*
     m_window.vkfw_window()->callbacks()->on_cursor_move
-      = []([[maybe_unused]] const vkfw::Window& a_window, const float64_t a_x_position, const float64_t a_y_position) {
-          input::input_subsystem_st::mouse_st::x_position = a_x_position;
-          input::input_subsystem_st::mouse_st::y_position = a_y_position;
-        };
+      = []([[maybe_unused]] const vkfw::Window& a_window, const float64_t a_cursor_x_position,
+           const float64_t a_cursor_y_position) {
+          input::input_subsystem_st::mouse_st::previous_cursor_position
+            = input::input_subsystem_st::mouse_st::current_cursor_position;
+          input::input_subsystem_st::mouse_st::current_cursor_position.m_x = a_cursor_x_position;
+          input::input_subsystem_st::mouse_st::current_cursor_position.m_y = a_cursor_y_position;
+        };*/
   }
   mwc_ct::~mwc_ct() {
     // if there are any subsystems left unfinalized, finalize them
@@ -39,5 +44,21 @@ namespace mwc {
         finalize_subsystems();
         return;
       }
+  }
+  auto mwc_ct::run() -> void {
+    while (true) {
+      std::ignore = mwc::input::input_subsystem_st::poll_hardware_events();
+
+      auto cursor_position_x = input::input_subsystem_st::mouse_st::cursor_positon_st::scalar_t {};
+      auto cursor_position_y = input::input_subsystem_st::mouse_st::cursor_positon_st::scalar_t {};
+      m_window.vkfw_window()->getCursorPos(&cursor_position_x, &cursor_position_y);
+
+      input::input_subsystem_st::mouse_st::previous_cursor_position
+        = input::input_subsystem_st::mouse_st::current_cursor_position;
+      input::input_subsystem_st::mouse_st::current_cursor_position.m_x = cursor_position_x;
+      input::input_subsystem_st::mouse_st::current_cursor_position.m_y = cursor_position_y;
+
+      m_graphics.render();
+    }
   }
 }

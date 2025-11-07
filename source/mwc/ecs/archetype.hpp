@@ -76,15 +76,19 @@ namespace mwc {
         constexpr auto requested_component_hash = ecs::component_hash<std::plus<>, tp_components...>();
         contract_assert(requested_component_hash == m_component_hash);
 
-        auto [... components] = sorted_component_types<tp_components...>();
+        using sorted_components_tuple_t = decltype(sorted_component_types<tp_components...>());
 
-        // note: consider returning references rather than values
-        static_for_loop<0, sizeof...(tp_components)>([this, &components..., a_entity_index]<size_t tp_index> {
-          components...[tp_index] = std::bit_cast<vector_t<std::remove_cvref_t<decltype(components...[tp_index])>>*>(
-                                      &m_component_data[tp_index].m_data)
-                                      ->operator[](a_entity_index);
-        });
-        return std::forward_as_tuple(components...);
+        const auto lambda = [this, a_entity_index]<size_t... tp_index>(const std::index_sequence<tp_index...>) {
+          using component_references_t
+            = tuple_t<std::add_lvalue_reference_t<std::tuple_element_t<tp_index, sorted_components_tuple_t>>...>;
+
+          return component_references_t {
+            std::bit_cast<vector_t<std::remove_cvref_t<std::tuple_element_t<tp_index, sorted_components_tuple_t>>>*>(
+              &m_component_data[tp_index].m_data)
+              ->operator[](a_entity_index)...};
+        };
+
+        return lambda(std::make_index_sequence<sizeof...(tp_components)> {});
       }
       constexpr auto component_data_row(const archetype_entity_index_t a_entity_index) -> component_row_data_t {
         auto component_row_data = component_row_data_t {};

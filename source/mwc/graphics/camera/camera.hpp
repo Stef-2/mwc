@@ -85,15 +85,16 @@ namespace mwc {
       if constexpr (tp_camera_projection == camera_projection_et::e_perspective) {
         const auto half_fov_tangent
           = scalar_t {std::tan(geometry::radians(a_configuration.m_field_of_view_degrees) / scalar_t {2.0})};
-
-        return projection_t {{scalar_t {1.0} / (a_configuration.m_aspect_ratio * half_fov_tangent), 0.0, 0.0, 0.0},
-                             {0.0, scalar_t {1.0} / half_fov_tangent, 0.0, 0.0},
-                             {0.0, 0.0,
-                              -(a_configuration.m_far_clip + a_configuration.m_near_clip)
-                                / (a_configuration.m_far_clip - a_configuration.m_near_clip),
-                              scalar_t {-2.0} * a_configuration.m_far_clip * a_configuration.m_near_clip
-                                / (a_configuration.m_far_clip - a_configuration.m_near_clip)},
-                             {0.0, 0.0, -1.0, 0.0}};
+        const auto projection_matrix
+          = math::matrix_t<scalar_t, 4, 4> {{scalar_t {1.0} / (a_configuration.m_aspect_ratio * half_fov_tangent), 0.0, 0.0, 0.0},
+                                            {0.0, scalar_t {1.0} / half_fov_tangent, 0.0, 0.0},
+                                            {0.0, 0.0,
+                                             -(a_configuration.m_far_clip + a_configuration.m_near_clip)
+                                               / (a_configuration.m_far_clip - a_configuration.m_near_clip),
+                                             scalar_t {-2.0} * a_configuration.m_far_clip * a_configuration.m_near_clip
+                                               / (a_configuration.m_far_clip - a_configuration.m_near_clip)},
+                                            {0.0, 0.0, -1.0, 0.0}};
+        return projection_t {projection_matrix.array()};
       } else {
         const auto width = a_configuration.m_right_clip - a_configuration.m_left_clip;
         const auto height = a_configuration.m_top_clip - a_configuration.m_bottom_clip;

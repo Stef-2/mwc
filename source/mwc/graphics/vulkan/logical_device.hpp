@@ -35,9 +35,9 @@ namespace mwc {
 
       // implementation
       constexpr auto logical_device_ct::configuration_st::default_configuration() -> configuration_st {
-        static constexpr auto required_extensions =
-          array_t<const char* const, 4> {vk::KHRSwapchainExtensionName, vk::EXTSwapchainMaintenance1ExtensionName,
-                                         vk::EXTMemoryBudgetExtensionName, vk::EXTShaderObjectExtensionName};
+        static constexpr auto required_extensions
+          = array_t<const char_t* const, 4> {vk::KHRSwapchainExtensionName, vk::EXTSwapchainMaintenance1ExtensionName,
+                                             vk::EXTMemoryBudgetExtensionName, vk::EXTShaderObjectExtensionName};
 
         return configuration_st {.m_required_extensions = required_extensions};
       }

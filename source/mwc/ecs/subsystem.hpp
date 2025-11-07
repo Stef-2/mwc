@@ -137,18 +137,18 @@ namespace mwc {
       contract_assert(false);
       std::unreachable();
     }
-    inline auto destroy_entity(const entity_index_t a_entity)
+    inline auto destroy_entity(const entity_index_t a_entity_index)
       -> void pre(ecs_subsystem_st::entity_archetype_map.contains(a_entity)) {
-      const auto archetype = ecs_subsystem_st::entity_archetype_map[a_entity];
+      const auto archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
       archetype.m_archetype->remove_component_row(archetype.m_entity_index);
-      ecs_subsystem_st::entity_archetype_map.erase(a_entity);
+      ecs_subsystem_st::entity_archetype_map.erase(a_entity_index);
     }
     template <component_c... tp_components>
       requires(sizeof...(tp_components) > 0)
-    constexpr auto entity_components(const entity_index_t m_entity_index) {
+    constexpr auto entity_components(const entity_index_t a_entity_index) {
       // determine the matching archetype
-      const auto& archetype = ecs_subsystem_st::entity_archetype_map[m_entity_index];
-      contract_assert(archetype.m_archetype != nullptr and m_entity_index != null_entity_index);
+      const auto& archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
+      contract_assert(archetype.m_archetype != nullptr and a_entity_index != null_entity_index);
 
       return archetype.m_archetype->component_row<tp_components...>(archetype.m_entity_index);
     }

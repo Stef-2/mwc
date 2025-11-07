@@ -112,7 +112,7 @@ namespace mwc {
           .m_color_attachment_configuration = {.m_attachment_operations = {.m_load_operation = vk::AttachmentLoadOp::eClear,
                                                                            .m_store_operation = vk::AttachmentStoreOp::eStore},
                                                .m_layout = vk::ImageLayout::eAttachmentOptimal,
-                                               .m_clear_color = vk::ClearColorValue {float32_t {1.0}, 1.0, 1.0, 1.0}},
+                                               .m_clear_color = vk::ClearColorValue {float32_t {0.7}, 0.5, 0.5, 1.0}},
           .m_depth_stencil_attachment_configuration
           = {.m_attachment_operations
              = {.m_load_operation = vk::AttachmentLoadOp::eClear, .m_store_operation = vk::AttachmentStoreOp::eDontCare},

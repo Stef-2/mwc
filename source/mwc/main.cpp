@@ -24,9 +24,7 @@ import std;
 //import vkfw;
 
 int main() {
-  //p("{0}", 33);
-  //std::print("test {0}", std::string_view {"bro pl"});
-  mwc::output::write_text_file("/home/billy/new_file_bro.txt", "hello world bro hello there o/");
+  //mwc::output::write_text_file("/home/billy/new_file_bro.txt", "hello world bro hello there o/");
   using namespace mwc::ecs;
   mwc::initialize_subsystems();
   /*
@@ -75,6 +73,7 @@ int main() {
   e.insert_components(test3 {.b = true});
   e.remove_components<test1>();
   mwc::ecs::remove_components<test3>(5);
+  const auto components = e.components<test2, test0, test3>();
   //auto after_ac = mwc::ecs::entity_components<test2, test0, test3>(e);
   //const auto ac2 = mwc::ecs::ecs_subsystem_st::entity_archetype_map[1].m_archetype->component_data_row(0);
 
@@ -96,11 +95,7 @@ int main() {
   // testing =======================
 
   mwc::mwc_ct mwc {};
-
-  while (true) {
-    std::ignore = mwc::input::input_subsystem_st::poll_hardware_events();
-    mwc.m_graphics.render();
-  }
+  mwc.run();
 
   mwc::finalize_subsystems();
 

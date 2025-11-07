@@ -23,10 +23,11 @@ namespace mwc {
   namespace graphics {
     // format component
     template <mwc::ecs::component_c tp_component>
-    constexpr auto format_component_data(tp_component a_component) {
+    constexpr auto format_component_data(const tp_component& a_component) {
       using underlying_pod_t = std::remove_cvref_t<tp_component>::underlying_pod_t;
       constexpr auto format_elements_per_line = size_t {4};
 
+      // note: consider reserving space for the string buffer
       auto buffer = mwc::string_t {};
 
       // determine if the component's underlying plain old data type is formattable
@@ -38,7 +39,8 @@ namespace mwc {
           static_for_loop<0, sizeof(tp_component) / sizeof(underlying_pod_t)>([&buffer, &array_ptr]<size_t tp_index> {
             if constexpr (tp_index > 0 and tp_index % format_elements_per_line == 0)
               buffer.append("\n");
-            std::format_to(std::back_inserter(buffer), "{0} ", array_ptr[tp_index]);
+            std::format_to(std::back_inserter(buffer), std::is_floating_point_v<underlying_pod_t> ? "[{:^ 8.2f}]" : "[{}]",
+                           array_ptr[tp_index]);
           });
         } else {
           return std::format("{0}", *std::bit_cast<underlying_pod_t*>(&a_component));

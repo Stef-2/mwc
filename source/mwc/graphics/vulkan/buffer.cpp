@@ -17,12 +17,13 @@ namespace mwc {
         contract_assert(expected.result == vk::Result::eSuccess);
         auto& [buffer, allocation] = expected.value;
         contract_assert(m_allocation_info.size >= m_configuration.m_buffer_create_info.size);
+
+        m_vulkan_handle = handle_t {a_logical_device.unique_handle(), buffer};
+
         if (device_address_requested()) {
           const auto buffer_device_address_info = vk::BufferDeviceAddressInfo {m_vulkan_handle};
           m_device_address = a_logical_device->getBufferAddress(buffer_device_address_info);
         }
-
-        m_vulkan_handle = handle_t {a_logical_device.unique_handle(), buffer};
       }
       buffer_ct::~buffer_ct() {
         if (*m_vulkan_handle and m_allocation)

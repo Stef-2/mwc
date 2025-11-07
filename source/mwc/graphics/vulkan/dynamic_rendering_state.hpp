@@ -28,22 +28,26 @@ namespace mwc {
             array_t<vk::ColorComponentFlags, attachment_count> m_color_write_mask;
           };
 
-          vk::CullModeFlags m_cull_mode = vk::CullModeFlagBits::eBack;
-          vk::FrontFace m_front_face = vk::FrontFace::eClockwise;
-          bool_t m_depth_testing = true;
-          bool_t m_depth_writing = true;
-          vk::CompareOp m_depth_compare_operation = vk::CompareOp::eLessOrEqual;
-          vk::PrimitiveTopology m_primitive_topology = vk::PrimitiveTopology::eTriangleList;
-          bool_t m_rasterizer_discarding = false;
-          vk::PolygonMode m_polygon_mode = vk::PolygonMode::eFill;
-          float32_t m_line_width = float32_t {1.0};
-          vk::SampleCountFlagBits m_sample_count = vk::SampleCountFlagBits::e1;
-          pair_t<vk::SampleCountFlagBits, array_t<uint32_t, 1>> m_sample_mask = {vk::SampleCountFlagBits::e1, {1}};
-          bool_t m_alpha_to_coverage = false;
-          bool_t m_depth_biasing = false;
-          bool_t m_stencil_testing = false;
-          bool_t m_primitive_restarting = false;
+          vk::CullModeFlags m_cull_mode;
+          vk::FrontFace m_front_face;
+          bool_t m_depth_test_enable;
+          bool_t m_depth_write_enable;
+          bool_t m_depth_bounds_test_enable;
+          bool_t m_depth_clamp_enable;
+          vk::CompareOp m_depth_compare_operation;
+          vk::PrimitiveTopology m_primitive_topology;
+          bool_t m_rasterizer_discard_enable;
+          vk::PolygonMode m_polygon_mode;
+          float32_t m_line_width;
+          vk::SampleCountFlagBits m_sample_count;
+          pair_t<vk::SampleCountFlagBits, array_t<uint32_t, 1>> m_sample_mask;
+          bool_t m_alpha_to_coverage_enable;
+          bool_t m_alpha_to_one_enable;
+          bool_t m_depth_bias_enable;
+          bool_t m_stencil_test_enable;
+          bool_t m_primitive_restart_enable;
           color_blend_configuration_st m_color_blend_configuration;
+          bool_t m_logic_operation_enable;
         };
 
         dynamic_rendering_state_ct(const surface_ct& a_surface,
@@ -65,21 +69,25 @@ namespace mwc {
       constexpr auto dynamic_rendering_state_ct::configuration_st::default_configuration() -> configuration_st {
         return configuration_st {.m_cull_mode = vk::CullModeFlagBits::eBack,
                                  .m_front_face = vk::FrontFace::eClockwise,
-                                 .m_depth_testing = true,
-                                 .m_depth_writing = true,
+                                 .m_depth_test_enable = true,
+                                 .m_depth_write_enable = true,
+                                 .m_depth_bounds_test_enable = false,
+                                 .m_depth_clamp_enable = false,
                                  .m_depth_compare_operation = vk::CompareOp::eLessOrEqual,
                                  .m_primitive_topology = vk::PrimitiveTopology::eTriangleList,
-                                 .m_rasterizer_discarding = false,
+                                 .m_rasterizer_discard_enable = false,
                                  .m_polygon_mode = vk::PolygonMode::eFill,
                                  .m_line_width = float32_t {1.0},
                                  .m_sample_count = vk::SampleCountFlagBits::e1,
-                                 .m_sample_mask =
-                                   pair_t<vk::SampleCountFlagBits, array_t<uint32_t, 1>> {vk::SampleCountFlagBits::e1, {1}},
-                                 .m_alpha_to_coverage = false,
-                                 .m_depth_biasing = false,
-                                 .m_stencil_testing = false,
-                                 .m_primitive_restarting = false,
-                                 .m_color_blend_configuration = color_blend_configuration_st::default_configuration()};
+                                 .m_sample_mask
+                                 = pair_t<vk::SampleCountFlagBits, array_t<uint32_t, 1>> {vk::SampleCountFlagBits::e1, {1}},
+                                 .m_alpha_to_coverage_enable = false,
+                                 .m_alpha_to_one_enable = false,
+                                 .m_depth_bias_enable = false,
+                                 .m_stencil_test_enable = false,
+                                 .m_primitive_restart_enable = false,
+                                 .m_color_blend_configuration = color_blend_configuration_st::default_configuration(),
+                                 .m_logic_operation_enable = false};
       }
       constexpr auto dynamic_rendering_state_ct::configuration_st::color_blend_configuration_st::default_configuration()
         -> color_blend_configuration_st {
@@ -90,8 +98,8 @@ namespace mwc {
           vk::BlendFactor::eSrcAlpha, vk::BlendFactor::eOneMinusSrcAlpha, vk::BlendOp::eAdd, vk::BlendFactor::eOne,
           vk::BlendFactor::eZero, vk::BlendOp::eAdd}},
           .m_color_write_mask = array_t<vk::ColorComponentFlags, attachment_count> {
-          vk::ColorComponentFlags {vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG |
-                                   vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA}}};
+          vk::ColorComponentFlags {vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG
+                                   | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA}}};
       }
       template <typename tp_this>
       auto dynamic_rendering_state_ct::configuration(this tp_this&& a_this) -> decltype(auto) {

@@ -45,8 +45,15 @@ namespace mwc {
         static inline auto key_map = unordered_set_t<vkfw::Key> {};
       };
       struct mouse_st {
-        static inline auto x_position = float64_t {};
-        static inline auto y_position = float64_t {};
+        struct cursor_positon_st {
+          using scalar_t = float64_t;
+
+          scalar_t m_x;
+          scalar_t m_y;
+        };
+        static inline auto previous_cursor_position = cursor_positon_st {};
+        static inline auto current_cursor_position = cursor_positon_st {};
+
         static inline auto key_map = unordered_set_t<vkfw::MouseButton> {};
       };
       struct filesystem_st {

@@ -75,7 +75,7 @@ namespace mwc {
 
           // generate device queue information
           const auto device_queue_information = generate_device_queue_information(a_queue_families);
-          // assert that the device supports all of the required extensions
+          // assert that the device supports all the required extensions
           const auto available_extensions = a_physical_device->enumerateDeviceExtensionProperties();
           contract_assert(available_extensions.result == vk::Result::eSuccess and not available_extensions.value.empty());
 

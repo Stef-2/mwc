@@ -24,6 +24,7 @@ namespace mwc {
     auto operator=(const mwc_ct&&) noexcept -> mwc_ct& = delete;
     ~mwc_ct();
 
+    auto run() -> void;
     // private :
     window_ct m_window;
     graphics::graphics_ct m_graphics;

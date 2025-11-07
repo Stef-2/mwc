@@ -43,9 +43,12 @@ namespace mwc {
           ImGui::SmallButton(key_name.data() ? key_name.data()
                                              : std::to_string(std::to_underlying(pressed_keyboard_key)).c_str());
         }
-        ImGui::TextUnformatted(std::format("cursor: {0} - {1}",
-                                           input::input_subsystem_st::mouse_st::x_position,
-                                           input::input_subsystem_st::mouse_st::y_position)
+        const auto cursor_position_delta_x = input::input_subsystem_st::mouse_st::current_cursor_position.m_x - input::input_subsystem_st::mouse_st::previous_cursor_position.m_x;
+        const auto cursor_position_delta_y = input::input_subsystem_st::mouse_st::current_cursor_position.m_y - input::input_subsystem_st::mouse_st::previous_cursor_position.m_y;
+        ImGui::TextUnformatted(std::format("cursor: {0} - {1}\tdelta: {2} - {3}",
+                                           input::input_subsystem_st::mouse_st::current_cursor_position.m_x,
+                                           input::input_subsystem_st::mouse_st::current_cursor_position.m_y,
+                                           cursor_position_delta_x, cursor_position_delta_y)
                                  .c_str());
         for (const auto& pressed_mouse_key : input::input_subsystem_st::mouse_st::key_map) {
           ImGui::SameLine();

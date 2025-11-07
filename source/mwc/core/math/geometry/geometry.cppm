@@ -17,8 +17,10 @@ export namespace mwc {
     using position_t = math::vector_t<tp, 3>;
     template <std::floating_point tp = default_scalar_t>
     using normal_t = math::vector_t<tp, 3>;
-    template <std::floating_point tp = default_scalar_t>
-    using transformation_t = math::matrix_t<tp, 4, 4>;
+    template <std::floating_point tp = default_scalar_t, size_t tp_count = 3,
+              math::dense_storage_type_et tp_storage_type = math::dense_storage_type_et::e_affine,
+              math::dense_storage_order_et tp_storage_order = math::dense_storage_order_et::e_column_major>
+    using transformation_t = math::transformation_t<tp, tp_count, tp_storage_type, tp_storage_order>;
 
     enum class coordinate_axis_et : uint8_t {
       e_x,

@@ -27,7 +27,11 @@ namespace mwc {
   namespace input {
     auto input_subsystem_st::initialize() -> void {
       keyboard_st::key_map.reserve(std::to_underlying(vkfw::Key::eLAST));
+
       mouse_st::key_map.reserve(std::to_underlying(vkfw::MouseButton::eLAST));
+      mouse_st::previous_cursor_position = mouse_st::cursor_positon_st {{0.0}, {0.0}};
+      mouse_st::current_cursor_position = mouse_st::cursor_positon_st {{0.0}, {0.0}};
+
       filesystem_st::gltf_parser = fastgltf::Parser {fastgltf::Extensions::None};
 
       // slang configuration
@@ -37,9 +41,11 @@ namespace mwc {
       const auto& shader_data_directory_path = filesystem::directory(filesystem::directory_et::e_shader).c_str();
       const auto slang_target_description
         = slang::TargetDesc {.format = SLANG_SPIRV, .profile = filesystem_st::slang_global_session->findProfile("spirv_1_6")};
-      auto slang_compiler_options = array_t<slang::CompilerOptionEntry, 1> {
+      auto slang_compiler_options = array_t<slang::CompilerOptionEntry, 2> {
         slang::CompilerOptionEntry {slang::CompilerOptionName::EmitSpirvDirectly,
-                                    slang::CompilerOptionValue {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}}};
+                                    slang::CompilerOptionValue {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}},
+        {slang::CompilerOptionName::VulkanUseEntryPointName,
+         slang::CompilerOptionValue {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}}};
       const auto slang_session_description = slang::SessionDesc {.targets = &slang_target_description,
                                                                  .targetCount = 1,
                                                                  .flags = {},
@@ -377,7 +383,7 @@ namespace mwc {
         auto program_layout_string_json = std::string {static_cast<const char_t*>(program_layout_binary_json->getBufferPointer()),
                                                        program_layout_binary_json->getBufferSize()};
         auto json_file_path = file_path_t {a_filepath}.replace_extension(".json");
-        output::write_text_file(json_file_path, program_layout_string_json);
+        output::write_file(json_file_path, program_layout_string_json);
       }
 
       // generate spir_v bytecode

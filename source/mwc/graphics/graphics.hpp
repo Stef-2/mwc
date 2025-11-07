@@ -20,9 +20,11 @@
 #include "mwc/graphics/vulkan/dynamic_rendering_state.hpp"
 #include "mwc/graphics/vulkan/shader_object.hpp"
 #include "mwc/graphics/user_interface/user_interface.hpp"
+#include "mwc/graphics/vulkan/push_constant.hpp"
 #include "mwc/graphics/camera/camera.hpp"
 
 import mwc_definition;
+import mwc_geometry;
 import mwc_host_mesh;
 
 import vulkan_hpp;
@@ -43,8 +45,8 @@ namespace mwc {
                   const configuration_st& a_configuration = configuration_st::default_configuration());
 
       auto render() -> void;
-      auto record_mesh_data_transfer_to_device_memory(const input::scene_st& a_scene,
-                                                      const vk::raii::CommandBuffer& a_command_buffer) -> void;
+      auto record_mesh_data_transfer_to_device_memory(input::scene_st& a_scene, const vk::raii::CommandBuffer& a_command_buffer)
+        -> void;
 
       template <typename tp_this>
       [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);

@@ -16,6 +16,8 @@ import std;
 namespace mwc {
   namespace graphics {
     namespace vulkan {
+      constexpr auto shader_object_pipeline_max_extent = 4;
+
       struct shader_object_binary_compatibility_st {
         using binary_uuid_t = decltype(vk::PhysicalDeviceShaderObjectPropertiesEXT::shaderBinaryUUID);
         using binary_version_t = decltype(vk::PhysicalDeviceShaderObjectPropertiesEXT::shaderBinaryVersion);
@@ -29,6 +31,12 @@ namespace mwc {
       class shader_object_pipeline_ct : public irreproducible_st {
         public:
         using storage_t = extent_t<vk::ShaderEXT, tp_extent>;
+
+        struct shader_object_pipeline_binary_data_st {
+          shader_object_binary_compatibility_st m_binary_compatibility;
+          uint32_t m_shader_object_count;
+          array_t<vector_t<byte_t>, shader_object_pipeline_max_extent> m_binary_data;
+        };
 
         struct configuration_st {
           using shader_create_info_storage_t = extent_t<vk::ShaderCreateInfoEXT, tp_extent>;
@@ -45,7 +53,8 @@ namespace mwc {
         ~shader_object_pipeline_ct();
 
         auto binary_compatibility() const -> const shader_object_binary_compatibility_st&;
-        auto binary_data() const -> extent_t<vector_t<byte_t>, tp_extent>;
+        auto shader_object_binary_data() const -> extent_t<vector_t<byte_t>, tp_extent>;
+        auto shader_pipeline_binary_data() const -> shader_object_pipeline_binary_data_st;
         template <typename tp_this>
         auto shader_objects(this tp_this&& a_this) -> decltype(auto);
         template <typename tp_this>
@@ -93,12 +102,12 @@ namespace mwc {
       template <size_t tp_extent>
       shader_object_pipeline_ct<tp_extent>::~shader_object_pipeline_ct() {
         // assume that if the first shader object in the pipeline exists, they all do
-        if (m_storage.front())
+        if (m_storage.data() and m_storage.front())
           for (const auto& shader_object : m_storage)
             m_logical_device->getDispatcher()->vkDestroyShaderEXT(m_logical_device.native_handle(), shader_object, nullptr);
       }
       template <size_t tp_extent>
-      auto shader_object_pipeline_ct<tp_extent>::binary_data() const -> extent_t<vector_t<byte_t>, tp_extent> {
+      auto shader_object_pipeline_ct<tp_extent>::shader_object_binary_data() const -> extent_t<vector_t<byte_t>, tp_extent> {
         auto binary_data = extent_t<vector_t<byte_t>, tp_extent> {};
         if constexpr (tp_extent == std::dynamic_extent)
           binary_data.reserve(m_storage.size());
@@ -118,9 +127,22 @@ namespace mwc {
         return binary_data;
       }
       template <size_t tp_extent>
+      auto ::mwc::graphics::vulkan::shader_object_pipeline_ct<tp_extent>::shader_pipeline_binary_data() const
+        -> shader_object_pipeline_binary_data_st {
+        const auto&& binary_data = shader_object_binary_data();
+        auto pipeline_binary_data = shader_object_pipeline_binary_data_st {
+          .m_binary_compatibility = m_binary_compatibility,
+          .m_shader_object_count
+          = static_cast<decltype(shader_object_pipeline_binary_data_st::m_shader_object_count)>(m_storage.size())};
+
+        std::ranges::move(binary_data, pipeline_binary_data.m_binary_data.begin());
+
+        return pipeline_binary_data;
+      }
+      template <size_t tp_extent>
       template <typename tp_this>
       auto shader_object_pipeline_ct<tp_extent>::shader_objects(this tp_this&& a_this) -> decltype(auto) {
-        return std::forward_like<decltype(a_this)>(span_t {a_this.m_storage});
+        return span_t {std::forward_like<decltype(a_this)>(a_this.m_storage)};
       }
       template <size_t tp_extent>
       template <typename tp_this>
@@ -136,6 +158,7 @@ namespace mwc {
 
         shader_object_pipeline_ct<2> yyy = std::move(xxx);
         optional_t<shader_object_pipeline_ct<>> osop {};
+        const auto zzz = xxx.shader_pipeline_binary_data();
       }
     }
   }

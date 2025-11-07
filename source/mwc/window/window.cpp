@@ -7,8 +7,8 @@ namespace mwc {
       const auto primary_monitor = vkfw::getPrimaryMonitor();
       contract_assert(vkfw::check(primary_monitor.result));
       const auto [physical_width, physical_height] = primary_monitor.value.getPhysicalSize().value;
-      const auto [work_area_offset_x, work_area_offset_y, work_area_size_x, work_area_size_y] =
-        primary_monitor.value.getWorkarea().value;
+      const auto [work_area_offset_x, work_area_offset_y, work_area_size_x, work_area_size_y]
+        = primary_monitor.value.getWorkarea().value;
       const auto name = primary_monitor.value.getName().value;
       information(std::format("selecting primary monitor: {0}" SUB "physical size: {1}mm x {2}mm" SUB
                               "work area: offset {3}px x {4}px - size {5}px x {6}px",
@@ -25,7 +25,9 @@ namespace mwc {
                                       a_configuration.m_full_screen ? m_monitor : nullptr)
         .value;
     })},
-    m_configuration {a_configuration} {}
+    m_configuration {a_configuration} {
+    //m_window->set<vkfw::InputMode::eCursor>(vkfw::CursorMode::eCaptured);
+  }
   auto window_ct::title() const -> string_view_t {
     return m_configuration.m_title;
   }

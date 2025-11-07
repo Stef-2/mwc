@@ -56,7 +56,7 @@ namespace mwc {
     }
     template <component_c... tp_components>
     constexpr auto entity_ct::components() const {
-      return entity_components<tp_components...>(m_index);
+      return ecs::entity_components<tp_components...>(m_index);
     }
     template <component_c... tp_components>
     constexpr auto entity_ct::insert_components(tp_components&&... a_components) const {
