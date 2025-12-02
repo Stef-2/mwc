@@ -269,13 +269,10 @@ namespace mwc {
       }
       contract_assert(native_scene.m_nodes.node_count() == asset.nodes.size());
 
-      auto processed_image_data = vector_t<span_t<byte_t>> {};
-      auto processed_image_data_byte_count = size_t {0};
-      processed_image_data.reserve(asset.images.size());
-
       // initial image processing
+      constexpr auto requested_channel_count = 4;
+      auto processed_image_data_byte_count = size_t {0};
       for (auto& gltf_image : asset.images) {
-        constexpr auto requested_channel_count = 4;
 
         contract_assert(std::holds_alternative<fastgltf::sources::BufferView>(gltf_image.data));
         auto& gltf_buffer_view = asset.bufferViews[std::get<fastgltf::sources::BufferView>(gltf_image.data).bufferViewIndex];
@@ -286,45 +283,82 @@ namespace mwc {
         auto& gltf_byte_array = std::get<fastgltf::sources::Array>(gltf_buffer).bytes;
         auto crude_image_data
           = span_t<byte_t> {gltf_byte_array.begin() + gltf_buffer_view.byteOffset, gltf_buffer_view.byteLength};
+
         auto native_image = image_st {resource_st {a_filepath, gltf_image.name}};
-        native_image.m_host_image.m_data_byte_count = crude_image_data.size_bytes();
+        native_image.m_host_image.m_data = {
+          std::bit_cast<obs_ptr_t<byte_t>>(stbi_load_from_memory(std::bit_cast<const stbi_uc*>(crude_image_data.data()),
+                                                                 crude_image_data.size(),
+                                                                 std::bit_cast<int*>(&native_image.m_host_image.m_width),
+                                                                 std::bit_cast<int*>(&native_image.m_host_image.m_height),
+                                                                 std::bit_cast<int*>(&native_image.m_host_image.m_channel_count),
+                                                                 requested_channel_count)),
+          dynamic_host_image_st::deleter};
 
-        const auto processed_image_bytes = std::bit_cast<obs_ptr_t<byte_t>>(
-          stbi_load_from_memory(std::bit_cast<const stbi_uc*>(crude_image_data.data()),
-                                crude_image_data.size(),
-                                std::bit_cast<int*>(&native_image.m_host_image.m_width),
-                                std::bit_cast<int*>(&native_image.m_host_image.m_height),
-                                std::bit_cast<int*>(&native_image.m_host_image.m_channel_count),
-                                requested_channel_count));
-
-        contract_assert(processed_image_bytes);
-        processed_image_data.emplace_back(processed_image_bytes, crude_image_data.size_bytes());
-        processed_image_data_byte_count += crude_image_data.size_bytes();
+        contract_assert(native_image.m_host_image.m_data);
+        contract_assert(native_image.m_host_image.m_channel_count == requested_channel_count);
+        native_image.m_host_image.m_data_byte_count = native_image.m_host_image.m_width * native_image.m_host_image.m_height
+                                                    * native_image.m_host_image.m_channel_count * sizeof(byte_t);
+        processed_image_data_byte_count += native_image.m_host_image.m_data_byte_count;
 
         native_scene.m_images.emplace_back(std::move(native_image));
       }
       // generate a virtual suballocation for transfer to device memory
       if (a_configuration.m_image_processing.m_propagate_to_device_memory) {
-        native_scene.m_memory_mapped_image_data
-          = a_configuration.m_device_buffer->request_suballocation<byte_t>(processed_image_data_byte_count);
+        native_scene.m_memory_mapped_image_data = a_configuration.m_device_buffer->request_suballocation<byte_t>(
+          processed_image_data_byte_count,
+          {.m_alignment = requested_channel_count * sizeof(float32_t)});
       }
       // transfer image data
-      for (auto i = 0uz, device_memory_offset = 0uz; i < native_scene.m_images.size(); ++i) {
-        // transfer to host memory
-        if (a_configuration.m_image_processing.m_preserve_in_host_memory) {
-          native_scene.m_images[i].m_host_image.m_data.resize(native_scene.m_images[i].m_host_image.m_data_byte_count);
-          std::memcpy(native_scene.m_images[i].m_host_image.m_data.data(),
-                      processed_image_data[i].data(),
-                      processed_image_data[i].size_bytes());
-        }
+      for (auto device_memory_offset = 0uz; auto& native_image : native_scene.m_images) {
         // transfer to device memory
         if (a_configuration.m_image_processing.m_propagate_to_device_memory) {
           std::memcpy(native_scene.m_memory_mapped_image_data.data() + device_memory_offset,
-                      processed_image_data[i].data(),
-                      processed_image_data[i].size_bytes());
-          device_memory_offset += processed_image_data[i].size_bytes();
+                      native_image.m_host_image.m_data.get(),
+                      native_image.m_host_image.m_data_byte_count);
+          device_memory_offset += native_image.m_host_image.m_data_byte_count;
         }
-        stbi_image_free(processed_image_data[i].data());
+        // release from host memory
+        if (not a_configuration.m_image_processing.m_preserve_in_host_memory) {
+          native_image.m_host_image.m_data.release();
+        }
+      }
+
+      // map mesh material data
+      for (auto i = 0uz; i < asset.meshes.size(); ++i) {
+        const auto material_index = asset.meshes[i].primitives.front().materialIndex;
+        if (not material_index.has_value())
+          continue;
+
+        auto& native_material = native_scene.m_meshes[i].m_material;
+        const fastgltf::Material& gltf_material = asset.materials[material_index.value()];
+        // diffuse mapping
+        native_material.m_diffuse_color
+          = color_st {gltf_material.pbrData.baseColorFactor.x(), gltf_material.pbrData.baseColorFactor.y(),
+                      gltf_material.pbrData.baseColorFactor.z(), gltf_material.pbrData.baseColorFactor.w()};
+        native_material.m_diffuse_map = gltf_material.pbrData.baseColorTexture.has_value()
+                                        ? &native_scene.m_images[gltf_material.pbrData.baseColorTexture.value().textureIndex]
+                                        : nullptr;
+        // metallic - roughness mapping
+        native_material.m_metallic_value = gltf_material.pbrData.metallicFactor;
+        native_material.m_roughness_value = gltf_material.pbrData.roughnessFactor;
+        native_material.m_metallic_roughness_map
+          = gltf_material.pbrData.metallicRoughnessTexture.has_value()
+            ? &native_scene.m_images[gltf_material.pbrData.metallicRoughnessTexture.value().textureIndex]
+            : nullptr;
+        // tangent space normal mapping
+        native_material.m_tangent_space_normal_map = gltf_material.normalTexture.has_value()
+                                                     ? &native_scene.m_images[gltf_material.normalTexture.value().textureIndex]
+                                                     : nullptr;
+        // specular mapping
+        if (gltf_material.specular) {
+          native_material.m_specular_color
+            = color_st {gltf_material.specular->specularColorFactor.x(), gltf_material.specular->specularColorFactor.y(),
+                        gltf_material.specular->specularColorFactor.z()};
+          native_material.m_specular_map
+            = gltf_material.specular->specularColorTexture.has_value()
+              ? &native_scene.m_images[gltf_material.specular->specularColorTexture.value().textureIndex]
+              : nullptr;
+        }
       }
 
       input_subsystem_st::filesystem_st::scene_registry.emplace_back(std::move(native_scene));

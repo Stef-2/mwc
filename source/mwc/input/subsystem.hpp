@@ -27,6 +27,7 @@ import mwc_enum_range;
 import mwc_vertex_model;
 import mwc_metaprogramming_utility;
 import mwc_input_shader_source;
+import mwc_color;
 
 //import vkfw;
 import fastgltf;

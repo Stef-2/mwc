@@ -44,6 +44,8 @@ export namespace mwc {
   using bool_t = bool;
   using nullptr_t = std::nullptr_t;
   using any_t = std::any;
+  template <typename tp, typename tp_deleter = std::default_delete<tp>>
+  using unique_ptr = std::unique_ptr<tp, tp_deleter>;
 
   // path types
   using file_path_t = std::filesystem::path;

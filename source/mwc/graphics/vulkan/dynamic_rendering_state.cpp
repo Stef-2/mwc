@@ -3,7 +3,6 @@
 namespace mwc {
   namespace graphics {
     namespace vulkan {
-
       dynamic_rendering_state_ct::dynamic_rendering_state_ct(const surface_ct& a_surface, const configuration_st& a_configuration)
       : m_viewport {float32_t {0},
                     0, //static_cast<float32_t>(a_surface.extent().height),
@@ -35,12 +34,13 @@ namespace mwc {
         a_command_buffer.setStencilTestEnable(m_configuration.m_stencil_test_enable);
         a_command_buffer.setPrimitiveRestartEnable(m_configuration.m_primitive_restart_enable);
         a_command_buffer.setColorBlendEnableEXT(m_configuration.m_color_blend_configuration.m_first_attachment_index,
-                                                /*m_configuration.m_color_blend_configuration.m_blending_enabled*/ {true, false});
+                                                m_configuration.m_color_blend_configuration.m_blending_enabled);
         a_command_buffer.setColorBlendEquationEXT(m_configuration.m_color_blend_configuration.m_first_attachment_index,
                                                   m_configuration.m_color_blend_configuration.m_blend_equation);
         a_command_buffer.setColorWriteMaskEXT(m_configuration.m_color_blend_configuration.m_first_attachment_index,
                                               m_configuration.m_color_blend_configuration.m_color_write_mask);
         a_command_buffer.setLogicOpEnableEXT(m_configuration.m_logic_operation_enable);
+        a_command_buffer.setVertexInputEXT({}, {});
       }
       auto dynamic_rendering_state_ct::viewport() const -> vk::Viewport {
         return m_viewport;

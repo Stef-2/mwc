@@ -16,6 +16,24 @@ namespace mwc {
 
         m_vulkan_handle = handle_t {a_logical_device.unique_handle(), image};
       }
+      auto image_ct::record_layout_transition(const vk::raii::CommandBuffer& a_command_buffer,
+                                              const layout_transition_configuration_st& a_layout_transition_configuration) const
+        -> void {
+        const auto image_memory_barrier = vk::ImageMemoryBarrier2 {a_layout_transition_configuration.m_source_pipeline_stage,
+                                                                   a_layout_transition_configuration.m_source_access_flags,
+                                                                   a_layout_transition_configuration.m_destination_pipeline_stage,
+                                                                   a_layout_transition_configuration.m_destination_access_flags,
+                                                                   a_layout_transition_configuration.m_old_layout,
+                                                                   a_layout_transition_configuration.m_new_layout,
+                                                                   a_layout_transition_configuration.m_source_queue_family,
+                                                                   a_layout_transition_configuration.m_destination_queue_family,
+                                                                   native_handle(),
+                                                                   a_layout_transition_configuration.m_subresource_range};
+
+        const auto dependency_info = vk::DependencyInfo {{}, {}, {}, image_memory_barrier};
+
+        a_command_buffer.pipelineBarrier2(dependency_info);
+      }
     }
   }
 }

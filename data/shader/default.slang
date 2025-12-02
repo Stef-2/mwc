@@ -22,14 +22,7 @@ struct push_constants_st {
     float32_t m_far_clip;
   };
   struct buffer_device_address_registers_st {
-    void* m_register_0;
-    void* m_register_1;
-    void* m_register_2;
-    void* m_register_3;
-    void* m_register_4;
-    void* m_register_5;
-    void* m_register_6;
-    void* m_register_7;
+    void* m_registers[8];
   };
 
   float32_t4x4 m_model_transformation;
@@ -39,8 +32,11 @@ struct push_constants_st {
   float64_t m_current_time = {};
   float64_t m_delta_time = {};
 };
+
 [vk::push_constant]
 uniform push_constants_st push_constants;
+
+uniform Sampler2D combined_image_samplers[3];
 
 static const float4x4 proj = {0.5627, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1.0002, -1, 0, 0, -0.2000, 0};
 static const float4x4 proj2 = {0.5625, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1.0000, -1, 0, 0, -0.0200, 0};
@@ -61,9 +57,10 @@ struct VOut
 }
 
 [shader("vertex")]
-VOut vertex_shader(uint32_t a_vertex_id : SV_VertexID, input_vertex_st a_input_vertex) {
+VOut vertex_shader(uint32_t a_vertex_id : SV_VertexID) {
   //static_assert((sizeof (input_vertex_st) == 48), "wtf");
-  input_vertex_st vertex = ((input_vertex_st*)(push_constants.m_registers.m_register_0))[a_vertex_id];
+  input_vertex_st vertex = ((input_vertex_st*)(push_constants.m_registers.m_registers[0]))[a_vertex_id];
+  //var xxx = red();
   //let output = output_vertex_st ((vertex.m_position, 1.0));
   /*
   if (a_vertex_id < 3) {
@@ -76,18 +73,18 @@ VOut vertex_shader(uint32_t a_vertex_id : SV_VertexID, input_vertex_st a_input_v
   let view = push_constants.m_model_transformation;
   //let model = mul(float4 (a_input_vertex.m_position.xyz, 1.0f), );
   //let model_in_view = mul((), model);
-  var model_in_ndc = mul(float4 (a_input_vertex.m_position.xyz, 1.0f), mvp);
+  //var model_in_ndc = mul(float4 (a_input_vertex.m_position.xyz, 1.0f), mvp);
   //float4 x =  mul(proj, mul(, ));
   //x = clamp(x, 0.0f, 1.0f);
   //let x = mul(proj, push_constants.m_model_transformation, float4 (a_input_vertex.m_position, 1.0f));
-  let test = mul(view, float4 (a_input_vertex.m_position.xyz, 1.0f));
+  let test = mul(view, float4 (vertex.m_position.xyz, 1.0f));
   let test2 = mul(proj, test);
   //model_in_ndc.w = clamp(model_in_ndc.w, 0.0f, 1.0f);
-  return  {test, a_input_vertex.m_normal, a_input_vertex.m_uv};
+  return  {test, vertex.m_normal, vertex.m_uv};
 }
 
 [shader("fragment")]
 float4 fragment_shader(VOut a_vertex) : SV_Target {
   //return output_fragment_st ({1.0, 0.0, 0.0, 1.0});
-  return float4(a_vertex.normal, 1.0f);
+  return combined_image_samplers[0].Sample(a_vertex.uv + sin((float32_t)push_constants.m_current_time * 0.25));
 }

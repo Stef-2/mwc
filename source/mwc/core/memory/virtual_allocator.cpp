@@ -21,6 +21,7 @@ namespace mwc {
 
     const auto result = m_virtual_memory_block.virtualAllocate(&virtual_allocation_create_info, &allocation, &offset);
     contract_assert(result == vk::Result::eSuccess);
+    contract_assert(a_configuration.m_alignment == 0 or offset % a_configuration.m_alignment == 0);
 
     m_virtual_allocation_map.emplace(offset, allocation);
 

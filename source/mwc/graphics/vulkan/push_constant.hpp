@@ -18,14 +18,7 @@ namespace mwc {
           float32_t m_far_clip = {};
         };
         struct buffer_device_address_registers_st {
-          vk::DeviceAddress m_register_0 = {};
-          vk::DeviceAddress m_register_1 = {};
-          vk::DeviceAddress m_register_2 = {};
-          vk::DeviceAddress m_register_3 = {};
-          vk::DeviceAddress m_register_4 = {};
-          vk::DeviceAddress m_register_5 = {};
-          vk::DeviceAddress m_register_6 = {};
-          vk::DeviceAddress m_register_7 = {};
+          array_t<vk::DeviceAddress, 8> m_registers = {};
         };
 
         geometry::transformation_t<> m_model = geometry::transformation_t<>::Identity();

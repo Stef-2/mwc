@@ -99,6 +99,7 @@ namespace mwc {
         const auto width = a_configuration.m_right_clip - a_configuration.m_left_clip;
         const auto height = a_configuration.m_top_clip - a_configuration.m_bottom_clip;
         const auto depth = a_configuration.m_far_clip - a_configuration.m_near_clip;
+        contract_assert(width > 0.0 and height > 0.0 and depth > 0.0);
 
         return projection_t {
           2.0 / width, 0.0,          0.0,          -(a_configuration.m_right_clip + a_configuration.m_left_clip) / width,

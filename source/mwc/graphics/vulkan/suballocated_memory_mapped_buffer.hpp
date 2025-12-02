@@ -55,10 +55,10 @@ namespace mwc {
       template <typename tp>
       auto suballocated_memory_mapped_buffer_ct::request_suballocation(
         this auto&& a_this, const size_t a_virtual_suballocation_size,
-        const virtual_allocator_ct::allocation_configuration_st& a_a_configuration) {
+        const virtual_allocator_ct::allocation_configuration_st& a_configuration) {
         // request a virtual suballocation, result is validated internally
         const auto virtual_allocation_offset
-          = a_this.m_virtual_allocator.request_suballocation(a_virtual_suballocation_size, a_a_configuration);
+          = a_this.m_virtual_allocator.request_suballocation(a_virtual_suballocation_size, a_configuration);
 
         const auto physical_data_address = static_cast<byte_t*>(a_this.mapped_data_pointer()) + virtual_allocation_offset;
         const auto element_count = a_virtual_suballocation_size / sizeof(tp);

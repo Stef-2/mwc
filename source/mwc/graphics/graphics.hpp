@@ -45,7 +45,7 @@ namespace mwc {
                   const configuration_st& a_configuration = configuration_st::default_configuration());
 
       auto render() -> void;
-      auto record_mesh_data_transfer_to_device_memory(input::scene_st& a_scene, const vk::raii::CommandBuffer& a_command_buffer)
+      auto record_scene_data_transfer_to_device_memory(input::scene_st& a_scene, const vk::raii::CommandBuffer& a_command_buffer)
         -> void;
 
       template <typename tp_this>
@@ -69,6 +69,7 @@ namespace mwc {
       vulkan::suballocated_memory_mapped_buffer_ct m_common_buffer;
       vulkan::dynamic_rendering_state_ct m_dynamic_rendering_state;
       vector_t<vulkan::buffer_ct> m_vertex_buffers;
+      vector_t<vulkan::pipeline_layout_ct::descriptor_count_t> m_free_image_descriptor_indices;
 
       user_interface_ct m_user_interface;
       camera_ct m_camera;

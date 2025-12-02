@@ -24,10 +24,27 @@ namespace mwc {
           vk::ImageCreateInfo m_image_create_info;
           vma::AllocationCreateInfo m_allocation_create_info;
         };
+        struct layout_transition_configuration_st {
+          static constexpr auto default_configuration() -> layout_transition_configuration_st;
+
+          vk::PipelineStageFlags2 m_source_pipeline_stage;
+          vk::PipelineStageFlags2 m_destination_pipeline_stage;
+          vk::AccessFlags2 m_source_access_flags;
+          vk::AccessFlags2 m_destination_access_flags;
+          vk::ImageLayout m_old_layout;
+          vk::ImageLayout m_new_layout;
+          std::uint32_t m_source_queue_family;
+          std::uint32_t m_destination_queue_family;
+          vk::ImageSubresourceRange m_subresource_range;
+        };
 
         using handle_ct::handle_ct;
         image_ct(const logical_device_ct& a_logical_device, const memory_allocator_ct& a_memory_allocator,
                  const configuration_st& a_configuration = configuration_st::default_configuration());
+
+        auto record_layout_transition(const vk::raii::CommandBuffer& a_command_buffer,
+                                      const layout_transition_configuration_st& a_layout_transition_configuration
+                                      = layout_transition_configuration_st::default_configuration()) const -> void;
 
         template <typename tp_this>
         [[nodiscard]] auto allocation_info(this tp_this&& a_this) -> decltype(auto);
@@ -50,6 +67,19 @@ namespace mwc {
                                   vk::ImageUsageFlagBits::eSampled, vk::SharingMode::eExclusive},
           .m_allocation_create_info = {vma::AllocationCreateFlags {}, vma::MemoryUsage::eAutoPreferDevice,
                                        vk::MemoryPropertyFlagBits::eDeviceLocal, vk::MemoryPropertyFlagBits::eDeviceLocal}};
+      }
+      constexpr auto image_ct::layout_transition_configuration_st::default_configuration() -> layout_transition_configuration_st {
+        return layout_transition_configuration_st {
+          .m_source_pipeline_stage = vk::PipelineStageFlagBits2::eTopOfPipe,
+          .m_destination_pipeline_stage = vk::PipelineStageFlagBits2::eTransfer,
+          .m_source_access_flags = {},
+          .m_destination_access_flags = vk::AccessFlagBits2::eTransferWrite,
+          .m_old_layout = vk::ImageLayout::eUndefined,
+          .m_new_layout = vk::ImageLayout::eTransferDstOptimal,
+          .m_source_queue_family = vk::QueueFamilyIgnored,
+          .m_destination_queue_family = vk::QueueFamilyIgnored,
+          .m_subresource_range
+          = vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eColor, 0, vk::RemainingMipLevels, 0, vk::RemainingArrayLayers}};
       }
       template <typename tp_this>
       auto image_ct::allocation_info(this tp_this&& a_this) -> decltype(auto) {
