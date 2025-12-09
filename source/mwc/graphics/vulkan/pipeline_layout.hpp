@@ -17,7 +17,7 @@ namespace mwc {
     namespace vulkan {
       class pipeline_layout_ct : public handle_ct<vk::raii::PipelineLayout> {
         public:
-        using descriptor_count_t = uint32_t;
+        using descriptor_count_t = uint16_t;
 
         struct configuration_st {
           static constexpr auto default_configuration() -> configuration_st;
@@ -32,8 +32,8 @@ namespace mwc {
         [[nodiscard]] auto combined_image_sampler_pool() const -> const vk::raii::DescriptorPool&;
         [[nodiscard]] auto combined_image_sampler_set() const -> const vk::raii::DescriptorSet&;
         [[nodiscard]] auto push_constant_range() const -> const vk::PushConstantRange&;
-        [[nodiscard]] auto descriptor_count() const -> const descriptor_count_t;
-        [[nodiscard]] auto acquire_descriptor_index() -> const descriptor_count_t;
+        [[nodiscard]] auto descriptor_count() const -> descriptor_count_t;
+        [[nodiscard]] auto acquire_descriptor_index() -> descriptor_count_t;
         template <typename tp_this>
         [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 
@@ -42,7 +42,7 @@ namespace mwc {
         vk::raii::DescriptorPool m_combined_image_sampler_pool;
         vk::raii::DescriptorSet m_combined_image_sampler_set;
         vk::PushConstantRange m_push_constant_range;
-        descriptor_count_t m_descriptor_count;
+        descriptor_count_t m_descriptor_index;
         configuration_st m_configuration;
       };
 

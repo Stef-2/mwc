@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mwc/graphics/vulkan/pipeline_layout.hpp"
+
 import mwc_math_definition;
 import mwc_geometry;
 
@@ -20,11 +22,19 @@ namespace mwc {
         struct buffer_device_address_registers_st {
           array_t<vk::DeviceAddress, 8> m_registers = {};
         };
+        struct material_data_st {
+          using descriptor_index_t = pipeline_layout_ct::descriptor_count_t;
+
+          descriptor_index_t m_base_color_map = {};
+          descriptor_index_t m_metallic_roughness_map = {};
+          descriptor_index_t m_normal_map = {};
+        };
 
         geometry::transformation_t<> m_model = geometry::transformation_t<>::Identity();
         view_data_st m_view_data = {};
         projection_data_st m_projection_data = {};
         buffer_device_address_registers_st m_registers = {};
+        material_data_st m_material_data = {};
         float64_t m_current_time = {};
         float64_t m_delta_time = {};
       };

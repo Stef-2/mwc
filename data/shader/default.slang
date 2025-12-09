@@ -1,3 +1,5 @@
+import brdf;
+
 struct input_vertex_st {
   float32_t3 m_position;
   float32_t3 m_normal;
@@ -24,19 +26,28 @@ struct push_constants_st {
   struct buffer_device_address_registers_st {
     void* m_registers[8];
   };
+  struct material_data_st {
+    typedef uint16_t descriptor_index_t;
+
+    descriptor_index_t m_base_color_map;
+    descriptor_index_t m_metallic_roughness_map;
+    descriptor_index_t m_normal_map;
+  };
 
   float32_t4x4 m_model_transformation;
   view_data_st m_view_data;
   projection_data_st m_projection_data;
   buffer_device_address_registers_st m_registers;
-  float64_t m_current_time = {};
-  float64_t m_delta_time = {};
+  material_data_st m_material_data;
+
+  float64_t m_current_time;
+  float64_t m_delta_time;
 };
 
 [vk::push_constant]
 uniform push_constants_st push_constants;
-
 uniform Sampler2D combined_image_samplers[3];
+
 
 static const float4x4 proj = {0.5627, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1.0002, -1, 0, 0, -0.2000, 0};
 static const float4x4 proj2 = {0.5625, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1.0000, -1, 0, 0, -0.0200, 0};
@@ -83,8 +94,38 @@ VOut vertex_shader(uint32_t a_vertex_id : SV_VertexID) {
   return  {test, vertex.m_normal, vertex.m_uv};
 }
 
+float32_t3 computeDiffuseColor(const float32_t4 baseColor, float metallic) {
+    return baseColor.rgb * (1.0 - metallic);
+}
+
 [shader("fragment")]
 float4 fragment_shader(VOut a_vertex) : SV_Target {
+  let light_pos = float32_t3 (1.0, 1.0, 2.0);
+  let light_nor = normalize(-light_pos);
+
+  let shading_view = normalize(a_vertex.position - push_constants.m_view_data.m_view_position).xyz;
+  let shading_normal = a_vertex.normal;//combined_image_samplers[push_constants.m_material_data.m_normal_map].Sample(a_vertex.uv).xyz;
+  let NoV = dot(shading_view, shading_normal);
+
+  let empty_metallic_roughness = combined_image_samplers[push_constants.m_material_data.m_metallic_roughness_map].Sample(a_vertex.uv);
+  let metallic = empty_metallic_roughness.b;
+  let base_color = computeDiffuseColor(combined_image_samplers[push_constants.m_material_data.m_base_color_map].Sample(a_vertex.uv), metallic);
+  let roughness = empty_metallic_roughness.g;
+
+  let h = normalize(shading_view + light_nor);
+  let NoL = saturate(dot(shading_normal, light_nor));
+  float NoH = saturate(dot(shading_normal, h));
+  float LoH = saturate(dot(light_nor, h));
+  printf("im printing bro: %f", LoH);
+  float F0 = 0.04;
+  PixelParams pp = {base_color, roughness, roughness, F0, roughness};
+  Light light = {float32_t4(1.0f, 1.0f, 1.0f, 1.0f), light_nor, 1.0, light_pos, NoL, light_nor};
+  float32_t3 Fr = specularLobe(pp, light, h, NoV, NoL, NoH, LoH);
+  float32_t3 Fd = diffuseLobe(pp, NoV, NoL, LoH);
+
+  float32_t3 color = Fd + Fr;
   //return output_fragment_st ({1.0, 0.0, 0.0, 1.0});
-  return combined_image_samplers[0].Sample(a_vertex.uv + sin((float32_t)push_constants.m_current_time * 0.25));
+  //return combined_image_samplers[push_constants.m_material_data.m_base_color_map].Sample(a_vertex.uv/* + sin((float32_t)push_constants.m_current_time * 0.25)*/);
+  return {(color * light.colorIntensity.rgb) * (light.colorIntensity.w * light.attenuation * NoL) /* * light.colorIntensity.rgb*/, 1.0};
+  //return {push_constants.m_view_data.m_view_direction.xyz, 1.0};
 }

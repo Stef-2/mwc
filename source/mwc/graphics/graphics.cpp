@@ -4,6 +4,8 @@
 
 //#include <eigen3/Eigen/src/Geometry/Transform.h>
 
+//#include <eigen3/Eigen/src/Geometry/Transform.h>
+
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
 
@@ -16,6 +18,11 @@ import mwc_memory_conversion;
 namespace mwc {
   namespace graphics {
     using float3 = math::vector_t<float32_t, 3>;
+    using float4 = math::vector_t<float32_t, 4>;
+    using quat = math::quaternion_t<float32_t>;
+    using mat3 = math::matrix_t<float32_t, 3, 3>;
+    using mat4 = math::matrix_t<float, 4, 4>;
+
     auto transition_image_layout(const vk::raii::CommandBuffer& a_command_buffer, const vk::Image a_image,
                                  const vk::ImageLayout a_previous_layout, const vk::ImageLayout a_layout) -> void {
       const auto barrier
@@ -139,11 +146,11 @@ namespace mwc {
         descriptor_image_infos[i] = vk::DescriptorImageInfo {*image.m_device_image.m_sampler, *image.m_device_image.m_image_view,
                                                              vk::ImageLayout::eShaderReadOnlyOptimal};
         /*descriptor_write_data.emplace_back(vk::WriteDescriptorSet {
-          *m_pipeline_layout.combined_image_sampler_set(),
-          0,
-          static_cast<uint32_t>(i),
-          vk::DescriptorType::eCombinedImageSampler,
-        });*/
+                  *m_pipeline_layout.combined_image_sampler_set(),
+                  0,
+                  static_cast<uint32_t>(i),
+                  vk::DescriptorType::eCombinedImageSampler,
+                });*/
         image.m_device_image.m_image_index = m_pipeline_layout.acquire_descriptor_index();
 
         accumulated_offset += image.m_host_image.m_data_byte_count;
@@ -197,6 +204,7 @@ namespace mwc {
         = virtual_allocator_ct::configuration_st {.m_virtual_block_create_flags = vma::VirtualBlockCreateFlags {}}}},
       m_dynamic_rendering_state {m_surface},
       m_vertex_buffers {},
+      m_void_descriptor_indices {},
       m_user_interface {dear_imgui_ct {a_window, m_context, m_instance, m_physical_device, m_logical_device,
                                        m_queue_families.graphics(), m_graphics_queue, m_swapchain}},
       m_camera {camera_ct::configuration_st<camera_projection_et::e_perspective>::default_configuration()},
@@ -204,7 +212,7 @@ namespace mwc {
       auto scene_cfg = input::input_subsystem_st::filesystem_st::scene_processing_configuration_st::default_configuration();
       scene_cfg.m_device_buffer = &m_common_buffer;
 
-      input::read_scene_file("/home/billy/dev/mwc/data/mesh/Untitled.glb",
+      input::read_scene_file("/home/billy/dev/mwc/data/mesh/metal_sphere.glb",
                              {{false, true, true}, {false, false, true}, &m_common_buffer});
       contract_assert(input::input_subsystem_st::filesystem_st::scene_registry.size() > 0);
 
@@ -239,50 +247,109 @@ namespace mwc {
       const auto cursor_position_delta_y = float(input::input_subsystem_st::mouse_st::current_cursor_position.m_y
                                                  - input::input_subsystem_st::mouse_st::previous_cursor_position.m_y);
 
+      auto& camera_trans = std::get<0>(camera_trans_comp).m_transformation;
+      auto prev_inv_camera_trans = camera_trans /*.inverse()*/;
+      auto R = camera_trans.matrix();
+      const auto& camera_proj = std::get<1>(camera_trans_comp).m_projection;
+
+      auto cam_prev_view = float3 {camera_trans(0, 2), camera_trans(1, 2), camera_trans(2, 2)};
+      auto previous_rot_x = float {camera_trans(0, 2)};
+      auto previous_rot_y = float {camera_trans(1, 2)};
+      //auto previous_angle_axis = camera_proj.rotation().angleAxis();
+      auto previous_yaw = (float)std::atan2(R(2, 1), R(1, 1));
+      auto previous_pitch = (float)std::atan2(-R(3, 1), std::sqrt(std::pow(R(3, 2), 2) + std::pow(R(3, 3), 2)));
+
+      auto new_rot_x = std::clamp(previous_rot_x + geometry::radians(cursor_position_delta_x),
+                                  geometry::radians(-90.0f),
+                                  geometry::radians((90.0f)));
+      auto new_rot_y = previous_rot_y;
+
       const auto x_angle_axis
         = math::angle_axis_t<float32_t> {geometry::radians(cursor_position_delta_y), math::vector_t<float32_t, 3>::UnitX()};
       const auto y_angle_axis
         = math::angle_axis_t<float32_t> {geometry::radians(cursor_position_delta_x), math::vector_t<float32_t, 3>::UnitY()};
-      auto& camera_trans = std::get<0>(camera_trans_comp).m_transformation;
-      const auto& camera_proj = std::get<1>(camera_trans_comp).m_projection;
+      auto comb_angle_axis = y_angle_axis * x_angle_axis;
       auto cam_quat_x = math::quaternion_t<float32_t> {x_angle_axis};
+      cam_quat_x.normalize();
       auto cam_quat_y = math::quaternion_t<float32_t> {y_angle_axis};
+      cam_quat_y.normalize();
+
+      auto cam3x3 = math::matrix_t<float, 3, 3> {camera_proj.matrix().topLeftCorner(3, 3)};
+      auto cam_roll_pitch_yaw = cam3x3.canonicalEulerAngles(2, 1, 0);
 
       geometry::transformation_t<float> t;
+
       //t.rotate() t* cam_quat_x;
-      auto full_quat = cam_quat_x * cam_quat_y;
-      auto full_rot_mat = full_quat.toRotationMatrix();
-      auto camera_quat = math::quaternion_t<float32_t> {camera_trans.rotation()};
+      //auto full_quat = cam_quat_x * cam_quat_y;
+      //auto full_rot_mat = full_quat.toRotationMatrix();
+      auto camera_angle_axis = math::angle_axis_t<float> {math::quaternion_t<float> {camera_trans.rotation()}};
+      auto camera_quat = math::quaternion_t<float32_t> {prev_inv_camera_trans.rotation()};
+      auto new_quat = cam_quat_y * camera_quat * cam_quat_x;
+      auto new_rot_mat = new_quat.matrix();
 
-      math::vector_t<float32_t, 3> cam_pos = {}; //camera_trans.translation();
-      float3 cam_look_center = {0.0f, 0.0f, 0.0f};
-      math::quaternion_t<float32_t> full_rot = cam_quat_y * math::quaternion_t<float32_t> {1.0f, 0.0f, 0.0f, 0.0f} * cam_quat_x;
-      camera_trans.rotate(full_rot);
+      math::vector_t<float32_t, 3> cam_pos = prev_inv_camera_trans.translation();
+      //float3 cam_look_center = {0.0f, 0.0f, 0.0f};
+      math::quaternion_t<float32_t> full_rot = cam_quat_y * camera_quat * cam_quat_x;
+      auto full_angle_axis = math::angle_axis_t<float> {full_rot};
+      //full_angle_axis.axis().x() = std::clamp(full_angle_axis.axis().x(), -1.0f, 1.0f);
+      //full_angle_axis.axis().normalize();
+      //full_rot = full_angle_axis;
+      //full_rot.x() = std::clamp(full_rot.x(), , );
+      auto full_rot_mat = geometry::transformation_t<float> {full_rot};
+      //camera_trans.rotate(full_rot);
 
-      const auto cam_view_dir
-        = math::vector_t<float32_t, 3> {camera_trans(0, 2), camera_trans(1, 2), camera_trans(2, 2) /*norm_axis*/};
+      auto view = float3 {camera_trans(0, 2), camera_trans(1, 2), camera_trans(2, 2)};
+      auto added_quat = quat {};
+      added_quat.vec() = cam_quat_x.vec() + cam_quat_y.vec();
+      added_quat.w() = (cam_quat_x.w() + cam_quat_y.w()) * -1;
+      added_quat.normalize();
+      view = comb_angle_axis * view;
+
+      auto translation = camera_trans.translation();
+      //math::vector_t<float32_t, 3> {camera_trans(0, 2), camera_trans(1, 2), camera_trans(2, 2)};
+      //camera_trans.rotate();
+      //camera_trans.translate(translation);
+      auto xxx = camera_trans.matrix();
+      auto cam_view_dir = float3 {xxx(0, 2), xxx(1, 2), xxx(2, 2)};
+      //const auto inv = camera_trans.matrix();
+      cam_view_dir.normalize();
+      auto cam_right_dir = cam_view_dir.cross(math::vector_t<float32_t, 3> {0.0f, 1.0f, 0.0f});
+      cam_right_dir.normalize();
+
+      camera_trans.rotate(comb_angle_axis);
+      view = {camera_trans(0, 2), camera_trans(1, 2), camera_trans(2, 2)};
+      auto up = float3 {camera_trans(0, 1), camera_trans(1, 1), camera_trans(2, 1)};
+      auto right = float3 {view.cross(up)};
+      right.normalize();
       constexpr auto speed = 0.01f;
-      const auto cam_right_dir = cam_view_dir.cross(math::vector_t<float32_t, 3> {0.0f, 1.0f, 0.0f});
+
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eW)) {
-        cam_pos += cam_view_dir * -speed;
+        translation += view * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eS)) {
-        cam_pos += cam_view_dir * speed;
+        translation += view * -speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eD)) {
-        cam_pos += cam_right_dir * speed;
+        translation += right * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eA)) {
-        cam_pos += cam_right_dir * -speed;
+        translation += right * -speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eSpace)) {
-        cam_pos += float3 {0.0f, 1.0f, 0.0f} * speed;
+        translation += (float3 {0.0f, 1.0f, 0.0f} * speed);
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eC)) {
-        cam_pos += float3 {0.0f, 1.0f, 0.0f} * -speed;
+        translation += (float3 {0.0f, 1.0f, 0.0f} * -speed);
       }
-      //camera_trans.fromPositionOrientationScale(cam_pos, full_rot, math::vector_t<float32_t, 3> {1.0f, 1.0f, 1.0f});
-      camera_trans.translate(cam_pos);
+      /*
+      camera_trans.matrix().col(0) = float4 {right.x(), right.y(), right.z(), 0.0f};
+      camera_trans.matrix().col(1) = float4 {up.x(), up.y(), up.z(), 0.0f};
+      camera_trans.matrix().col(2) = float4 {view.x(), view.y(), view.z(), 0.0f};
+      camera_trans.matrix().col(3) = float4 {translation.x(), translation.y(), translation.z(), 1.0f};
+*/
+      camera_trans.translation() = translation;
+      //camera_trans.fromPositionOrientationScale(translation, view, math::vector_t<float32_t, 3> {1.0f, 1.0f, 1.0f});
+      //camera_trans.translate(cam_pos);
       //m_graphics_queue.command_pool()->reset(vk::CommandPoolResetFlagBits {});
       auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
 
@@ -300,14 +367,16 @@ namespace mwc {
       const auto inv_camera = camera_trans.inverse();
 
       // mesh to render
-      const auto& mesh = input::input_subsystem_st::filesystem_st::scene_registry[0].m_meshes[2];
+      const auto& mesh = input::input_subsystem_st::filesystem_st::scene_registry[0].m_meshes[0];
 
       // push constants
       auto push_constants = vulkan::push_constant_st {};
-      push_constants.m_model = camera_proj.matrix() * inv_camera.matrix() /* * math::matrix_t<float32_t, 4, 4>::Ones()*/;
+      push_constants.m_model = camera_proj.matrix() * inv_camera.matrix()
+        /* * math::matrix_t<float32_t, 4, 4>::Ones()*/;
       push_constants.m_registers.m_registers[0] = m_vertex_buffers[0].address() + mesh.m_device_mesh.m_vertex_buffer.m_offset;
+      push_constants.m_material_data = {1, 2, 0};
       push_constants.m_view_data.m_view_direction
-        = math::vector_t<float32_t, 4> {cam_view_dir[0], cam_view_dir[1], cam_view_dir[2], 1.0f};
+        = math::vector_t<float32_t, 4> {inv_camera(0, 2), inv_camera(1, 2), inv_camera(2, 2), 1.0f};
       push_constants.m_view_data.m_view_position = math::vector_t<float32_t, 4> {cam_pos[0], cam_pos[1], cam_pos[2], 0.0f};
       push_constants.m_current_time = vkfw::getTime().value;
       cmd.pushConstants<vulkan::push_constant_st>(m_pipeline_layout.native_handle(), vk::ShaderStageFlagBits::eAll, 0,
@@ -327,15 +396,15 @@ namespace mwc {
 
       // vertex buffer
       /*
-      auto vert_attribs = array_t<vk::VertexInputAttributeDescription2EXT, 4> {};
-      vert_attribs[0] = {0, 0, vk::Format::eR32G32B32Sfloat, 0};
-      vert_attribs[1] = {1, 0, vk::Format::eR32G32B32Sfloat, 12};
-      vert_attribs[2] = {2, 0, vk::Format::eR32G32B32A32Sfloat, 24};
-      vert_attribs[3] = {3, 0, vk::Format::eR32G32Sfloat, 40};
-      cmd.bindVertexBuffers(0, mesh.m_device_mesh.m_vertex_buffer.m_buffer, {0});
-      cmd.setVertexInputEXT(vk::VertexInputBindingDescription2EXT {0, uint32_t(mesh.m_host_mesh.m_vertex_model_size),
-                                                                   vk::VertexInputRate::eVertex, 1},
-                            vert_attribs);*/
+            auto vert_attribs = array_t<vk::VertexInputAttributeDescription2EXT, 4> {};
+            vert_attribs[0] = {0, 0, vk::Format::eR32G32B32Sfloat, 0};
+            vert_attribs[1] = {1, 0, vk::Format::eR32G32B32Sfloat, 12};
+            vert_attribs[2] = {2, 0, vk::Format::eR32G32B32A32Sfloat, 24};
+            vert_attribs[3] = {3, 0, vk::Format::eR32G32Sfloat, 40};
+            cmd.bindVertexBuffers(0, mesh.m_device_mesh.m_vertex_buffer.m_buffer, {0});
+            cmd.setVertexInputEXT(vk::VertexInputBindingDescription2EXT {0, uint32_t(mesh.m_host_mesh.m_vertex_model_size),
+                                                                         vk::VertexInputRate::eVertex, 1},
+                                  vert_attribs);*/
       // descriptors
       cmd.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_pipeline_layout.native_handle(), 0,
                              *m_pipeline_layout.combined_image_sampler_set(), {});

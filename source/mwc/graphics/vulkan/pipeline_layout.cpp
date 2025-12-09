@@ -7,7 +7,9 @@ namespace {
     const auto descriptor_indexing_properties
       = a_physical_device.properties().m_default_properties_chain.get<vk::PhysicalDeviceDescriptorIndexingProperties>();
 
-    return std::min(a_requested_descriptor_count, descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindSampledImages);
+    return std::saturate_cast<mwc::graphics::vulkan::pipeline_layout_ct::descriptor_count_t>(
+      std::min(static_cast<mwc::uint32_t>(a_requested_descriptor_count),
+               descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindSampledImages));
   }
 }
 
@@ -59,7 +61,7 @@ namespace mwc {
                                a_physical_device.properties()
                                  .m_default_properties_chain.get<vk::PhysicalDeviceProperties2>()
                                  .properties.limits.maxPushConstantsSize},
-        m_descriptor_count {0},
+        m_descriptor_index {0},
         m_configuration {.m_combined_image_sampler_count
                          = clamp_descriptor_count(a_physical_device, a_configuration.m_combined_image_sampler_count)} {
         information(std::format("initializing vulkan pipeline layout:" SUB "combined image sampler descriptor count: {0}" SUB
@@ -83,12 +85,12 @@ namespace mwc {
       auto pipeline_layout_ct::push_constant_range() const -> const vk::PushConstantRange& {
         return m_push_constant_range;
       }
-      auto pipeline_layout_ct::descriptor_count() const -> const descriptor_count_t {
-        return m_descriptor_count;
+      auto pipeline_layout_ct::descriptor_count() const -> descriptor_count_t {
+        return m_configuration.m_combined_image_sampler_count;
       }
-      auto pipeline_layout_ct::acquire_descriptor_index() -> const descriptor_count_t {
-        const auto descriptor_index = m_descriptor_count;
-        ++m_descriptor_count;
+      auto pipeline_layout_ct::acquire_descriptor_index() -> descriptor_count_t {
+        const auto descriptor_index = m_descriptor_index;
+        ++m_descriptor_index;
 
         return descriptor_index;
       }

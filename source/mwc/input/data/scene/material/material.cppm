@@ -13,8 +13,8 @@ import std;
 export namespace mwc {
   namespace input {
     struct material_st {
-      obs_ptr_t<image_st> m_diffuse_map;
-      color_st<float32_t> m_diffuse_color;
+      obs_ptr_t<image_st> m_base_color_map;
+      color_st<float32_t> m_base_color;
 
       obs_ptr_t<image_st> m_metallic_roughness_map;
       float32_t m_metallic_value;

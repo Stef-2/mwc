@@ -33,6 +33,7 @@ export namespace mwc {
       dimension_t m_width;
       dimension_t m_height;
       channel_count_t m_channel_count;
+      uint8_t m_bits_per_pixel;
     };
   }
 }

@@ -285,19 +285,23 @@ namespace mwc {
           = span_t<byte_t> {gltf_byte_array.begin() + gltf_buffer_view.byteOffset, gltf_buffer_view.byteLength};
 
         auto native_image = image_st {resource_st {a_filepath, gltf_image.name}};
-        native_image.m_host_image.m_data = {
-          std::bit_cast<obs_ptr_t<byte_t>>(stbi_load_from_memory(std::bit_cast<const stbi_uc*>(crude_image_data.data()),
-                                                                 crude_image_data.size(),
-                                                                 std::bit_cast<int*>(&native_image.m_host_image.m_width),
-                                                                 std::bit_cast<int*>(&native_image.m_host_image.m_height),
-                                                                 std::bit_cast<int*>(&native_image.m_host_image.m_channel_count),
-                                                                 requested_channel_count)),
-          dynamic_host_image_st::deleter};
+        auto gltf_image_channel_count = int {0};
+        native_image.m_host_image.m_data
+          = {std::bit_cast<obs_ptr_t<byte_t>>(stbi_load_from_memory(std::bit_cast<const stbi_uc*>(crude_image_data.data()),
+                                                                    crude_image_data.size(),
+                                                                    std::bit_cast<int*>(&native_image.m_host_image.m_width),
+                                                                    std::bit_cast<int*>(&native_image.m_host_image.m_height),
+                                                                    &gltf_image_channel_count,
+                                                                    requested_channel_count)),
+             dynamic_host_image_st::deleter};
 
         contract_assert(native_image.m_host_image.m_data);
-        contract_assert(native_image.m_host_image.m_channel_count == requested_channel_count);
-        native_image.m_host_image.m_data_byte_count = native_image.m_host_image.m_width * native_image.m_host_image.m_height
-                                                    * native_image.m_host_image.m_channel_count * sizeof(byte_t);
+        native_image.m_host_image.m_channel_count = requested_channel_count;
+        native_image.m_host_image.m_data_byte_count
+          = native_image.m_host_image.m_width * native_image.m_host_image.m_height * native_image.m_host_image.m_channel_count;
+        native_image.m_host_image.m_bits_per_pixel = native_image.m_host_image.m_data_byte_count
+                                                   / (native_image.m_host_image.m_width * native_image.m_host_image.m_height)
+                                                   * CHAR_BIT;
         processed_image_data_byte_count += native_image.m_host_image.m_data_byte_count;
 
         native_scene.m_images.emplace_back(std::move(native_image));
@@ -332,12 +336,12 @@ namespace mwc {
         auto& native_material = native_scene.m_meshes[i].m_material;
         const fastgltf::Material& gltf_material = asset.materials[material_index.value()];
         // diffuse mapping
-        native_material.m_diffuse_color
+        native_material.m_base_color
           = color_st {gltf_material.pbrData.baseColorFactor.x(), gltf_material.pbrData.baseColorFactor.y(),
                       gltf_material.pbrData.baseColorFactor.z(), gltf_material.pbrData.baseColorFactor.w()};
-        native_material.m_diffuse_map = gltf_material.pbrData.baseColorTexture.has_value()
-                                        ? &native_scene.m_images[gltf_material.pbrData.baseColorTexture.value().textureIndex]
-                                        : nullptr;
+        native_material.m_base_color_map = gltf_material.pbrData.baseColorTexture.has_value()
+                                           ? &native_scene.m_images[gltf_material.pbrData.baseColorTexture.value().textureIndex]
+                                           : nullptr;
         // metallic - roughness mapping
         native_material.m_metallic_value = gltf_material.pbrData.metallicFactor;
         native_material.m_roughness_value = gltf_material.pbrData.roughnessFactor;
