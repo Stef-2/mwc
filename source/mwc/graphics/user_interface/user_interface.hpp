@@ -2,7 +2,7 @@
 
 #include "mwc/graphics/user_interface/dear_imgui.hpp"
 
-import vulkan_hpp;
+import vulkan;
 
 import std;
 

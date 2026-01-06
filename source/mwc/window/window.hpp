@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mwc/core/diagnostic/assert.hpp"
 #include "mwc/core/contract/definition.hpp"
 
 import mwc_definition;
@@ -9,7 +10,7 @@ import mwc_project_name_string;
 import mwc_type_mobility;
 
 import std;
-import vulkan_hpp;
+import vulkan;
 import vkfw;
 
 namespace mwc {

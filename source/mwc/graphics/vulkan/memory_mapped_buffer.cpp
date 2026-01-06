@@ -1,5 +1,5 @@
 #include "mwc/graphics/vulkan/memory_mapped_buffer.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/diagnostic/log/logging.hpp"
 
 namespace mwc {
   namespace graphics {

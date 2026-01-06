@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 #include "mwc/core/chrono/subsystem.hpp"
 #include "mwc/core/container/static_bi_map.hpp"

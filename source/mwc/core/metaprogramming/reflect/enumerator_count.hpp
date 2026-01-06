@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 import mwc_static_string;
 
 namespace mwc {

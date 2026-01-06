@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/graphics/vulkan/command_pool.hpp"
 #include "mwc/graphics/vulkan/debug.hpp"
@@ -10,7 +8,7 @@ import mwc_definition;
 import mwc_debug;
 import mwc_extent;
 
-import vulkan_hpp;
+import vulkan;
 
 import std;
 

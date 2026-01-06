@@ -1,5 +1,6 @@
 module;
 
+#include "mwc/core/diagnostic/assert.hpp"
 #include "mwc/core/contract/definition.hpp"
 
 export module mwc_vertex_model;

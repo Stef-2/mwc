@@ -1,6 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
 #include "mwc/ecs/component_convergence.hpp"
 #include "mwc/ecs/archetype.hpp"
 #include "mwc/ecs/definition.hpp"
@@ -138,7 +137,7 @@ namespace mwc {
       std::unreachable();
     }
     inline auto destroy_entity(const entity_index_t a_entity_index)
-      -> void pre(ecs_subsystem_st::entity_archetype_map.contains(a_entity)) {
+      -> void pre(ecs_subsystem_st::entity_archetype_map.contains(a_entity_index)) {
       const auto archetype = ecs_subsystem_st::entity_archetype_map[a_entity_index];
       archetype.m_archetype->remove_component_row(archetype.m_entity_index);
       ecs_subsystem_st::entity_archetype_map.erase(a_entity_index);

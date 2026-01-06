@@ -15,7 +15,7 @@ namespace mwc {
         auto expected = a_memory_allocator.createBuffer(m_configuration.m_buffer_create_info,
                                                         m_configuration.m_allocation_create_info, m_allocation_info);
         contract_assert(expected.result == vk::Result::eSuccess);
-        auto& [buffer, allocation] = expected.value;
+        auto& [allocation, buffer] = expected.value;
         contract_assert(m_allocation_info.size >= m_configuration.m_buffer_create_info.size);
 
         m_vulkan_handle = handle_t {a_logical_device.unique_handle(), buffer};

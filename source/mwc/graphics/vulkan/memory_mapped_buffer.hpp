@@ -1,11 +1,9 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/graphics/vulkan/buffer.hpp"
 #include "mwc/core/utility/pointer_cast.hpp"
 
-import vulkan_hpp;
+import vulkan;
 
 import std;
 

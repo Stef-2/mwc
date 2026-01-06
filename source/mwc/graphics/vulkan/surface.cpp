@@ -1,5 +1,5 @@
 #include "mwc/graphics/vulkan/surface.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/diagnostic/log/logging.hpp"
 
 namespace {
   auto select_surface_present_mode(const mwc::graphics::vulkan::physical_device_ct& a_physical_device,
@@ -31,7 +31,8 @@ namespace mwc {
                       [[maybe_unused]] this auto&& a_template_synthesizer) -> capabilities_st::capabilities_chain_t {
           auto surface_information_chain = capabilities_st::information_chain_t {};
           // structure chain type deduction
-          auto& [... capabilities_pack] = m_capabilities.m_capabilities_chain;
+          auto&& [... capabilities_pack]
+            = static_cast<capabilities_st::capabilities_chain_t::storage_t>(m_capabilities.m_capabilities_chain);
           surface_information_chain.get<vk::PhysicalDeviceSurfaceInfo2KHR>().surface = this->native_handle();
           surface_information_chain.get<vk::SurfacePresentModeEXT>().presentMode
             = select_surface_present_mode(a_physical_device, *this, a_configuration.m_present_mode);

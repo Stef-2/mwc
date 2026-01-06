@@ -1,5 +1,5 @@
 #include "mwc/window/window.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/diagnostic/log/logging.hpp"
 
 namespace mwc {
   window_ct::window_ct(const configuration_st& a_configuration)

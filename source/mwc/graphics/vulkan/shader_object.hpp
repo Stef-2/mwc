@@ -1,5 +1,5 @@
 #pragma once
-
+#include "mwc/core/diagnostic/assert.hpp"
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/graphics/vulkan/physical_device.hpp"
 
@@ -9,7 +9,7 @@ import mwc_definition;
 import mwc_extent;
 import mwc_type_mobility;
 
-import vulkan_hpp;
+import vulkan;
 
 import std;
 
@@ -82,9 +82,10 @@ namespace mwc {
             = std::bit_cast<const VkShaderCreateInfoEXT*>(a_configuration.m_shader_create_info.data());
           const auto native_storage_ptr = std::bit_cast<VkShaderEXT*>(storage.data());
 
-          const auto result = static_cast<vk::Result>(m_logical_device->getDispatcher()->vkCreateShadersEXT(
-            m_logical_device.native_handle(), a_configuration.m_shader_create_info.size(), native_create_info_ptr, nullptr,
-            native_storage_ptr));
+          const auto dispatcher = m_logical_device->getDispatcher();
+          const auto result = static_cast<vk::Result>(
+            dispatcher->vkCreateShadersEXT(m_logical_device.native_handle(), a_configuration.m_shader_create_info.size(),
+                                           native_create_info_ptr, nullptr, native_storage_ptr));
           contract_assert(result == vk::Result::eSuccess);
 
           for (const auto& shader_object : storage)
@@ -148,17 +149,6 @@ namespace mwc {
       template <typename tp_this>
       constexpr auto shader_object_pipeline_ct<tp_extent>::configuration(this tp_this&& a_this) -> decltype(auto) {
         return std::forward_like<decltype(a_this)>(a_this.m_configuration);
-      }
-
-      inline void test() {
-        logical_device_ct* ld;
-        physical_device_ct* pd;
-        //pipeline_layout_ct* pl;
-        shader_object_pipeline_ct<2> xxx {*ld, *pd, {}};
-
-        shader_object_pipeline_ct<2> yyy = std::move(xxx);
-        optional_t<shader_object_pipeline_ct<>> osop {};
-        const auto zzz = xxx.shader_pipeline_binary_data();
       }
     }
   }

@@ -1,5 +1,5 @@
 #include "mwc/graphics/vulkan/physical_device.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/diagnostic/log/logging.hpp"
 #include "mwc/core/utility/semantic_version.hpp"
 
 namespace mwc {
@@ -34,8 +34,10 @@ namespace mwc {
         })},
         m_properties {std::invoke([this]([[maybe_unused]] this auto&& a_this) -> properties_st {
           // structure chain type deduction
-          [[maybe_unused]] auto& [... default_properties_pack] = m_properties.m_default_properties_chain;
-          [[maybe_unused]] auto& [... memory_properties_pack] = m_properties.m_memory_properties_chain;
+          [[maybe_unused]] auto&& [... default_properties_pack]
+            = static_cast<properties_st::default_chain_t::storage_t>(m_properties.m_default_properties_chain);
+          [[maybe_unused]] auto&& [... memory_properties_pack]
+            = static_cast<properties_st::memory_chain_t::storage_t>(m_properties.m_memory_properties_chain);
 
           return properties_st {(*this)->getProperties2<decltype(default_properties_pack)...>(),
                                 (*this)->getMemoryProperties2<decltype(memory_properties_pack)...>(),
@@ -43,7 +45,8 @@ namespace mwc {
         })},
         m_features {std::invoke([this]([[maybe_unused]] this auto&& a_this) -> features_st {
           // structure chain type deduction
-          [[maybe_unused]] auto& [... default_features_pack] = m_features.m_default_features_chain;
+          [[maybe_unused]] auto&& [... default_features_pack]
+            = static_cast<features_st::default_chain_t::storage_t>(m_features.m_default_features_chain);
 
           return features_st {(*this)->getFeatures2<decltype(default_features_pack)...>()};
         })},

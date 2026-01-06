@@ -1,5 +1,5 @@
 #include "mwc/graphics/vulkan/memory_allocator.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/diagnostic/log/logging.hpp"
 #include "mwc/core/utility/semantic_version.hpp"
 
 import mwc_observer_ptr;
@@ -51,8 +51,8 @@ namespace mwc {
             // extract individual extension bits and convert them to their respective device extensions
             const auto bit_flag = vma::AllocatorCreateFlagBits {e};
             const auto extension_string = vma_extension_map(bit_flag);
-            if (vk::isPromotedExtension(extension_string) or
-                std::ranges::contains(a_logical_device.configuration().m_required_extensions, extension_string)) {
+            if (vk::isPromotedExtension(extension_string)
+                or std::ranges::contains(a_logical_device.configuration().m_required_extensions, extension_string)) {
               std::format_to(std::back_inserter(buffer), "" SUB "[{0}] {1}", i++, extension_string);
               allocator_extensions |= bit_flag;
             }

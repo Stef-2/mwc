@@ -49,8 +49,8 @@ namespace mwc::diagnostic::log {
       // event severity level matches exactly
       const auto matching_severity_level = event_severity_level == sink.m_event_severity;
       // the sink is also subscribed to higher event severity levels
-      const auto covering_higher_severity_level = event_severity_level > sink.m_event_severity and
-                                                  (configuration.m_bit_mask bitand std::to_underlying(e_cover_higher_severities));
+      const auto covering_higher_severity_level = event_severity_level > sink.m_event_severity
+                                              and (configuration.m_bit_mask bitand std::to_underlying(e_cover_higher_severities));
 
       if (matching_severity_level or covering_higher_severity_level) {
         // generate and preallocate the buffer storage

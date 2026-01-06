@@ -22,6 +22,43 @@ namespace mwc {
     using quat = math::quaternion_t<float32_t>;
     using mat3 = math::matrix_t<float32_t, 3, 3>;
     using mat4 = math::matrix_t<float, 4, 4>;
+    using trans = geometry::transformation_t<float>;
+
+    mat4 view(float3 pos, float yaw, float pitch) {
+      float cosPitch = std::cos(pitch);
+      float sinPitch = std::sin(pitch);
+      float cosYaw = std::cos(yaw);
+      float sinYaw = std::sin(yaw);
+
+      float3 xaxis = {cosYaw, 0, -sinYaw};
+      float3 yaxis = {sinYaw * sinPitch, cosPitch, cosYaw * sinPitch};
+      float3 zaxis = {sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw};
+
+      mat4 m;
+      m.col(0) = float4 {xaxis.x(), yaxis.x(), zaxis.x(), 0.0f};
+      m.col(1) = float4 {xaxis.y(), yaxis.y(), zaxis.y(), 0.0f};
+      m.col(2) = float4 {xaxis.z(), yaxis.z(), zaxis.z(), 0.0f};
+      m.col(3) = float4 {-(xaxis.dot(pos)), -(yaxis.dot(pos)), -(zaxis.dot(pos)), 1.0f};
+
+      return m;
+    }
+    mat4 look_at(float3 eye, float3 target, float3 up = {0.0f, 1.0f, 0.0f}) {
+      float3 z_axis = float3 {eye - target}.normalized();
+      float3 x_axis = up.cross(z_axis).normalized();
+      float3 y_axis = z_axis.cross(x_axis);
+
+      float3 translation = {-x_axis.dot(eye), -y_axis.dot(eye), -z_axis.dot(eye)};
+
+      mat3 r;
+      r.col(0) = x_axis;
+      r.col(1) = y_axis;
+      r.col(2) = z_axis;
+      trans t = trans::Identity();
+      t.linear() = r;
+      t.translation() = -eye;
+
+      return t.matrix();
+    }
 
     auto transition_image_layout(const vk::raii::CommandBuffer& a_command_buffer, const vk::Image a_image,
                                  const vk::ImageLayout a_previous_layout, const vk::ImageLayout a_layout) -> void {
@@ -212,7 +249,7 @@ namespace mwc {
       auto scene_cfg = input::input_subsystem_st::filesystem_st::scene_processing_configuration_st::default_configuration();
       scene_cfg.m_device_buffer = &m_common_buffer;
 
-      input::read_scene_file("/home/billy/dev/mwc/data/mesh/metal_sphere.glb",
+      input::read_scene_file("/home/billy/dev/mwc/data/mesh/metal_sphere_plus_xyz.glb",
                              {{false, true, true}, {false, false, true}, &m_common_buffer});
       contract_assert(input::input_subsystem_st::filesystem_st::scene_registry.size() > 0);
 
@@ -237,120 +274,106 @@ namespace mwc {
       mwc::file_path_t shader_path = mwc::filesystem::directory(mwc::filesystem::directory_et::e_shader);
       shader_path /= "default.slang";
       mwc::input::read_shader_file(shader_path, shader_cfg);
+
+      auto camera_trans_comp = m_camera.components<ecs::transformation_st, ecs::camera_projection_st, ecs::camera_type_st>();
+      auto& c = std::get<0>(camera_trans_comp).m_transformation;
+      //c.translate(float3 {-2.0f, -2.0f, -2.0f});
+      //c.matrix() = look_at(float3 {2.0f, 2.0f, 2.0f}, float3 {0.0f, 0.0f, 0.0f}).inverse();
+      //c.pretranslate(float3 {2.0f, 2.0f, 2.0f});
+      c(2, 2) = 1.0f;
     }
 
     auto graphics_ct::render() -> void {
       //camera
+      static float yaw = 0.0f;
+      static float pitch = 0.0f;
+      static float3 pos = {0.0f, 0.0f, 0.0f};
       auto camera_trans_comp = m_camera.components<ecs::transformation_st, ecs::camera_projection_st, ecs::camera_type_st>();
+      trans& camera_trans = std::get<0>(camera_trans_comp).m_transformation;
+      auto& camera_proj = std::get<1>(camera_trans_comp).m_projection;
+
       const auto cursor_position_delta_x = float(input::input_subsystem_st::mouse_st::current_cursor_position.m_x
                                                  - input::input_subsystem_st::mouse_st::previous_cursor_position.m_x);
       const auto cursor_position_delta_y = float(input::input_subsystem_st::mouse_st::current_cursor_position.m_y
                                                  - input::input_subsystem_st::mouse_st::previous_cursor_position.m_y);
-
-      auto& camera_trans = std::get<0>(camera_trans_comp).m_transformation;
-      auto prev_inv_camera_trans = camera_trans /*.inverse()*/;
-      auto R = camera_trans.matrix();
-      const auto& camera_proj = std::get<1>(camera_trans_comp).m_projection;
-
-      auto cam_prev_view = float3 {camera_trans(0, 2), camera_trans(1, 2), camera_trans(2, 2)};
-      auto previous_rot_x = float {camera_trans(0, 2)};
-      auto previous_rot_y = float {camera_trans(1, 2)};
-      //auto previous_angle_axis = camera_proj.rotation().angleAxis();
-      auto previous_yaw = (float)std::atan2(R(2, 1), R(1, 1));
-      auto previous_pitch = (float)std::atan2(-R(3, 1), std::sqrt(std::pow(R(3, 2), 2) + std::pow(R(3, 3), 2)));
-
-      auto new_rot_x = std::clamp(previous_rot_x + geometry::radians(cursor_position_delta_x),
-                                  geometry::radians(-90.0f),
-                                  geometry::radians((90.0f)));
-      auto new_rot_y = previous_rot_y;
-
-      const auto x_angle_axis
-        = math::angle_axis_t<float32_t> {geometry::radians(cursor_position_delta_y), math::vector_t<float32_t, 3>::UnitX()};
-      const auto y_angle_axis
-        = math::angle_axis_t<float32_t> {geometry::radians(cursor_position_delta_x), math::vector_t<float32_t, 3>::UnitY()};
-      auto comb_angle_axis = y_angle_axis * x_angle_axis;
-      auto cam_quat_x = math::quaternion_t<float32_t> {x_angle_axis};
-      cam_quat_x.normalize();
-      auto cam_quat_y = math::quaternion_t<float32_t> {y_angle_axis};
-      cam_quat_y.normalize();
-
-      auto cam3x3 = math::matrix_t<float, 3, 3> {camera_proj.matrix().topLeftCorner(3, 3)};
-      auto cam_roll_pitch_yaw = cam3x3.canonicalEulerAngles(2, 1, 0);
-
-      geometry::transformation_t<float> t;
-
-      //t.rotate() t* cam_quat_x;
-      //auto full_quat = cam_quat_x * cam_quat_y;
-      //auto full_rot_mat = full_quat.toRotationMatrix();
-      auto camera_angle_axis = math::angle_axis_t<float> {math::quaternion_t<float> {camera_trans.rotation()}};
-      auto camera_quat = math::quaternion_t<float32_t> {prev_inv_camera_trans.rotation()};
-      auto new_quat = cam_quat_y * camera_quat * cam_quat_x;
-      auto new_rot_mat = new_quat.matrix();
-
-      math::vector_t<float32_t, 3> cam_pos = prev_inv_camera_trans.translation();
-      //float3 cam_look_center = {0.0f, 0.0f, 0.0f};
-      math::quaternion_t<float32_t> full_rot = cam_quat_y * camera_quat * cam_quat_x;
-      auto full_angle_axis = math::angle_axis_t<float> {full_rot};
-      //full_angle_axis.axis().x() = std::clamp(full_angle_axis.axis().x(), -1.0f, 1.0f);
-      //full_angle_axis.axis().normalize();
-      //full_rot = full_angle_axis;
-      //full_rot.x() = std::clamp(full_rot.x(), , );
-      auto full_rot_mat = geometry::transformation_t<float> {full_rot};
-      //camera_trans.rotate(full_rot);
-
-      auto view = float3 {camera_trans(0, 2), camera_trans(1, 2), camera_trans(2, 2)};
-      auto added_quat = quat {};
-      added_quat.vec() = cam_quat_x.vec() + cam_quat_y.vec();
-      added_quat.w() = (cam_quat_x.w() + cam_quat_y.w()) * -1;
-      added_quat.normalize();
-      view = comb_angle_axis * view;
-
-      auto translation = camera_trans.translation();
-      //math::vector_t<float32_t, 3> {camera_trans(0, 2), camera_trans(1, 2), camera_trans(2, 2)};
-      //camera_trans.rotate();
-      //camera_trans.translate(translation);
-      auto xxx = camera_trans.matrix();
-      auto cam_view_dir = float3 {xxx(0, 2), xxx(1, 2), xxx(2, 2)};
-      //const auto inv = camera_trans.matrix();
-      cam_view_dir.normalize();
-      auto cam_right_dir = cam_view_dir.cross(math::vector_t<float32_t, 3> {0.0f, 1.0f, 0.0f});
-      cam_right_dir.normalize();
-
-      camera_trans.rotate(comb_angle_axis);
-      view = {camera_trans(0, 2), camera_trans(1, 2), camera_trans(2, 2)};
-      auto up = float3 {camera_trans(0, 1), camera_trans(1, 1), camera_trans(2, 1)};
-      auto right = float3 {view.cross(up)};
+      auto offset = float3 {0.0f, 0.0f, 0.0f};
+      constexpr auto speed = -0.01f;
+      //const auto inv_c = camera_trans.inverse();
+      auto fwd = float3 {camera_trans(0, 2), camera_trans(1, 2), camera_trans(2, 2)};
+      //auto old_look = look_at(pos, {0.0f, 0.0f, 0.0f}).inverse();
+      //fwd = {old_look(0, 2), old_look(1, 2), old_look(2, 2)};
+      //fwd.normalize();
+      auto up = float3 {0.0f, 1.0f, 0.0f};
+      auto local_up = float3 {camera_trans(0, 1), camera_trans(1, 1), camera_trans(2, 1)};
+      auto right = float3 {up.cross(fwd)};
       right.normalize();
-      constexpr auto speed = 0.01f;
 
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eW)) {
-        translation += view * speed;
+        offset += fwd * speed;
+        //pos += float3 {0.0f, 0.0f, 1.0f} * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eS)) {
-        translation += view * -speed;
+        offset += -fwd * speed;
+        //pos += float3 {0.0f, 0.0f, -1.0f} * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eD)) {
-        translation += right * speed;
+        offset += right * speed;
+        //pos += float3 {1.0f, 0.0f, 0.0f} * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eA)) {
-        translation += right * -speed;
+        offset += -right * speed;
+        //pos += float3 {-1.0f, 0.0f, 0.0f} * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eSpace)) {
-        translation += (float3 {0.0f, 1.0f, 0.0f} * speed);
+        offset += up * speed;
+        //pos += up * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eC)) {
-        translation += (float3 {0.0f, 1.0f, 0.0f} * -speed);
+        offset += -up * speed;
+        //pos += -up * speed;
       }
-      /*
-      camera_trans.matrix().col(0) = float4 {right.x(), right.y(), right.z(), 0.0f};
-      camera_trans.matrix().col(1) = float4 {up.x(), up.y(), up.z(), 0.0f};
-      camera_trans.matrix().col(2) = float4 {view.x(), view.y(), view.z(), 0.0f};
-      camera_trans.matrix().col(3) = float4 {translation.x(), translation.y(), translation.z(), 1.0f};
-*/
-      camera_trans.translation() = translation;
-      //camera_trans.fromPositionOrientationScale(translation, view, math::vector_t<float32_t, 3> {1.0f, 1.0f, 1.0f});
-      //camera_trans.translate(cam_pos);
-      //m_graphics_queue.command_pool()->reset(vk::CommandPoolResetFlagBits {});
+      //trans t;
+
+      //if (cursor_position_delta_x != 0.0f or cursor_position_delta_y != 0.0f) {
+      yaw += (float)cursor_position_delta_x / 20000.0f;
+      pitch += (float)cursor_position_delta_y / 20000.0f;
+
+      math::angle_axis_t<float> x_angle_axis = {cursor_position_delta_y / 200.0f, float3 {1.0f, 0.0f, 0.0f}};
+      quat accum_pitch_quat = quat {x_angle_axis};
+      auto accum_pitch_mat3 = accum_pitch_quat.toRotationMatrix();
+      mat4 accum_pitch_mat4 = mat4::Identity();
+      accum_pitch_mat4.block<3, 3>(0, 0) = accum_pitch_quat.toRotationMatrix();
+
+      math::angle_axis_t<float> y_angle_axis = {cursor_position_delta_x / 200.0f, float3 {0.0f, 1.0f, 0.0f}};
+      quat accum_yaw_quat = quat {y_angle_axis};
+      auto accum_yaw_mat3 = accum_yaw_quat.toRotationMatrix();
+      mat4 accum_yaw_mat4 = mat4::Identity();
+      accum_yaw_mat4.block<3, 3>(0, 0) = accum_yaw_mat3;
+
+      mat4 rot4 = accum_yaw_mat4 * accum_pitch_mat4;
+      mat3 rot3 = accum_yaw_mat3 * accum_pitch_mat3;
+
+      auto xxx = y_angle_axis * x_angle_axis;
+      quat q;
+      q.x() = accum_pitch_quat.x() + accum_yaw_quat.x();
+      q.y() = accum_pitch_quat.y() + accum_yaw_quat.y();
+      q.z() = accum_pitch_quat.z() + accum_yaw_quat.z();
+      q.w() = accum_pitch_quat.w() + accum_yaw_quat.w();
+      q.normalize();
+      //camera_trans.rotate(accum_pitch_quat);
+      //camera_trans.rotate(accum_pitch_quat * accum_yaw_quat);
+      mat3 r = camera_trans.rotation();
+      camera_trans.rotate(q);
+      camera_trans.pretranslate(offset);
+      //camera_trans.linear() = quat {quat {r} * accum_pitch_quat * r.inverse() * accum_yaw_quat}.toRotationMatrix().normalized();
+
+      //mat4 look = look_at(pos, {0.0f, 0.0f, 0.0f});
+      //camera_trans = look.inverse();
+      //camera_trans.matrix() = look.inverse();
+      //}
+      auto model = input::input_subsystem_st::filesystem_st::scene_registry[0].m_nodes[0].m_transformation;
+      auto inv = camera_trans.inverse();
+
       auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
 
       const auto& cmd = frame_data.m_command_buffer;
@@ -364,20 +387,17 @@ namespace mwc {
       // dynamic rendring state
       m_dynamic_rendering_state.bind(cmd);
 
-      const auto inv_camera = camera_trans.inverse();
-
       // mesh to render
       const auto& mesh = input::input_subsystem_st::filesystem_st::scene_registry[0].m_meshes[0];
 
       // push constants
       auto push_constants = vulkan::push_constant_st {};
-      push_constants.m_model = camera_proj.matrix() * inv_camera.matrix()
-        /* * math::matrix_t<float32_t, 4, 4>::Ones()*/;
+      push_constants.m_model = camera_proj.matrix() * inv.matrix() * model.matrix();
+      /* * math::matrix_t<float32_t, 4, 4>::Ones()*/;
       push_constants.m_registers.m_registers[0] = m_vertex_buffers[0].address() + mesh.m_device_mesh.m_vertex_buffer.m_offset;
       push_constants.m_material_data = {1, 2, 0};
-      push_constants.m_view_data.m_view_direction
-        = math::vector_t<float32_t, 4> {inv_camera(0, 2), inv_camera(1, 2), inv_camera(2, 2), 1.0f};
-      push_constants.m_view_data.m_view_position = math::vector_t<float32_t, 4> {cam_pos[0], cam_pos[1], cam_pos[2], 0.0f};
+      push_constants.m_view_data.m_view_direction = math::vector_t<float32_t, 4> {inv(0, 2), inv(1, 2), inv(2, 2), 1.0f};
+      push_constants.m_view_data.m_view_position = math::vector_t<float32_t, 4> {inv(0, 3), inv(1, 3), inv(2, 3), 0.0f};
       push_constants.m_current_time = vkfw::getTime().value;
       cmd.pushConstants<vulkan::push_constant_st>(m_pipeline_layout.native_handle(), vk::ShaderStageFlagBits::eAll, 0,
                                                   push_constants);

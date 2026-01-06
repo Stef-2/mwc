@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/input/subsystem.hpp"
 #include "mwc/window/window.hpp"
 #include "mwc/graphics/vulkan/context.hpp"
@@ -27,7 +25,7 @@ import mwc_definition;
 import mwc_geometry;
 import mwc_host_mesh;
 
-import vulkan_hpp;
+import vulkan;
 
 import std;
 

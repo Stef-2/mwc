@@ -5,10 +5,8 @@ module;
 export module mwc_device_mesh;
 
 import mwc_observer_ptr;
-import mwc_vertex_model;
-import mwc_host_mesh;
 
-import vulkan_hpp;
+import vulkan;
 
 export namespace mwc {
   namespace graphics {

@@ -12,7 +12,7 @@ namespace mwc {
         auto expected = a_memory_allocator.createImage(m_configuration.m_image_create_info,
                                                        m_configuration.m_allocation_create_info, m_allocation_info);
         contract_assert(expected.result == vk::Result::eSuccess);
-        auto& [image, allocation] = expected.value;
+        auto& [allocation, image] = expected.value;
 
         m_vulkan_handle = handle_t {a_logical_device.unique_handle(), image};
       }

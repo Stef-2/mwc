@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/graphics/vulkan/handle.hpp"
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/graphics/vulkan/queue_families.hpp"
@@ -9,7 +7,7 @@
 
 import mwc_definition;
 
-import vulkan_hpp;
+import vulkan;
 
 import std;
 
@@ -27,7 +25,11 @@ namespace mwc {
           queue_families_ct::family_st::index_t m_family_index;
         };
 
-        enum class queue_state_et { e_initial, e_recording, e_executing };
+        enum class queue_state_et {
+          e_initial,
+          e_recording,
+          e_executing
+        };
 
         queue_ct(const logical_device_ct& a_logical_device,
                  const configuration_st& a_configuration = configuration_st::default_configuration());

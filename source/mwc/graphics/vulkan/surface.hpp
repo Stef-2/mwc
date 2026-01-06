@@ -1,13 +1,13 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/graphics/vulkan/handle.hpp"
 #include "mwc/graphics/vulkan/instance.hpp"
 #include "mwc/graphics/vulkan/physical_device.hpp"
 #include "mwc/window/window.hpp"
 
-import vulkan_hpp;
+import mwc_vulkan_structure_chain;
+
+import vulkan;
 import vkfw;
 
 import std;
@@ -19,8 +19,8 @@ namespace mwc {
         public:
         using extent_t = vk::Extent2D;
         struct capabilities_st {
-          using information_chain_t = vk::StructureChain<vk::PhysicalDeviceSurfaceInfo2KHR, vk::SurfacePresentModeEXT>;
-          using capabilities_chain_t = vk::StructureChain<vk::SurfaceCapabilities2KHR, vk::SurfacePresentModeCompatibilityEXT,
+          using information_chain_t = structure_chain_st<vk::PhysicalDeviceSurfaceInfo2KHR, vk::SurfacePresentModeEXT>;
+          using capabilities_chain_t = structure_chain_st<vk::SurfaceCapabilities2KHR, vk::SurfacePresentModeCompatibilityEXT,
                                                           vk::SurfacePresentScalingCapabilitiesEXT>;
 
           capabilities_chain_t m_capabilities_chain;

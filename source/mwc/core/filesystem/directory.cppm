@@ -1,6 +1,6 @@
 module;
 
-#include "mwc/core/contract/definition.hpp"
+#include "mwc/core/diagnostic/assert.hpp"
 
 export module mwc_directory;
 

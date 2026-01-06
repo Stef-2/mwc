@@ -1,6 +1,8 @@
 #pragma once
 
+#include "mwc/core/diagnostic/assert.hpp"
 #include "mwc/core/contract/definition.hpp"
+
 #include "mwc/ecs/definition.hpp"
 #include "mwc/ecs/component.hpp"
 

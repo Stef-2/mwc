@@ -1,13 +1,12 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/core/chrono/subsystem.hpp"
 #include "mwc/core/diagnostic/log/log.hpp"
-#include "mwc/core/filesystem/file_type.hpp"
+//#include "mwc/core/filesystem/file_type.hpp"
 
 import mwc_subsystem;
 import mwc_empty_type;
+import mwc_logging_subsystem_switch;
 
 import std;
 
@@ -28,7 +27,8 @@ namespace mwc {
       };
 
       namespace global {
-        inline auto logging_subsystem = log_subsystem_st {{&chrono::global::chrono_subsystem}, string_view_t {"log subsystem"}};
+        inline auto logging_subsystem
+          = log_subsystem_st {{&::mwc::chrono::global::chrono_subsystem}, string_view_t {"log subsystem"}};
       }
     }
   }

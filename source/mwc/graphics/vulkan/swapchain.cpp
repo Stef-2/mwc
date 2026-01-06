@@ -1,5 +1,5 @@
 #include "mwc/graphics/vulkan/swapchain.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/diagnostic/log/logging.hpp"
 
 namespace {
   auto clamp_image_count(const mwc::graphics::vulkan::swapchain_ct::image_index_t a_image_count,

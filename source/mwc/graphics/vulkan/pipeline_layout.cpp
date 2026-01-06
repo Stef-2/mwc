@@ -1,6 +1,5 @@
 #include "mwc/graphics/vulkan/pipeline_layout.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
-
+#include "mwc/core/diagnostic/log/logging.hpp"
 namespace {
   auto clamp_descriptor_count(const mwc::graphics::vulkan::physical_device_ct& a_physical_device,
                               const mwc::graphics::vulkan::pipeline_layout_ct::descriptor_count_t a_requested_descriptor_count) {

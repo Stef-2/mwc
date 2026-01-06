@@ -1,6 +1,6 @@
 module;
 
-#include "mwc/core/chrono/subsystem.hpp"
+//#include "mwc/core/chrono/subsystem.hpp"
 
 export module mwc_chrono;
 
@@ -13,8 +13,8 @@ import std;
 export namespace mwc {
   namespace chrono {
     template <typename tp>
-    concept duration_c = specialization_of_v<tp, std::chrono::duration> or std::is_same_v<tp, integral_duration_t> or
-                         std::is_same_v<tp, floating_duration_t>;
+    concept duration_c = specialization_of_v<tp, std::chrono::duration> or std::is_same_v<tp, integral_duration_t>
+                      or std::is_same_v<tp, floating_duration_t>;
     template <typename tp>
     concept clock_c = concepts::any_of_c<tp, high_resolution_clock_t, system_clock_t>;
 
@@ -47,9 +47,9 @@ export namespace mwc {
     auto stopwatch_ct::stop() const -> const tp_duration {
       return {current_time() - m_start_time};
     }
-    auto initialization_time() -> const time_point_t& {
+    /*auto initialization_time() -> const time_point_t& {
       return chrono_subsystem_st::initialization_time;
-    }
+    }*/
     template <clock_c tp_clock = high_resolution_clock_t>
     auto current_time() -> const tp_clock::time_point {
       return tp_clock::now();

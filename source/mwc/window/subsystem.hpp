@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 
 import vkfw;
@@ -17,7 +15,7 @@ namespace mwc {
   };
 
   namespace global {
-    inline auto window_subsystem =
-      window_subsystem_st {{&diagnostic::log::global::logging_subsystem}, string_view_t {"window subsystem"}};
+    inline auto window_subsystem
+      = window_subsystem_st {{&diagnostic::log::global::logging_subsystem}, string_view_t {"window subsystem"}};
   }
 }

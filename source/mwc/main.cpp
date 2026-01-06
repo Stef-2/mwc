@@ -1,7 +1,5 @@
 #include "eigen3/Eigen/Dense"
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/mwc.hpp"
 #include "mwc/ecs/component.hpp"
 #include "mwc/core/filesystem/subsystem.hpp"

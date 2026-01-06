@@ -1,5 +1,5 @@
 #include "mwc/graphics/vulkan/queue.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/diagnostic/log/logging.hpp"
 
 namespace mwc {
   namespace graphics {

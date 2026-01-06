@@ -1,8 +1,7 @@
 #include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/filesystem/file_type.hpp"
 
-import mwc_event_severity;
 import mwc_output_stream;
-import mwc_chrono;
 
 namespace mwc {
   namespace diagnostic {
@@ -50,6 +49,7 @@ namespace mwc {
       }
     }
   }
+  /*
   template <>
   auto information<true>(const string_view_t a_message, const std::source_location& a_source_location)
     -> void pre(contract::validate_storage(a_message)) {
@@ -70,7 +70,7 @@ namespace mwc {
     -> void pre(contract::validate_storage(a_message)) {
     diagnostic::log::log_subsystem_st::log.critical(a_message, a_source_location);
     std::abort();
-  }
+  }*/
 }
 
 namespace mwc {

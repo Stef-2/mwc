@@ -129,7 +129,7 @@ namespace mwc {
         else if constexpr (std::is_same_v<sink_t, file_ptr_t>)
           m_type = sink_et::e_file;
         else
-          contract_assert(false);
+          static_assert(false);
       }
       template <typename tp_this>
       auto log_ct::storage(this tp_this&& a_this) -> decltype(auto) {

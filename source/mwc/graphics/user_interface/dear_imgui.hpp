@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/window/window.hpp"
 #include "mwc/graphics/vulkan/context.hpp"
 #include "mwc/graphics/vulkan/instance.hpp"
@@ -16,7 +14,7 @@
 import mwc_definition;
 import mwc_type_mobility;
 
-import vulkan_hpp;
+import vulkan;
 
 import std;
 

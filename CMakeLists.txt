@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
 set(CMAKE_CXX_MODULE_STD TRUE)
 
 project(mwc LANGUAGES CXX)
-include_directories(/opt/compiler-explorer/clang-ericwf-contracts-trunk-20250726/include/x86_64-unknown-linux-gnu/c++/v1/)
+#include_directories(/opt/compiler-explorer/clang-ericwf-contracts-trunk-20250726/include/x86_64-unknown-linux-gnu/c++/v1/)
 # project configuration
 set(CXX_HEADER_FILE_EXTENSION ".hpp")
 set(CXX_SOURCE_FILE_EXTENSION ".cpp")
@@ -50,10 +50,18 @@ if (NOT EXISTS ${DATA_SHADER_DIR})
 endif ()
 
 set(MWC_ASSERT assert)
-
+add_compile_definitions(VULKAN_HPP_NO_EXCEPTIONS)
+add_compile_definitions(VULKAN_HPP_RAII_NO_EXCEPTIONS)
+add_compile_definitions(VULKAN_HPP_ENABLE_STD_MODULE)
+add_compile_definitions(VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1)
+add_compile_definitions(VKFW_NO_EXCEPTIONS)
+add_compile_definitions(VKFW_NO_STRUCT_CONSTRUCTORS)
+#add_compile_definitions(VULKAN_HPP_NO_EXCEPTIONS 1)
 # vulkan library
-add_library(VulkanHppModule)
-find_package(Vulkan REQUIRED)
+
+#add_library(VulkanHppModule)
+#find_package(Vulkan REQUIRED)
+#[[
 target_compile_definitions(VulkanHppModule PUBLIC
         VULKAN_HPP_NO_EXCEPTIONS
         VULKAN_HPP_RAII_NO_EXCEPTIONS
@@ -68,12 +76,12 @@ target_compile_definitions(VulkanHppModule PRIVATE
 )
 target_sources(VulkanHppModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${Vulkan_INCLUDE_DIR} FILES ${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm)
 target_compile_features(VulkanHppModule PUBLIC cxx_std_26)
-target_link_libraries(VulkanHppModule PUBLIC Vulkan::Vulkan)
-
+target_link_libraries(VulkanHppModule PUBLIC Vulkan::Headers)
+]]
 # vkfw library
-add_library(vkfw_module)
-FetchContent_Declare(vkfw GIT_REPOSITORY https://github.com/Cvelth/vkfw GIT_TAG main)
-FetchContent_MakeAvailable(vkfw)
+#add_library(vkfw_module)
+
+#[[
 target_include_directories(vkfw_module PRIVATE ${vkfw_SOURCE_DIR}/include)
 target_sources(vkfw_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${vkfw_SOURCE_DIR} FILES ${vkfw_SOURCE_DIR}/include/vkfw/vkfw.cppm)
 target_compile_features(vkfw_module PUBLIC cxx_std_26)
@@ -88,13 +96,26 @@ target_compile_definitions(vkfw_module PRIVATE
 )
 
 target_link_libraries(vkfw_module PRIVATE VulkanHppModule)
-
+]]
 # vma library
-add_library(vma_module)
+#
+
+#add_library(vma_module)
 FetchContent_Declare(vma GIT_REPOSITORY https://github.com/YaaZ/VulkanMemoryAllocator-Hpp)
 FetchContent_MakeAvailable(vma)
+
+set(VKFW_BUILD_CXX_MODULE 1)
+set(VKFW_NO_INCLUDE_VULKAN_HPP 1)
+set(VKFW_BUILD_WITH_VULKAN_MODULE 0)
+FetchContent_Declare(
+        vkfw
+        GIT_REPOSITORY https://github.com/Cvelth/vkfw
+        GIT_TAG main
+)
+FetchContent_MakeAvailable(vkfw)
+#[[
 target_include_directories(vma_module PRIVATE ${vma_SOURCE_DIR}/include)
-target_sources(vma_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${vma_SOURCE_DIR} FILES ${vma_SOURCE_DIR}/src/vk_mem_alloc.cppm)
+target_sources(vma_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${vma_SOURCE_DIR} FILES ${vma_SOURCE_DIR}/include/vk_mem_alloc.cppm)
 target_compile_features(vma_module PUBLIC cxx_std_26)
 target_compile_definitions(vma_module PRIVATE
         VULKAN_HPP_STD_MODULE=std
@@ -105,7 +126,7 @@ target_compile_definitions(vma_module PRIVATE
         assert=VMA_ASSERT
 )
 target_link_libraries(vma_module PRIVATE VulkanHppModule)
-
+]]
 # fastgltf library
 add_library(fast_gltf_module)
 FetchContent_Declare(fastgltf GIT_REPOSITORY https://github.com/spnda/fastgltf GIT_TAG main)
@@ -140,11 +161,17 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         MWC_ASSERT=${MWC_ASSERT}
 )
 # project libraries
-target_link_libraries(${PROJECT_NAME} PUBLIC
-        VulkanHppModule
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        #VulkanHppModule
+        #Vulkan
+        vulkan
+        VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-HppModule
+        #VMA-Hpp
         glfw
-        vkfw_module
-        vma_module
+        #Vulkan
+        #vkfw_module
+        vkfw-module
+        #vma
         imgui
         fast_gltf_module
         shader-slang

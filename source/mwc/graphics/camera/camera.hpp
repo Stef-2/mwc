@@ -40,12 +40,6 @@ namespace mwc {
         scalar_t m_near_clip;
         scalar_t m_far_clip;
       };
-      struct test_cfg {
-        scalar_t m_aspect_ratio;
-        scalar_t m_field_of_view_degrees;
-        scalar_t m_near_clip;
-        scalar_t m_far_clip;
-      };
 
       template <camera_projection_et tp_camera_projection = camera_projection_et::e_perspective>
       constexpr camera_ct(const configuration_st<tp_camera_projection>& a_configuration

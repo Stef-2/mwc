@@ -1,15 +1,14 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/graphics/vulkan/handle.hpp"
 #include "mwc/graphics/vulkan/instance.hpp"
 
 import mwc_definition;
 import mwc_static_string;
 import mwc_empty_type;
+import mwc_vulkan_structure_chain;
 
-import vulkan_hpp;
+import vulkan;
 
 import std;
 
@@ -18,18 +17,18 @@ namespace mwc {
     namespace vulkan {
       class physical_device_ct : public handle_ct<vk::raii::PhysicalDevice> {
         public:
-        using properties_t = vk::StructureChain<vk::PhysicalDeviceProperties2>;
+        using properties_t = structure_chain_st<vk::PhysicalDeviceProperties2>;
         struct configuration_st {
           static constexpr auto default_configuration() -> configuration_st;
         };
         struct properties_st {
-          using default_chain_t = vk::StructureChain<vk::PhysicalDeviceProperties2,
+          using default_chain_t = structure_chain_st<vk::PhysicalDeviceProperties2,
                                                      vk::PhysicalDeviceShaderObjectPropertiesEXT,
                                                      vk::PhysicalDeviceDescriptorIndexingProperties>;
           using memory_chain_t
-            = vk::StructureChain<vk::PhysicalDeviceMemoryProperties2, vk::PhysicalDeviceMemoryBudgetPropertiesEXT>;
+            = structure_chain_st<vk::PhysicalDeviceMemoryProperties2, vk::PhysicalDeviceMemoryBudgetPropertiesEXT>;
           using queue_family_chain_t
-            = vk::StructureChain<vk::QueueFamilyProperties2 /*, vk::QueueFamilyOwnershipTransferPropertiesKHR*/>;
+            = structure_chain_st<vk::QueueFamilyProperties2 /*, vk::QueueFamilyOwnershipTransferPropertiesKHR*/>;
 
           default_chain_t m_default_properties_chain;
           memory_chain_t m_memory_properties_chain;
@@ -37,7 +36,7 @@ namespace mwc {
         };
 
         struct features_st {
-          using default_chain_t = vk::StructureChain<vk::PhysicalDeviceFeatures2,
+          using default_chain_t = structure_chain_st<vk::PhysicalDeviceFeatures2,
                                                      vk::PhysicalDeviceVulkan11Features,
                                                      vk::PhysicalDeviceVulkan12Features,
                                                      vk::PhysicalDeviceVulkan13Features,

@@ -6,6 +6,8 @@
 #include <stb/stb_image.h>
 
 import mwc_breakpoint;
+import mwc_vertex_model;
+
 namespace {
   auto process_slang_diagnostics(const Slang::ComPtr<slang::IBlob> a_slang_diagnostics) -> void {
     if (a_slang_diagnostics) {

@@ -1,5 +1,6 @@
+#include "mwc/core/contract/definition.hpp"
 #include "mwc/graphics/vulkan/logical_device.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/diagnostic/log/logging.hpp"
 
 #include "vulkan/vulkan_hpp_macros.hpp"
 

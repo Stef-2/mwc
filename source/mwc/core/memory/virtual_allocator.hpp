@@ -1,11 +1,12 @@
 #pragma once
 
+#include "mwc/core/diagnostic/assert.hpp"
 #include "mwc/core/contract/definition.hpp"
 
 import mwc_definition;
 import mwc_type_mobility;
 
-import vk_mem_alloc_hpp;
+import vk_mem_alloc;
 
 import std;
 
@@ -36,10 +37,10 @@ namespace mwc {
       pre(a_virtual_memory_block_size > 0);
     ~virtual_allocator_ct();
 
-    [[nodiscard]] auto request_suballocation(
-      const memory_size_t a_virtual_suballocation_size,
-      const allocation_configuration_st& a_configuration = allocation_configuration_st::default_configuration())
-      -> memory_offset_t pre(a_virtual_suballocation_size > 0) post(r : r != failed_suballocation_offset);
+    [[nodiscard]] auto request_suballocation(const memory_size_t a_virtual_suballocation_size,
+                                             const allocation_configuration_st& a_configuration
+                                             = allocation_configuration_st::default_configuration()) -> memory_offset_t
+      pre(a_virtual_suballocation_size > 0) post(r : r != failed_suballocation_offset);
     auto release_suballocation(const memory_offset_t a_virtual_memory_offset)
       -> void pre(m_virtual_allocation_map.contains(a_virtual_memory_offset));
     auto clear_virtual_memory_block() const -> void;

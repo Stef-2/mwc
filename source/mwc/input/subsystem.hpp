@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 #include "mwc/window/subsystem.hpp"
 #include "mwc/core/chrono/subsystem.hpp"
@@ -19,12 +17,9 @@
 
 import mwc_definition;
 import mwc_subsystem;
-import mwc_input_resource;
 import mwc_optional;
-import mwc_host_mesh;
-import mwc_geometry;
+//import mwc_host_mesh;
 import mwc_enum_range;
-import mwc_vertex_model;
 import mwc_metaprogramming_utility;
 import mwc_input_shader_source;
 import mwc_color;

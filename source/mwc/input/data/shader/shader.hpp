@@ -6,6 +6,8 @@ import mwc_input_resource;
 import mwc_input_shader_source;
 import mwc_input_spir_v;
 
+import vulkan;
+
 namespace mwc {
   namespace input {
     struct shader_st : public resource_st {

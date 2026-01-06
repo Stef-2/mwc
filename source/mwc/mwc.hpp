@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/core/utility/semantic_version.hpp"
 #include "mwc/graphics/graphics.hpp"
 #include "mwc/window/window.hpp"

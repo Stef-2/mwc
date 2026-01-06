@@ -5,9 +5,9 @@ namespace mwc {
     namespace vulkan {
       dynamic_rendering_state_ct::dynamic_rendering_state_ct(const surface_ct& a_surface, const configuration_st& a_configuration)
       : m_viewport {float32_t {0},
-                    0, //static_cast<float32_t>(a_surface.extent().height),
-                    static_cast<float32_t>(a_surface.extent().width),
                     static_cast<float32_t>(a_surface.extent().height),
+                    static_cast<float32_t>(a_surface.extent().width),
+                    -static_cast<float32_t>(a_surface.extent().height),
                     float32_t {0},
                     float32_t {1}},
         m_scissor {vk::Offset2D {0, 0}, a_surface.extent()},

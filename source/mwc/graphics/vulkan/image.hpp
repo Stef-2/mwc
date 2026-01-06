@@ -1,15 +1,13 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/graphics/vulkan/handle.hpp"
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/graphics/vulkan/memory_allocator.hpp"
 
 import mwc_definition;
 
-import vulkan_hpp;
-import vk_mem_alloc_hpp;
+import vulkan;
+import vk_mem_alloc;
 
 import std;
 

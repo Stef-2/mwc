@@ -1,5 +1,8 @@
 module;
 
+#include "mwc/core/diagnostic/assert.hpp"
+#include "mwc/core/contract/definition.hpp"
+
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 
 module mwc_subsystem;

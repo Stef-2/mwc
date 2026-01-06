@@ -1,14 +1,12 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/graphics/vulkan/handle.hpp"
 #include "mwc/graphics/vulkan/physical_device.hpp"
 #include "mwc/graphics/vulkan/logical_device.hpp"
 
 import mwc_definition;
 
-import vulkan_hpp;
+import vulkan;
 
 import std;
 

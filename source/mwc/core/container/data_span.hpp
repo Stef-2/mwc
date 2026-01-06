@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 import mwc_definition;
 import mwc_observer_ptr;
 import mwc_contract_assertion;

@@ -1,5 +1,5 @@
 #include "mwc/graphics/vulkan/instance.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/diagnostic/log/logging.hpp"
 
 #include "vulkan/vulkan_hpp_macros.hpp"
 

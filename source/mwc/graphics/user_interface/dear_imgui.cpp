@@ -1,5 +1,8 @@
+#include "mwc/core/diagnostic/assert.hpp"
+#include "mwc/core/contract/definition.hpp"
+
 #include "mwc/graphics/user_interface/dear_imgui.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+#include "mwc/core/diagnostic/log/logging.hpp"
 
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"

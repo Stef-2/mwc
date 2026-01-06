@@ -7,6 +7,7 @@ export module mwc_input_resource;
 import mwc_definition;
 import mwc_set_bit;
 import mwc_bit_mask;
+
 import std;
 
 export namespace mwc {

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/core/utility/semantic_version.hpp"
 #include "mwc/graphics/vulkan/context.hpp"
 #include "mwc/graphics/vulkan/handle.hpp"
@@ -10,7 +8,7 @@ import mwc_definition;
 import mwc_project_name_string;
 import mwc_contract_assertion;
 
-import vulkan_hpp;
+import vulkan;
 
 import std;
 

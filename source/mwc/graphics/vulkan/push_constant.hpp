@@ -5,6 +5,8 @@
 import mwc_math_definition;
 import mwc_geometry;
 
+import vulkan;
+
 namespace mwc {
   namespace graphics {
     namespace vulkan {
@@ -39,6 +41,7 @@ namespace mwc {
         float64_t m_delta_time = {};
       };
 
+      // most implementation allow at most 256 bytes of push constant data
       static_assert(sizeof(push_constant_st) <= 256);
     }
   }

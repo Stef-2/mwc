@@ -1,6 +1,6 @@
 #include "mwc/core/memory/virtual_allocator.hpp"
 
-import vulkan_hpp;
+import vulkan;
 
 namespace mwc {
   virtual_allocator_ct::virtual_allocator_ct(const memory_size_t a_virtual_memory_block_size,

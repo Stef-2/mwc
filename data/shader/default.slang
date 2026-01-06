@@ -79,8 +79,8 @@ VOut vertex_shader(uint32_t a_vertex_id : SV_VertexID) {
     return {{0.0f + offset, 0.0f + offset, 0.0f + offset, 1.0f}, a_input_vertex.m_normal, a_input_vertex.m_uv};
   }
   */
-  let model_view = mul(float4x4(1.0f), push_constants.m_model_transformation);
-  let mvp = mul(model_view, proj);
+  // model_view = mul(float4x4(1.0f), push_constants.m_model_transformation);
+  //let mvp = mul(model_view, proj);
   let view = push_constants.m_model_transformation;
   //let model = mul(float4 (a_input_vertex.m_position.xyz, 1.0f), );
   //let model_in_view = mul((), model);
@@ -88,8 +88,10 @@ VOut vertex_shader(uint32_t a_vertex_id : SV_VertexID) {
   //float4 x =  mul(proj, mul(, ));
   //x = clamp(x, 0.0f, 1.0f);
   //let x = mul(proj, push_constants.m_model_transformation, float4 (a_input_vertex.m_position, 1.0f));
+  //let id = float4x4 ();
+  //let test3 = mul(view, view);
   let test = mul(view, float4 (vertex.m_position.xyz, 1.0f));
-  let test2 = mul(proj, test);
+  //let test2 = mul(proj, test);
   //model_in_ndc.w = clamp(model_in_ndc.w, 0.0f, 1.0f);
   return  {test, vertex.m_normal, vertex.m_uv};
 }
@@ -99,7 +101,7 @@ float32_t3 computeDiffuseColor(const float32_t4 baseColor, float metallic) {
 }
 
 [shader("fragment")]
-float4 fragment_shader(VOut a_vertex) : SV_Target {
+float4 fragment_shader(VOut a_vertex, float4 pos : SV_Position) : SV_Target {
   let light_pos = float32_t3 (1.0, 1.0, 2.0);
   let light_nor = normalize(-light_pos);
 
@@ -116,7 +118,7 @@ float4 fragment_shader(VOut a_vertex) : SV_Target {
   let NoL = saturate(dot(shading_normal, light_nor));
   float NoH = saturate(dot(shading_normal, h));
   float LoH = saturate(dot(light_nor, h));
-  printf("im printing bro: %f", LoH);
+  //printf("im printing bro: %f", LoH);
   float F0 = 0.04;
   PixelParams pp = {base_color, roughness, roughness, F0, roughness};
   Light light = {float32_t4(1.0f, 1.0f, 1.0f, 1.0f), light_nor, 1.0, light_pos, NoL, light_nor};
@@ -127,5 +129,5 @@ float4 fragment_shader(VOut a_vertex) : SV_Target {
   //return output_fragment_st ({1.0, 0.0, 0.0, 1.0});
   //return combined_image_samplers[push_constants.m_material_data.m_base_color_map].Sample(a_vertex.uv/* + sin((float32_t)push_constants.m_current_time * 0.25)*/);
   return {(color * light.colorIntensity.rgb) * (light.colorIntensity.w * light.attenuation * NoL) /* * light.colorIntensity.rgb*/, 1.0};
-  //return {push_constants.m_view_data.m_view_direction.xyz, 1.0};
+  //return {mul(-push_constants.m_model_transformation, float4(pos.xyz, 1.0f)).xyz, 1.0};
 }

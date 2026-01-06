@@ -1,11 +1,12 @@
 #pragma once
 
+#include "mwc/core/diagnostic/assert.hpp"
 #include "mwc/core/contract/definition.hpp"
 
 import mwc_definition;
 import mwc_debug;
 
-import vulkan_hpp;
+import vulkan;
 
 namespace mwc {
   namespace graphics {
