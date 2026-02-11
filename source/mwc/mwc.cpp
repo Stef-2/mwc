@@ -1,17 +1,23 @@
 #include "mwc/mwc.hpp"
+
 #include "mwc/input/subsystem.hpp"
 
 namespace mwc {
   mwc_ct::mwc_ct(const configuration_st& a_configuration)
   : m_window {a_configuration.m_window_configuration},
-    m_graphics {m_window, a_configuration.m_version},
+    m_graphics {&m_window, a_configuration.m_version},
     m_configuration {a_configuration} {
     m_window.vkfw_window()->callbacks()->on_key
-      = []([[maybe_unused]] const vkfw::Window& a_window, vkfw::Key a_key, [[maybe_unused]] sint32_t a_scancode,
-           vkfw::KeyAction a_key_action, [[maybe_unused]] vkfw::ModifierKeyFlags a_modifier_flags) {
+      = [this]([[maybe_unused]] const vkfw::Window& a_window, vkfw::Key a_key, [[maybe_unused]] sint32_t a_scancode,
+               vkfw::KeyAction a_key_action, [[maybe_unused]] vkfw::ModifierKeyFlags a_modifier_flags) {
           // note: remove this later
           if (a_key == vkfw::Key::eEscape)
             std::quick_exit(0);
+          if (a_key == vkfw::Key::eF1)
+            m_window.vkfw_window()->set<vkfw::InputMode::eCursor>(vkfw::CursorMode::eDisabled);
+          if (a_key == vkfw::Key::eF2)
+            m_window.vkfw_window()->set<vkfw::InputMode::eCursor>(vkfw::CursorMode::eNormal);
+
           if (a_key_action == vkfw::KeyAction::ePress)
             input::input_subsystem_st::keyboard_st::key_map.emplace(a_key);
           else if (a_key_action == vkfw::KeyAction::eRelease)

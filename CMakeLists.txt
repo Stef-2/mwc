@@ -3,6 +3,7 @@ include(CMakePrintHelpers)
 include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_LINKER_TYPE LLD)
 set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")
 set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
 set(CMAKE_CXX_MODULE_STD TRUE)
@@ -110,9 +111,10 @@ set(VKFW_BUILD_WITH_VULKAN_MODULE 0)
 FetchContent_Declare(
         vkfw
         GIT_REPOSITORY https://github.com/Cvelth/vkfw
-        GIT_TAG main
+        GIT_TAG gcc-16
 )
 FetchContent_MakeAvailable(vkfw)
+find_package(glm REQUIRED)
 #[[
 target_include_directories(vma_module PRIVATE ${vma_SOURCE_DIR}/include)
 target_sources(vma_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${vma_SOURCE_DIR} FILES ${vma_SOURCE_DIR}/include/vk_mem_alloc.cppm)
@@ -140,6 +142,8 @@ target_compile_definitions(fast_gltf_module PRIVATE
 )
 target_link_libraries(fast_gltf_module PRIVATE fastgltf)
 
+find_package(pxr CONFIG REQUIRED)
+
 # project executable
 add_executable(${PROJECT_NAME})
 # project include directories
@@ -161,17 +165,22 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         MWC_ASSERT=${MWC_ASSERT}
 )
 # project libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE
+#target_link_directories(${PROJECT_NAME} PUBLIC "/home/billy/Downloads/usd.py312.manylinux_2_35_x86_64.usdview.release-v25.08.71e038c1/lib/")
+target_link_libraries(${PROJECT_NAME} PUBLIC
         #VulkanHppModule
         #Vulkan
         vulkan
         VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-HppModule
+        glm::glm
         #VMA-Hpp
         glfw
         #Vulkan
         #vkfw_module
+        usd
+        usd_ms
         vkfw-module
         #vma
+        #python
         imgui
         fast_gltf_module
         shader-slang

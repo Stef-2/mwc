@@ -43,8 +43,10 @@ namespace mwc {
           ImGui::SmallButton(key_name.data() ? key_name.data()
                                              : std::to_string(std::to_underlying(pressed_keyboard_key)).c_str());
         }
-        const auto cursor_position_delta_x = input::input_subsystem_st::mouse_st::current_cursor_position.m_x - input::input_subsystem_st::mouse_st::previous_cursor_position.m_x;
-        const auto cursor_position_delta_y = input::input_subsystem_st::mouse_st::current_cursor_position.m_y - input::input_subsystem_st::mouse_st::previous_cursor_position.m_y;
+        const auto cursor_position_delta_x = input::input_subsystem_st::mouse_st::current_cursor_position.m_x
+                                           - input::input_subsystem_st::mouse_st::previous_cursor_position.m_x;
+        const auto cursor_position_delta_y = input::input_subsystem_st::mouse_st::current_cursor_position.m_y
+                                           - input::input_subsystem_st::mouse_st::previous_cursor_position.m_y;
         ImGui::TextUnformatted(std::format("cursor: {0} - {1}\tdelta: {2} - {3}",
                                            input::input_subsystem_st::mouse_st::current_cursor_position.m_x,
                                            input::input_subsystem_st::mouse_st::current_cursor_position.m_y,
@@ -69,7 +71,7 @@ namespace mwc {
         if (ImGui::BeginTable("ecs", component_count + 1, table_flags, table_size)) {
           ImGui::TableSetupColumn("entity");
           mwc::static_for_loop<0, component_count>([]<size_t tp_index> {
-            constexpr auto header_string = string_t {std::tuple_element_t<tp_index, component_tuple_t>::type_name(false)};
+            auto header_string = string_t {std::tuple_element_t<tp_index, component_tuple_t>::type_name(false)};
             ImGui::TableSetupColumn(header_string.c_str());
           });
           ImGui::TableHeadersRow();

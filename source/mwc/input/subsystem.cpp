@@ -2,11 +2,11 @@
 #include "mwc/core/filesystem/subsystem.hpp"
 #include "mwc/graphics/vulkan/shader_object.hpp"
 #include "mwc/output/output.hpp"
-
-#include <stb/stb_image.h>
+#include "mwc/graphics/camera/camera.hpp"
 
 import mwc_breakpoint;
 import mwc_vertex_model;
+import mwc_stb_image;
 
 namespace {
   auto process_slang_diagnostics(const Slang::ComPtr<slang::IBlob> a_slang_diagnostics) -> void {
@@ -39,7 +39,7 @@ namespace mwc {
       // slang configuration
       const auto slang_global_session_generation_result
         = slang::createGlobalSession(filesystem_st::slang_global_session.writeRef());
-      contract_assert(SLANG_SUCCEEDED(slang_global_session_generation_result));
+      contract_assert(slang_succeeded(slang_global_session_generation_result));
       const auto& shader_data_directory_path = filesystem::directory(filesystem::directory_et::e_shader).c_str();
       const auto slang_target_description
         = slang::TargetDesc {.format = SLANG_SPIRV, .profile = filesystem_st::slang_global_session->findProfile("spirv_1_6")};
@@ -58,7 +58,7 @@ namespace mwc {
                                                                  .compilerOptionEntryCount = slang_compiler_options.size()};
       const auto slang_session_generation_result
         = filesystem_st::slang_global_session->createSession(slang_session_description, filesystem_st::slang_session.writeRef());
-      contract_assert(SLANG_SUCCEEDED(slang_session_generation_result));
+      contract_assert(slang_succeeded(slang_session_generation_result));
 
       m_initialized = true;
     }
@@ -121,13 +121,14 @@ namespace mwc {
         = input_subsystem_st::filesystem_st::gltf_parser.loadGltfBinary(data_buffer, a_filepath, parse_options);
       contract_assert(parse_error == fastgltf::Error::None);
       // assert one scene per file
-      contract_assert(asset.scenes.size() == 1);
+      contract_assert(asset.scenes.size() <= 1);
 
       const auto& gltf_scene = asset.scenes.front();
       auto native_scene = scene_st {};
       native_scene.m_nodes = decltype(scene_st::m_nodes)::configuration_st {asset.nodes.size()},
       native_scene.m_meshes.reserve(asset.meshes.size());
       native_scene.m_images.reserve(asset.images.size());
+      native_scene.m_cameras.reserve(asset.cameras.size());
 
       // initial mesh processing
       using index_t = std::remove_cvref_t<decltype(native_scene.m_meshes.front().m_host_mesh.m_index_storage.front())>;
@@ -174,7 +175,7 @@ namespace mwc {
         native_mesh.m_host_mesh.m_aabb = geometry::aabb_st {.m_min = {0.0, 0.0, 0.0}, .m_max = {0.0, 0.0, 0.0}};
       }
       // generate a virtual suballocation for transfer to device memory
-      if (a_configuration.m_mesh_processing.m_propagate_to_device_memory) {
+      if (not asset.meshes.empty() and a_configuration.m_mesh_processing.m_propagate_to_device_memory) {
         native_scene.m_memory_mapped_mesh_data
           = a_configuration.m_device_buffer->request_suballocation<byte_t>(mesh_data_byte_count);
       }
@@ -237,8 +238,39 @@ namespace mwc {
         }
       }
 
+      // process cameras
+      for (const fastgltf::Camera& gltf_camera : asset.cameras) {
+        // perspective camera
+        if (std::holds_alternative<fastgltf::Camera::Perspective>(gltf_camera.camera)) {
+          const auto& perspective_camera = std::get<fastgltf::Camera::Perspective>(gltf_camera.camera);
+          contract_assert(perspective_camera.aspectRatio.has_value() and perspective_camera.zfar.has_value());
+
+          const auto camera_configuration = graphics::camera_ct::configuration_st<graphics::camera_projection_et::e_perspective> {
+            .m_aspect_ratio = perspective_camera.aspectRatio.value(),
+            .m_field_of_view_degrees = geometry::degrees(perspective_camera.yfov),
+            .m_near_clip = perspective_camera.znear,
+            .m_far_clip = perspective_camera.zfar.value()};
+          native_scene.m_cameras.emplace_back(camera_st {graphics::camera_ct::generate_projection_matrix(camera_configuration),
+                                                         graphics::camera_projection_et::e_perspective});
+        }
+        // ortographic camera
+        else {
+          const auto& ortographic_camera = std::get<fastgltf::Camera::Orthographic>(gltf_camera.camera);
+          const auto camera_configuration
+            = graphics::camera_ct::configuration_st<graphics::camera_projection_et::e_orthographic> {
+            .m_left_clip = -ortographic_camera.xmag / graphics::camera_ct::scalar_t {2.0},
+            .m_right_clip = ortographic_camera.xmag / graphics::camera_ct::scalar_t {2.0},
+            .m_bottom_clip = -ortographic_camera.ymag / graphics::camera_ct::scalar_t {2.0},
+            .m_top_clip = ortographic_camera.ymag / graphics::camera_ct::scalar_t {2.0},
+            .m_near_clip = ortographic_camera.znear,
+            .m_far_clip = ortographic_camera.zfar};
+          native_scene.m_cameras.emplace_back(camera_st {graphics::camera_ct::generate_projection_matrix(camera_configuration),
+                                                         graphics::camera_projection_et::e_orthographic});
+        }
+      }
       // iterate scene nodes
-      const auto root_node_count = gltf_scene.nodeIndices.size();
+      const auto root_node_count
+        = gltf_scene.nodeIndices.size() >= std::numeric_limits<uint32_t>::max() ? 0 : gltf_scene.nodeIndices.size();
       if (root_node_count > 1) {
         warning(std::format("scene loaded from {0} has {1} root nodes", a_filepath.c_str(), root_node_count));
       }
@@ -249,9 +281,11 @@ namespace mwc {
           const auto& child_node = asset.nodes[child_index];
           const auto transformation_matrix = fastgltf::getTransformMatrix(child_node);
           const auto mesh_index = child_node.meshIndex ? child_node.meshIndex.value() : resource_st::null_resource_index;
+          const auto camera_index = child_node.cameraIndex ? child_node.cameraIndex.value() : resource_st::null_resource_index;
           native_scene.m_nodes.insert_node(
             scene_st::node_data_st {.m_transformation = *std::bit_cast<geometry::transformation_t<>*>(&transformation_matrix),
-                                    .m_resource_index = static_cast<resource_index_t>(mesh_index)},
+                                    .m_mesh_index = static_cast<resource_index_t>(mesh_index),
+                                    .m_camera_index = static_cast<resource_index_t>(camera_index)},
             a_parent_index);
 
           // call recursively
@@ -263,9 +297,11 @@ namespace mwc {
         const auto& root_node = asset.nodes[gltf_scene.nodeIndices[i]];
         const auto transformation_matrix = fastgltf::getTransformMatrix(root_node);
         const auto mesh_index = root_node.meshIndex ? root_node.meshIndex.value() : resource_st::null_resource_index;
+        const auto camera_index = root_node.cameraIndex ? root_node.cameraIndex.value() : resource_st::null_resource_index;
         native_scene.m_nodes.insert_node(
           scene_st::node_data_st {.m_transformation = *std::bit_cast<geometry::transformation_t<>*>(&transformation_matrix),
-                                  .m_resource_index = static_cast<resource_index_t>(mesh_index)},
+                                  .m_mesh_index = static_cast<resource_index_t>(mesh_index),
+                                  .m_camera_index = static_cast<resource_index_t>(camera_index)},
           gltf_scene.nodeIndices[i]);
         iterate_node_hierarchy(gltf_scene.nodeIndices[i]);
       }
@@ -288,14 +324,14 @@ namespace mwc {
 
         auto native_image = image_st {resource_st {a_filepath, gltf_image.name}};
         auto gltf_image_channel_count = int {0};
-        native_image.m_host_image.m_data
-          = {std::bit_cast<obs_ptr_t<byte_t>>(stbi_load_from_memory(std::bit_cast<const stbi_uc*>(crude_image_data.data()),
-                                                                    crude_image_data.size(),
-                                                                    std::bit_cast<int*>(&native_image.m_host_image.m_width),
-                                                                    std::bit_cast<int*>(&native_image.m_host_image.m_height),
-                                                                    &gltf_image_channel_count,
-                                                                    requested_channel_count)),
-             dynamic_host_image_st::deleter};
+        native_image.m_host_image.m_data = {
+          std::bit_cast<obs_ptr_t<byte_t>>(stb::stbi_load_from_memory(std::bit_cast<const stb::stbi_uc*>(crude_image_data.data()),
+                                                                      crude_image_data.size(),
+                                                                      std::bit_cast<int*>(&native_image.m_host_image.m_width),
+                                                                      std::bit_cast<int*>(&native_image.m_host_image.m_height),
+                                                                      &gltf_image_channel_count,
+                                                                      requested_channel_count)),
+          dynamic_host_image_st::deleter};
 
         contract_assert(native_image.m_host_image.m_data);
         native_image.m_host_image.m_channel_count = requested_channel_count;
@@ -303,13 +339,13 @@ namespace mwc {
           = native_image.m_host_image.m_width * native_image.m_host_image.m_height * native_image.m_host_image.m_channel_count;
         native_image.m_host_image.m_bits_per_pixel = native_image.m_host_image.m_data_byte_count
                                                    / (native_image.m_host_image.m_width * native_image.m_host_image.m_height)
-                                                   * CHAR_BIT;
+                                                   * std::numeric_limits<std::byte>::digits;
         processed_image_data_byte_count += native_image.m_host_image.m_data_byte_count;
 
         native_scene.m_images.emplace_back(std::move(native_image));
       }
       // generate a virtual suballocation for transfer to device memory
-      if (a_configuration.m_image_processing.m_propagate_to_device_memory) {
+      if (not asset.images.empty() and a_configuration.m_image_processing.m_propagate_to_device_memory) {
         native_scene.m_memory_mapped_image_data = a_configuration.m_device_buffer->request_suballocation<byte_t>(
           processed_image_data_byte_count,
           {.m_alignment = requested_channel_count * sizeof(float32_t)});
@@ -366,7 +402,6 @@ namespace mwc {
               : nullptr;
         }
       }
-
       input_subsystem_st::filesystem_st::scene_registry.emplace_back(std::move(native_scene));
     }
     auto read_shader_file(const file_path_t& a_filepath,
@@ -396,7 +431,7 @@ namespace mwc {
       for (auto i = 0uz; i < entry_point_count; ++i) {
         auto entry_point = Slang::ComPtr<slang::IEntryPoint> {};
         const auto entry_point_discovery_result = module->getDefinedEntryPoint(i, entry_point.writeRef());
-        contract_assert(SLANG_SUCCEEDED(entry_point_discovery_result));
+        contract_assert(slang_succeeded(entry_point_discovery_result));
         component_types.emplace_back(entry_point);
       }
       // link program
@@ -407,12 +442,12 @@ namespace mwc {
                                                       composed_program.writeRef(),
                                                       slang_diagnostics.writeRef());
       process_slang_diagnostics(slang_diagnostics);
-      contract_assert(SLANG_SUCCEEDED(composite_component_type_creation_result));
+      contract_assert(slang_succeeded(composite_component_type_creation_result));
 
       auto linked_program = Slang::ComPtr<slang::IComponentType> {};
       const auto linking_result = composed_program->link(linked_program.writeRef(), slang_diagnostics.writeRef());
       process_slang_diagnostics(slang_diagnostics);
-      contract_assert(SLANG_SUCCEEDED(linking_result));
+      contract_assert(slang_succeeded(linking_result));
       // generate reflection data
       const auto program_layout = linked_program->getLayout(0, slang_diagnostics.writeRef());
       process_slang_diagnostics(slang_diagnostics);
@@ -434,14 +469,14 @@ namespace mwc {
                                                                           spir_v_bytecode.writeRef(),
                                                                           slang_diagnostics.writeRef());
         process_slang_diagnostics(slang_diagnostics);
-        contract_assert(SLANG_SUCCEEDED(compilation_result));
+        contract_assert(slang_succeeded(compilation_result));
 
         // process metadata
         auto entry_point_metadata = Slang::ComPtr<slang::IMetadata> {};
         const auto metadata_acquisition_result
           = linked_program->getEntryPointMetadata(i, 0, entry_point_metadata.writeRef(), slang_diagnostics.writeRef());
         process_slang_diagnostics(slang_diagnostics);
-        contract_assert(SLANG_SUCCEEDED(metadata_acquisition_result));
+        contract_assert(slang_succeeded(metadata_acquisition_result));
 
         const auto spir_v_bytecode_count = spir_v_bytecode->getBufferSize();
         shader.m_compiled_spir_v[i].m_data.resize(spir_v_bytecode_count);

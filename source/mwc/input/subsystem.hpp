@@ -11,14 +11,15 @@
 #include "mwc/graphics/vulkan/suballocated_memory_mapped_buffer.hpp"
 #include "mwc/input/data/scene/scene.hpp"
 #include "mwc/input/data/shader/shader.hpp"
-
+/*
 #include <shader-slang/slang.h>
 #include <shader-slang/slang-com-ptr.h>
-
+*/
 import mwc_definition;
 import mwc_subsystem;
 import mwc_optional;
 //import mwc_host_mesh;
+import mwc_slang;
 import mwc_enum_range;
 import mwc_metaprogramming_utility;
 import mwc_input_shader_source;

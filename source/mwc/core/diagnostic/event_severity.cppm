@@ -27,7 +27,7 @@ export namespace mwc {
         case e_error : return "error";
         case e_critical : return "critical";
         default :
-#ifdef __cpp_contracts
+#if __cpp_contracts >= 202502L
           contract_assert(false);
 #endif
           std::unreachable();

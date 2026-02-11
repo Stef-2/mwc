@@ -33,7 +33,7 @@ namespace mwc {
   }
   auto window_ct::title(const string_view_t a_title) -> void {
     m_configuration.m_title = a_title;
-    const auto result = m_window->setTitle(a_title);
+    const auto result = m_window->setTitle(a_title.data());
 
     contract_assert(vkfw::check(result));
   }

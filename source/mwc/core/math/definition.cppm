@@ -2,6 +2,7 @@ module;
 
 #include <eigen3/Eigen/Eigen>
 #include <eigen3/Eigen/Geometry>
+#include <eigen3/unsupported/Eigen/EulerAngles>
 
 export module mwc_math_definition;
 
@@ -12,6 +13,7 @@ import std;
 
 export namespace mwc {
   namespace math {
+    using Eigen::Dynamic;
     enum class dense_storage_order_et : int32_t {
       e_column_major = Eigen::ColMajor,
       e_row_major = Eigen::RowMajor,
@@ -41,5 +43,7 @@ export namespace mwc {
 
     template <std::floating_point tp>
     using angle_axis_t = Eigen::AngleAxis<tp>;
+    template <std::floating_point tp>
+    using euler_angles_t = Eigen::EulerAngles<tp, Eigen::EulerSystemXYZ>;
   }
 }

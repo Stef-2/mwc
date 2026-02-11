@@ -24,6 +24,35 @@ namespace mwc {
     using mat4 = math::matrix_t<float, 4, 4>;
     using trans = geometry::transformation_t<float>;
 
+    constexpr auto Rad2Deg = 360 / (std::numbers::pi_v<float> * 2);
+    constexpr auto Deg2Rad = std::numbers::pi_v<float> / 180;
+
+    quat clamp_quaternion(quat q, const float3& bounds) {
+      q.x() /= q.w();
+      q.y() /= q.w();
+      q.z() /= q.w();
+      q.w() = 1.0f;
+
+      if (bounds.x() != 0.0) {
+        float angleX = 2.0f * Rad2Deg * std::atan(q.x());
+        angleX = std::clamp(angleX, -bounds.x(), bounds.x());
+        q.x() = std::tan(0.5f * Deg2Rad * angleX);
+      }
+
+      if (bounds.y() != 0.0) {
+        float angleY = 2.0f * Rad2Deg * std::atan(q.y());
+        angleY = std::clamp(angleY, -bounds.y(), bounds.y());
+        q.y() = std::tan(0.5f * Deg2Rad * angleY);
+      }
+
+      if (bounds.z() != 0.0) {
+        float angleZ = 2.0f * Rad2Deg * std::atan(q.z());
+        angleZ = std::clamp(angleZ, -bounds.z(), bounds.z());
+        q.z() = std::tan(0.5f * Deg2Rad * angleZ);
+      }
+
+      return q.normalized();
+    }
     mat4 view(float3 pos, float yaw, float pitch) {
       float cosPitch = std::cos(pitch);
       float sinPitch = std::sin(pitch);
@@ -82,129 +111,134 @@ namespace mwc {
     auto graphics_ct::record_scene_data_transfer_to_device_memory(input::scene_st& a_scene,
                                                                   const vk::raii::CommandBuffer& a_command_buffer) -> void {
       // mesh data
-      // generate a new vertex buffer
-      m_vertex_buffers.emplace_back(
-        m_logical_device, m_memory_allocator,
-        vulkan::buffer_ct::configuration_st {
-        .m_buffer_create_info
-        = vk::BufferCreateInfo {vk::BufferCreateFlags {}, a_scene.m_memory_mapped_mesh_data.size(),
-                                vk::BufferUsageFlagBits::eVertexBuffer bitor vk::BufferUsageFlagBits::eIndexBuffer
-                                  bitor vk::BufferUsageFlagBits::eTransferDst bitor vk::BufferUsageFlagBits::eShaderDeviceAddress},
-        .m_allocation_create_info = vma::AllocationCreateInfo {vma::AllocationCreateFlags {}, vma::MemoryUsage::eAuto}});
-      m_vertex_buffers.back().debug_name("vertex_buffer");
+      if (not a_scene.m_meshes.empty()) {
+        // generate a new vertex buffer
+        m_vertex_buffers.emplace_back(
+          m_logical_device, m_memory_allocator,
+          vulkan::buffer_ct::configuration_st {
+          .m_buffer_create_info
+          = vk::BufferCreateInfo {vk::BufferCreateFlags {}, a_scene.m_memory_mapped_mesh_data.size(),
+                                  vk::BufferUsageFlagBits::eVertexBuffer bitor vk::BufferUsageFlagBits::eIndexBuffer
+                                    bitor vk::BufferUsageFlagBits::eTransferDst
+                                    bitor vk::BufferUsageFlagBits::eShaderDeviceAddress},
+          .m_allocation_create_info = vma::AllocationCreateInfo {vma::AllocationCreateFlags {}, vma::MemoryUsage::eAuto}});
+        m_vertex_buffers.back().debug_name("vertex_buffer");
 
-      // record transfer to device memory
-      const auto mesh_data_suballocation_offset = vk::DeviceSize {pointer_cast(a_scene.m_memory_mapped_mesh_data.data())
-                                                                  - pointer_cast(m_common_buffer.mapped_data_pointer())};
-      const auto copy_information
-        = vk::BufferCopy2 {/*source_offset*/ mesh_data_suballocation_offset,
-                           /*destination_offset*/ vk::DeviceSize {0}, a_scene.m_memory_mapped_mesh_data.size()};
-      a_command_buffer.copyBuffer2(
-        vk::CopyBufferInfo2 {m_common_buffer.native_handle(), m_vertex_buffers.back().native_handle(), copy_information});
+        // record transfer to device memory
+        const auto mesh_data_suballocation_offset = vk::DeviceSize {pointer_cast(a_scene.m_memory_mapped_mesh_data.data())
+                                                                    - pointer_cast(m_common_buffer.mapped_data_pointer())};
+        const auto copy_information
+          = vk::BufferCopy2 {/*source_offset*/ mesh_data_suballocation_offset,
+                             /*destination_offset*/ vk::DeviceSize {0}, a_scene.m_memory_mapped_mesh_data.size()};
+        a_command_buffer.copyBuffer2(
+          vk::CopyBufferInfo2 {m_common_buffer.native_handle(), m_vertex_buffers.back().native_handle(), copy_information});
 
-      // record mesh device addresses
-      for (auto offset = vk::DeviceSize {0}; auto& mesh : a_scene.m_meshes) {
-        mesh.m_device_mesh.m_vertex_buffer.m_buffer = m_vertex_buffers.back().native_handle();
-        mesh.m_device_mesh.m_vertex_buffer.m_offset = offset;
-        mesh.m_device_mesh.m_vertex_buffer.m_size = mesh.m_host_mesh.m_vertex_storage.size();
-        offset += mesh.m_host_mesh.m_vertex_storage.size();
+        // record mesh device addresses
+        for (auto offset = vk::DeviceSize {0}; auto& mesh : a_scene.m_meshes) {
+          mesh.m_device_mesh.m_vertex_buffer.m_buffer = m_vertex_buffers.back().native_handle();
+          mesh.m_device_mesh.m_vertex_buffer.m_offset = offset;
+          mesh.m_device_mesh.m_vertex_buffer.m_size = mesh.m_host_mesh.m_vertex_storage.size();
+          offset += mesh.m_host_mesh.m_vertex_storage.size();
 
-        mesh.m_device_mesh.m_index_buffer.m_buffer = m_vertex_buffers.back().native_handle();
-        mesh.m_device_mesh.m_index_buffer.m_offset = offset;
-        mesh.m_device_mesh.m_index_buffer.m_size = mesh.m_host_mesh.m_index_storage.size() * sizeof(uint32_t);
-        offset += mesh.m_host_mesh.m_index_storage.size() * sizeof(uint32_t);
+          mesh.m_device_mesh.m_index_buffer.m_buffer = m_vertex_buffers.back().native_handle();
+          mesh.m_device_mesh.m_index_buffer.m_offset = offset;
+          mesh.m_device_mesh.m_index_buffer.m_size = mesh.m_host_mesh.m_index_storage.size() * sizeof(uint32_t);
+          offset += mesh.m_host_mesh.m_index_storage.size() * sizeof(uint32_t);
+        }
       }
       // images
-      const auto image_data_suballocation_offset = vk::DeviceSize {pointer_cast(a_scene.m_memory_mapped_image_data.data())
-                                                                   - pointer_cast(m_common_buffer.mapped_data_pointer())};
-      auto descriptor_write_data = vk::WriteDescriptorSet {};
-      auto descriptor_image_infos = vector_t<vk::DescriptorImageInfo> {};
-      //descriptor_write_data.reserve(a_scene.m_images.size());
-      descriptor_image_infos.resize(a_scene.m_images.size());
+      if (not a_scene.m_images.empty()) {
+        const auto image_data_suballocation_offset = vk::DeviceSize {pointer_cast(a_scene.m_memory_mapped_image_data.data())
+                                                                     - pointer_cast(m_common_buffer.mapped_data_pointer())};
+        auto descriptor_write_data = vk::WriteDescriptorSet {};
+        auto descriptor_image_infos = vector_t<vk::DescriptorImageInfo> {};
+        //descriptor_write_data.reserve(a_scene.m_images.size());
+        descriptor_image_infos.resize(a_scene.m_images.size());
 
-      // generate device image resources
-      for (auto accumulated_offset = vk::DeviceSize {0}, i = 0uz; auto& image : a_scene.m_images) {
-        const auto image_create_info
-          = vk::ImageCreateInfo {vk::ImageCreateFlags {},
-                                 vk::ImageType::e2D,
-                                 vk::Format::eR8G8B8A8Srgb,
-                                 vk::Extent3D {image.m_host_image.m_width, image.m_host_image.m_height, 1},
-                                 /*mip_levels*/ 1,
-                                 /*array_layers*/ 1,
-                                 vk::SampleCountFlagBits::e1,
-                                 vk::ImageTiling::eOptimal,
-                                 vk::ImageUsageFlagBits::eTransferDst bitor vk::ImageUsageFlagBits::eSampled,
-                                 vk::SharingMode::eExclusive,
-                                 /*queue_family_indices*/ {},
-                                 vk::ImageLayout::eUndefined};
-        const auto allocation_info = vma::AllocationCreateInfo {vma::AllocationCreateFlags {}, vma::MemoryUsage::eAuto};
-        image.m_device_image.m_image
-          = vulkan::image_ct {m_logical_device,
-                              m_memory_allocator,
-                              {.m_image_create_info = image_create_info, .m_allocation_create_info = allocation_info}};
-        image.m_device_image.m_image.record_layout_transition(
-          a_command_buffer, vulkan::image_ct::layout_transition_configuration_st::default_configuration());
+        // generate device image resources
+        for (auto accumulated_offset = vk::DeviceSize {0}, i = 0uz; auto& image : a_scene.m_images) {
+          const auto image_create_info
+            = vk::ImageCreateInfo {vk::ImageCreateFlags {},
+                                   vk::ImageType::e2D,
+                                   vk::Format::eR8G8B8A8Srgb,
+                                   vk::Extent3D {image.m_host_image.m_width, image.m_host_image.m_height, 1},
+                                   /*mip_levels*/ 1,
+                                   /*array_layers*/ 1,
+                                   vk::SampleCountFlagBits::e1,
+                                   vk::ImageTiling::eOptimal,
+                                   vk::ImageUsageFlagBits::eTransferDst bitor vk::ImageUsageFlagBits::eSampled,
+                                   vk::SharingMode::eExclusive,
+                                   /*queue_family_indices*/ {},
+                                   vk::ImageLayout::eUndefined};
+          const auto allocation_info = vma::AllocationCreateInfo {vma::AllocationCreateFlags {}, vma::MemoryUsage::eAuto};
+          image.m_device_image.m_image
+            = vulkan::image_ct {m_logical_device,
+                                m_memory_allocator,
+                                {.m_image_create_info = image_create_info, .m_allocation_create_info = allocation_info}};
+          image.m_device_image.m_image.record_layout_transition(
+            a_command_buffer, vulkan::image_ct::layout_transition_configuration_st::default_configuration());
 
-        image.m_device_image.m_image.debug_name(image.m_name);
-        image.m_device_image.m_image_view
-          = m_logical_device
-              ->createImageView(vk::ImageViewCreateInfo {
-              vk::ImageViewCreateFlags {}, image.m_device_image.m_image.native_handle(), vk::ImageViewType::e2D,
-              vk::Format::eR8G8B8A8Srgb, vk::ComponentMapping {},
-              vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eColor, /*base_mip_level*/ 0, vk::RemainingMipLevels,
-                                         /*base_array_layer*/ 0, vk::RemainingArrayLayers}})
-              .value;
-        image.m_device_image.m_sampler = m_logical_device->createSampler(vk::SamplerCreateInfo {}).value;
+          image.m_device_image.m_image.debug_name(image.m_name);
+          image.m_device_image.m_image_view
+            = m_logical_device
+                ->createImageView(vk::ImageViewCreateInfo {
+                vk::ImageViewCreateFlags {}, image.m_device_image.m_image.native_handle(), vk::ImageViewType::e2D,
+                vk::Format::eR8G8B8A8Srgb, vk::ComponentMapping {},
+                vk::ImageSubresourceRange {vk::ImageAspectFlagBits::eColor, /*base_mip_level*/ 0, vk::RemainingMipLevels,
+                                           /*base_array_layer*/ 0, vk::RemainingArrayLayers}})
+                .value;
+          image.m_device_image.m_sampler = m_logical_device->createSampler(vk::SamplerCreateInfo {}).value;
 
-        const auto buffer_image_copy
-          = vk::BufferImageCopy2 {image_data_suballocation_offset + accumulated_offset,
-                                  /*image.m_host_image.m_width*/ 0,
-                                  /*image.m_host_image.m_height*/ 0,
-                                  vk::ImageSubresourceLayers {vk::ImageAspectFlagBits::eColor, /*mip_level*/ 0,
-                                                              /*base_array_layer*/ 0, /*layer_count*/ 1},
-                                  vk::Offset3D {},
-                                  vk::Extent3D {image.m_host_image.m_width, image.m_host_image.m_height, 1}};
-        const auto copy_buffer_to_image_info
-          = vk::CopyBufferToImageInfo2 {m_common_buffer.native_handle(), image.m_device_image.m_image.native_handle(),
-                                        vk::ImageLayout::eTransferDstOptimal, buffer_image_copy};
-        a_command_buffer.copyBufferToImage2(copy_buffer_to_image_info);
-        image.m_device_image.m_image.record_layout_transition(
-          a_command_buffer, {.m_source_pipeline_stage = vk::PipelineStageFlagBits2::eTransfer,
-                             .m_destination_pipeline_stage = vk::PipelineStageFlagBits2::eTransfer,
-                             .m_source_access_flags = vk::AccessFlagBits2::eTransferWrite,
-                             .m_destination_access_flags = vk::AccessFlagBits2::eTransferRead,
-                             .m_old_layout = vk::ImageLayout::eTransferDstOptimal,
-                             .m_new_layout = vk::ImageLayout::eShaderReadOnlyOptimal,
-                             .m_source_queue_family = vk::QueueFamilyIgnored,
-                             .m_destination_queue_family = vk::QueueFamilyIgnored,
-                             .m_subresource_range = vk::ImageSubresourceRange {
-                             vk::ImageAspectFlagBits::eColor, 0, vk::RemainingMipLevels, 0, vk::RemainingArrayLayers}});
+          const auto buffer_image_copy
+            = vk::BufferImageCopy2 {image_data_suballocation_offset + accumulated_offset,
+                                    /*image.m_host_image.m_width*/ 0,
+                                    /*image.m_host_image.m_height*/ 0,
+                                    vk::ImageSubresourceLayers {vk::ImageAspectFlagBits::eColor, /*mip_level*/ 0,
+                                                                /*base_array_layer*/ 0, /*layer_count*/ 1},
+                                    vk::Offset3D {},
+                                    vk::Extent3D {image.m_host_image.m_width, image.m_host_image.m_height, 1}};
+          const auto copy_buffer_to_image_info
+            = vk::CopyBufferToImageInfo2 {m_common_buffer.native_handle(), image.m_device_image.m_image.native_handle(),
+                                          vk::ImageLayout::eTransferDstOptimal, buffer_image_copy};
+          a_command_buffer.copyBufferToImage2(copy_buffer_to_image_info);
+          image.m_device_image.m_image.record_layout_transition(
+            a_command_buffer, {.m_source_pipeline_stage = vk::PipelineStageFlagBits2::eTransfer,
+                               .m_destination_pipeline_stage = vk::PipelineStageFlagBits2::eTransfer,
+                               .m_source_access_flags = vk::AccessFlagBits2::eTransferWrite,
+                               .m_destination_access_flags = vk::AccessFlagBits2::eTransferRead,
+                               .m_old_layout = vk::ImageLayout::eTransferDstOptimal,
+                               .m_new_layout = vk::ImageLayout::eShaderReadOnlyOptimal,
+                               .m_source_queue_family = vk::QueueFamilyIgnored,
+                               .m_destination_queue_family = vk::QueueFamilyIgnored,
+                               .m_subresource_range = vk::ImageSubresourceRange {
+                               vk::ImageAspectFlagBits::eColor, 0, vk::RemainingMipLevels, 0, vk::RemainingArrayLayers}});
 
-        descriptor_image_infos[i] = vk::DescriptorImageInfo {*image.m_device_image.m_sampler, *image.m_device_image.m_image_view,
-                                                             vk::ImageLayout::eShaderReadOnlyOptimal};
-        /*descriptor_write_data.emplace_back(vk::WriteDescriptorSet {
-                  *m_pipeline_layout.combined_image_sampler_set(),
-                  0,
-                  static_cast<uint32_t>(i),
-                  vk::DescriptorType::eCombinedImageSampler,
-                });*/
-        image.m_device_image.m_image_index = m_pipeline_layout.acquire_descriptor_index();
+          descriptor_image_infos[i] = vk::DescriptorImageInfo {
+            *image.m_device_image.m_sampler, *image.m_device_image.m_image_view, vk::ImageLayout::eShaderReadOnlyOptimal};
+          /*descriptor_write_data.emplace_back(vk::WriteDescriptorSet {
+                    *m_pipeline_layout.combined_image_sampler_set(),
+                    0,
+                    static_cast<uint32_t>(i),
+                    vk::DescriptorType::eCombinedImageSampler,
+                  });*/
+          image.m_device_image.m_image_index = m_pipeline_layout.acquire_descriptor_index();
 
-        accumulated_offset += image.m_host_image.m_data_byte_count;
-        ++i;
+          accumulated_offset += image.m_host_image.m_data_byte_count;
+          ++i;
+        }
+        descriptor_write_data = vk::WriteDescriptorSet {*m_pipeline_layout.combined_image_sampler_set(), 0, 0,
+                                                        vk::DescriptorType::eCombinedImageSampler, descriptor_image_infos};
+        m_logical_device->updateDescriptorSets(descriptor_write_data, {});
       }
-      descriptor_write_data = vk::WriteDescriptorSet {*m_pipeline_layout.combined_image_sampler_set(), 0, 0,
-                                                      vk::DescriptorType::eCombinedImageSampler, descriptor_image_infos};
-      m_logical_device->updateDescriptorSets(descriptor_write_data, {});
     }
 
-    graphics_ct::graphics_ct(const window_ct& a_window, const semantic_version_st& a_engine_version,
+    graphics_ct::graphics_ct(window_ct* a_window, const semantic_version_st& a_engine_version,
                              const configuration_st& a_configuration)
     : m_window {a_window},
       m_context {vulkan::context_st::configuration_st {.m_engine_version = a_engine_version}},
       m_instance {m_context},
       m_physical_device {m_instance},
-      m_surface {m_window, m_instance, m_physical_device},
+      m_surface {*m_window, m_instance, m_physical_device},
       m_queue_families {m_physical_device, m_surface},
       m_logical_device {m_physical_device, m_queue_families},
       m_memory_allocator {m_context, m_instance, m_physical_device, m_logical_device},
@@ -242,15 +276,19 @@ namespace mwc {
       m_dynamic_rendering_state {m_surface},
       m_vertex_buffers {},
       m_void_descriptor_indices {},
-      m_user_interface {dear_imgui_ct {a_window, m_context, m_instance, m_physical_device, m_logical_device,
+      m_user_interface {dear_imgui_ct {*m_window, m_context, m_instance, m_physical_device, m_logical_device,
                                        m_queue_families.graphics(), m_graphics_queue, m_swapchain}},
       m_camera {camera_ct::configuration_st<camera_projection_et::e_perspective>::default_configuration()},
       m_configuration {a_configuration} {
+      /*
       auto scene_cfg = input::input_subsystem_st::filesystem_st::scene_processing_configuration_st::default_configuration();
       scene_cfg.m_device_buffer = &m_common_buffer;
-
+*/
       input::read_scene_file("/home/billy/dev/mwc/data/mesh/metal_sphere_plus_xyz.glb",
                              {{false, true, true}, {false, false, true}, &m_common_buffer});
+      input::read_scene_file("/home/billy/dev/mwc/data/mesh/skybox.glb",
+                             {{false, true, true}, {false, false, true}, &m_common_buffer});
+
       contract_assert(input::input_subsystem_st::filesystem_st::scene_registry.size() > 0);
 
       auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
@@ -258,6 +296,7 @@ namespace mwc {
 
       cmd.begin(vk::CommandBufferBeginInfo {vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
       record_scene_data_transfer_to_device_memory(input::input_subsystem_st::filesystem_st::scene_registry[0], cmd);
+      record_scene_data_transfer_to_device_memory(input::input_subsystem_st::filesystem_st::scene_registry[1], cmd);
       cmd.end();
       vk::CommandBufferSubmitInfo submit_info {*cmd};
       m_graphics_queue->submit2(vk::SubmitInfo2 {vk::SubmitFlags {}, {}, submit_info, {}});
@@ -265,6 +304,8 @@ namespace mwc {
       m_common_buffer.release_suballocation(input::input_subsystem_st::filesystem_st::scene_registry[0].m_memory_mapped_mesh_data);
       m_common_buffer.release_suballocation(
         input::input_subsystem_st::filesystem_st::scene_registry[0].m_memory_mapped_image_data);
+
+      // read another scene
 
       auto shader_cfg = input::input_subsystem_st::filesystem_st::shader_processing_configuration_st {
         .m_device_context = {{&m_logical_device, &m_physical_device, &m_pipeline_layout}},
@@ -275,12 +316,19 @@ namespace mwc {
       shader_path /= "default.slang";
       mwc::input::read_shader_file(shader_path, shader_cfg);
 
-      auto camera_trans_comp = m_camera.components<ecs::transformation_st, ecs::camera_projection_st, ecs::camera_type_st>();
-      auto& c = std::get<0>(camera_trans_comp).m_transformation;
+      //auto camera_trans_comp = m_camera.components<ecs::transformation_st, ecs::camera_projection_st, ecs::camera_type_st>();
+      //auto& c = std::get<0>(camera_trans_comp).m_transformation;
       //c.translate(float3 {-2.0f, -2.0f, -2.0f});
       //c.matrix() = look_at(float3 {2.0f, 2.0f, 2.0f}, float3 {0.0f, 0.0f, 0.0f}).inverse();
       //c.pretranslate(float3 {2.0f, 2.0f, 2.0f});
-      c(2, 2) = 1.0f;
+      //c(2, 2) = 1.0f;
+      auto cam_comps
+        = m_camera
+            .components<ecs::position_st, ecs::orientation_st, ecs::scale_st, ecs::camera_projection_st, ecs::camera_type_st>();
+      float3& cam_pos = std::get<0>(cam_comps).m_position;
+      quat& cam_ori = std::get<1>(cam_comps).m_orientation;
+      cam_pos = {0.5f, 0.5f, 0.5f};
+      cam_ori = quat {geometry::look_at(float3 {cam_pos * -1.0f}, float3 {0.1f, 0.1f, 0.1f}).rotation().inverse()};
     }
 
     auto graphics_ct::render() -> void {
@@ -288,91 +336,152 @@ namespace mwc {
       static float yaw = 0.0f;
       static float pitch = 0.0f;
       static float3 pos = {0.0f, 0.0f, 0.0f};
-      auto camera_trans_comp = m_camera.components<ecs::transformation_st, ecs::camera_projection_st, ecs::camera_type_st>();
-      trans& camera_trans = std::get<0>(camera_trans_comp).m_transformation;
-      auto& camera_proj = std::get<1>(camera_trans_comp).m_projection;
+      auto cam_comps
+        = m_camera
+            .components<ecs::position_st, ecs::orientation_st, ecs::scale_st, ecs::camera_projection_st, ecs::camera_type_st>();
+      float3& cam_pos = std::get<0>(cam_comps).m_position;
+      quat& cam_ori = std::get<1>(cam_comps).m_orientation;
+      float3& cam_sca = std::get<2>(cam_comps).m_scale;
+      auto& cam_proj = std::get<3>(cam_comps).m_projection;
 
-      const auto cursor_position_delta_x = float(input::input_subsystem_st::mouse_st::current_cursor_position.m_x
-                                                 - input::input_subsystem_st::mouse_st::previous_cursor_position.m_x);
-      const auto cursor_position_delta_y = float(input::input_subsystem_st::mouse_st::current_cursor_position.m_y
-                                                 - input::input_subsystem_st::mouse_st::previous_cursor_position.m_y);
-      auto offset = float3 {0.0f, 0.0f, 0.0f};
-      constexpr auto speed = -0.01f;
+      const auto cursor_position_delta_x = -float(input::input_subsystem_st::mouse_st::current_cursor_position.m_x
+                                                  - input::input_subsystem_st::mouse_st::previous_cursor_position.m_x);
+      const auto cursor_position_delta_y = -float(input::input_subsystem_st::mouse_st::current_cursor_position.m_y
+                                                  - input::input_subsystem_st::mouse_st::previous_cursor_position.m_y);
+      //yaw += (float)cursor_position_delta_x / 20000.0f;
+      //pitch += (float)cursor_position_delta_y / 20000.0f;
+
+      math::angle_axis_t<float> x_angle_axis = {cursor_position_delta_y / 200.0f, float3 {1.0f, 0.0f, 0.0f}};
+      quat quat_delta_x = quat {x_angle_axis};
+      quat quat_to_y = quat {math::angle_axis_t<float> {geometry::radians(89.0f), float3 {1.0f, 0.0f, 0.0f}}};
+      math::angle_axis_t<float> y_angle_axis = {cursor_position_delta_x / 200.0f, float3 {0.0f, 1.0f, 0.0f}};
+      quat quat_delta_y = quat {y_angle_axis};
+      //auto comb_delta = x_angle_axis * y_angle_axis;
+      //auto offset = float3 {0.0f, 0.0f, 0.0f};
+      quat new_ori = quat::Identity() * quat_delta_y * cam_ori * quat_delta_x;
+      mat3 nm = new_ori.toRotationMatrix();
+      auto t = math::euler_angles_t<float> {new_ori.toRotationMatrix()};
+      auto bv = float3 {t.angles()};
+      //new_ori = clamp_quaternion(new_ori, {90.0f, 0.0f, 0.0f});
+      auto new_aa = math::angle_axis_t<float> {new_ori};
+      auto new_ea
+        = new_ori.toRotationMatrix().canonicalEulerAngles(0, 1, 2); //math::euler_angles_t<float> {new_ori.toRotationMatrix()};
+      /*if (std::abs(new_aa.axis().x()) >= 1.0f) {
+        new_aa.angle() = std::clamp(new_aa.angle(), geometry::radians(-89.0f), geometry::radians(89.0f));
+      }*/
+      //t.angles().x() = std::clamp(t.angles().x(), geometry::radians(-89.0f), geometry::radians(89.0f));
+      //t.angles().z() = 0.0f;
+
+      float x = geometry::degrees(new_aa.angle()) * new_aa.axis().x();
+      float z = geometry::degrees(new_aa.angle()) * new_aa.axis().z();
+      float r = (x + z) / 2;
+
+      /*if (std::abs(x) > 90.0f or std::abs(z) > 90.0f)
+        new_aa.angle() *= 0.95f;*/
+      /*{
+        auto lambda = std::abs(new_aa.axis().x()) - 0.5f;
+        if (new_aa.axis().x() > 0.0f) {
+          new_aa.axis().x() -= lambda;
+          new_aa.axis().z() += lambda / 2.0f;
+          new_aa.axis().y() += lambda / 2.0f;
+        } else {
+          new_aa.axis().x() += lambda;
+          new_aa.axis().z() -= lambda / 2.0f;
+          new_aa.axis().y() -= lambda / 2.0f;
+        }
+      }*/
+
+      //new_aa.axis().normalize();
+
+      m_window->title(std::format("AA: [x:{: 4.2f}]   [y:{: 4.2f}]   [z:{: 4.2f}]   [a_deg:{: 4.2f}]"
+                                  " === AA*MAG: [x:{: 4.2f}] [y:{: 4.2f}]   [z:{: 4.2f}]"
+                                  " === DIR: [x:{: 4.2f}]   [y:{: 4.2f}]   [z:{: 4.2f}]",
+                                  new_aa.axis().x(), new_aa.axis().y(), new_aa.axis().z(), geometry::degrees(new_aa.angle()), x,
+                                  geometry::degrees(new_aa.angle()) * new_aa.axis().y(), z, nm(0, 2), nm(1, 2), nm(2, 2)));
+      //float angle_between = new_ori.angularDistance(quat_to_y);
+      //float mix = std::min(1.0f, geometry::radians(89.0f) / std::abs(angle_between));
+      if (not(std::abs(nm(1, 2)) >= 0.98f))
+        cam_ori = new_aa; //cam_ori.slerp(mix, new_ori);
+
+      //auto cam_aa = math::angle_axis_t<float> {cam_ori};
+
+      constexpr auto speed = 0.01f;
+      mat3 cam_ori_mat = cam_ori.toRotationMatrix();
       //const auto inv_c = camera_trans.inverse();
-      auto fwd = float3 {camera_trans(0, 2), camera_trans(1, 2), camera_trans(2, 2)};
+      /*
+      // mat3 look = geometry::look_at(cam_pos, cam_pos + cam)
+      auto cam_ori_ea = float3 {cam_ori_mat.canonicalEulerAngles(0, 1, 2).data()};
+      cam_ori_ea.x() = std::clamp(cam_ori_ea.x(), geometry::radians(-89.0f), geometry::radians(89.0f));
+      m_window->title(std::format("[{:.2}]   [{:.2}]   [{:.2}]", geometry::degrees(cam_ori_ea.x()),
+                                  geometry::degrees(cam_ori_ea.y()), geometry::degrees(cam_ori_ea.z()))
+                        .c_str());
+      cam_ori_mat = (math::angle_axis_t<float> {cam_ori_ea[0], float3::UnitX()}
+                     * math::angle_axis_t<float> {cam_ori_ea[1], float3::UnitY()}
+                     * math::angle_axis_t<float> {cam_ori_ea[2], float3::UnitZ()})
+                      .toRotationMatrix();
+      cam_ori = cam_ori_mat;*/
+
+      auto fwd = float3 {-cam_ori_mat(0, 2), -cam_ori_mat(1, 2), -cam_ori_mat(2, 2)};
       //auto old_look = look_at(pos, {0.0f, 0.0f, 0.0f}).inverse();
       //fwd = {old_look(0, 2), old_look(1, 2), old_look(2, 2)};
       //fwd.normalize();
       auto up = float3 {0.0f, 1.0f, 0.0f};
-      auto local_up = float3 {camera_trans(0, 1), camera_trans(1, 1), camera_trans(2, 1)};
-      auto right = float3 {up.cross(fwd)};
-      right.normalize();
+      //auto local_up = float3 {camera_trans(0, 1), camera_trans(1, 1), camera_trans(2, 1)};
+      auto right = float3 {fwd.cross(up)}.normalized();
+      //right.normalize();
 
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eW)) {
-        offset += fwd * speed;
+        //offset += fwd * speed;
+        cam_pos += fwd * speed;
         //pos += float3 {0.0f, 0.0f, 1.0f} * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eS)) {
-        offset += -fwd * speed;
+        //offset += -fwd * speed;
+        cam_pos += -fwd * speed;
         //pos += float3 {0.0f, 0.0f, -1.0f} * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eD)) {
-        offset += right * speed;
+        //offset += right * speed;
+        cam_pos += right * speed;
         //pos += float3 {1.0f, 0.0f, 0.0f} * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eA)) {
-        offset += -right * speed;
+        //offset += -right * speed;
+        cam_pos += -right * speed;
         //pos += float3 {-1.0f, 0.0f, 0.0f} * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eSpace)) {
-        offset += up * speed;
+        //offset += up * speed;
+        cam_pos += up * speed;
         //pos += up * speed;
       }
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eC)) {
-        offset += -up * speed;
+        //offset += -up * speed;
+        cam_pos += -up * speed;
         //pos += -up * speed;
       }
       //trans t;
 
       //if (cursor_position_delta_x != 0.0f or cursor_position_delta_y != 0.0f) {
-      yaw += (float)cursor_position_delta_x / 20000.0f;
-      pitch += (float)cursor_position_delta_y / 20000.0f;
 
-      math::angle_axis_t<float> x_angle_axis = {cursor_position_delta_y / 200.0f, float3 {1.0f, 0.0f, 0.0f}};
-      quat accum_pitch_quat = quat {x_angle_axis};
-      auto accum_pitch_mat3 = accum_pitch_quat.toRotationMatrix();
-      mat4 accum_pitch_mat4 = mat4::Identity();
-      accum_pitch_mat4.block<3, 3>(0, 0) = accum_pitch_quat.toRotationMatrix();
-
-      math::angle_axis_t<float> y_angle_axis = {cursor_position_delta_x / 200.0f, float3 {0.0f, 1.0f, 0.0f}};
-      quat accum_yaw_quat = quat {y_angle_axis};
-      auto accum_yaw_mat3 = accum_yaw_quat.toRotationMatrix();
-      mat4 accum_yaw_mat4 = mat4::Identity();
-      accum_yaw_mat4.block<3, 3>(0, 0) = accum_yaw_mat3;
-
-      mat4 rot4 = accum_yaw_mat4 * accum_pitch_mat4;
-      mat3 rot3 = accum_yaw_mat3 * accum_pitch_mat3;
-
-      auto xxx = y_angle_axis * x_angle_axis;
-      quat q;
-      q.x() = accum_pitch_quat.x() + accum_yaw_quat.x();
-      q.y() = accum_pitch_quat.y() + accum_yaw_quat.y();
-      q.z() = accum_pitch_quat.z() + accum_yaw_quat.z();
-      q.w() = accum_pitch_quat.w() + accum_yaw_quat.w();
-      q.normalize();
       //camera_trans.rotate(accum_pitch_quat);
       //camera_trans.rotate(accum_pitch_quat * accum_yaw_quat);
-      mat3 r = camera_trans.rotation();
+      /*mat3 r = camera_trans.rotation();
       camera_trans.rotate(q);
-      camera_trans.pretranslate(offset);
+      camera_trans.pretranslate(offset);*/
       //camera_trans.linear() = quat {quat {r} * accum_pitch_quat * r.inverse() * accum_yaw_quat}.toRotationMatrix().normalized();
 
       //mat4 look = look_at(pos, {0.0f, 0.0f, 0.0f});
       //camera_trans = look.inverse();
       //camera_trans.matrix() = look.inverse();
       //}
-      auto model = input::input_subsystem_st::filesystem_st::scene_registry[0].m_nodes[0].m_transformation;
-      auto inv = camera_trans.inverse();
+      auto& model = input::input_subsystem_st::filesystem_st::scene_registry[0].m_nodes[0].m_transformation;
+      //model.translate(float3 {0.0f, 0.005f, 0.0f} * std::sin((float)(vkfw::getTime().value)));
+      //auto inv = camera_trans.inverse();
+      trans cam_trans;
+      cam_trans.fromPositionOrientationScale(cam_pos, cam_ori, cam_sca);
+      mat4 inv = cam_trans.inverse().matrix();
+      //inv = geometry::look_at(cam_pos, float3 {cam_pos + fwd}).matrix();
 
       auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
 
@@ -392,7 +501,7 @@ namespace mwc {
 
       // push constants
       auto push_constants = vulkan::push_constant_st {};
-      push_constants.m_model = camera_proj.matrix() * inv.matrix() * model.matrix();
+      push_constants.m_model = cam_proj.matrix() * inv.matrix() * model.matrix();
       /* * math::matrix_t<float32_t, 4, 4>::Ones()*/;
       push_constants.m_registers.m_registers[0] = m_vertex_buffers[0].address() + mesh.m_device_mesh.m_vertex_buffer.m_offset;
       push_constants.m_material_data = {1, 2, 0};

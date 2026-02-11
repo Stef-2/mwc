@@ -1,3 +1,4 @@
+//#pragma once
 module;
 
 export module mwc_ctti;
@@ -48,7 +49,7 @@ export namespace mwc {
     // constant evaluated, observable and modifiable state
     // type identified version
     template <typename tp_identity, auto tp_modifier, auto tp_state = 0, auto = [] {}>
-    [[nodiscard]] consteval auto modify_state() -> decltype(tp_state) {
+    [[nodiscard]] inline consteval auto modify_state() -> decltype(tp_state) {
       if constexpr (requires { state_function(type_identified_declaration_st<tp_identity, tp_state> {}); })
         return modify_state<tp_identity, tp_modifier, tp_modifier(tp_state)>();
       else

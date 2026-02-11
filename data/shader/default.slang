@@ -52,7 +52,10 @@ uniform Sampler2D combined_image_samplers[3];
 static const float4x4 proj = {0.5627, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1.0002, -1, 0, 0, -0.2000, 0};
 static const float4x4 proj2 = {0.5625, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1.0000, -1, 0, 0, -0.0200, 0};
 static const float4x4 proj3 = {0.5625, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1.0101, -1, 0, 0, -0.2010, 0};
-
+static const float4x4 identity = {1.0, 0.0, 0.0, 0.0,
+                                  0.0, 1.0, 0.0, 0.0,
+                                  0.0, 0.0, 1.0, 0.0,
+                                  0.0, 0.0, 0.0, 1.0};
 struct output_vertex_st {
   float32_t4 m_position;
 };
@@ -64,6 +67,7 @@ struct VOut
 {
   float4 position : SV_Position;
   float3 normal;
+  float3x3 tbn;
   float2 uv;
 }
 
@@ -91,9 +95,13 @@ VOut vertex_shader(uint32_t a_vertex_id : SV_VertexID) {
   //let id = float4x4 ();
   //let test3 = mul(view, view);
   let test = mul(view, float4 (vertex.m_position.xyz, 1.0f));
+  float3 t = normalize(mul(identity, vertex.m_tangent).xyz);
+  float3 n = normalize(mul(identity, float4 (vertex.m_normal, 0.0)).xyz);
+  let b = cross(n,t);
+
   //let test2 = mul(proj, test);
   //model_in_ndc.w = clamp(model_in_ndc.w, 0.0f, 1.0f);
-  return  {test, vertex.m_normal, vertex.m_uv};
+  return  {test, vertex.m_normal, float3x3(t,b,n),vertex.m_uv};
 }
 
 float32_t3 computeDiffuseColor(const float32_t4 baseColor, float metallic) {
@@ -106,7 +114,9 @@ float4 fragment_shader(VOut a_vertex, float4 pos : SV_Position) : SV_Target {
   let light_nor = normalize(-light_pos);
 
   let shading_view = normalize(a_vertex.position - push_constants.m_view_data.m_view_position).xyz;
-  let shading_normal = a_vertex.normal;//combined_image_samplers[push_constants.m_material_data.m_normal_map].Sample(a_vertex.uv).xyz;
+  var shading_normal = combined_image_samplers[push_constants.m_material_data.m_normal_map].Sample(a_vertex.uv).xyz;
+  shading_normal = shading_normal * 2.0 - 1.0;
+  shading_normal = normalize(mul(a_vertex.tbn, shading_normal));
   let NoV = dot(shading_view, shading_normal);
 
   let empty_metallic_roughness = combined_image_samplers[push_constants.m_material_data.m_metallic_roughness_map].Sample(a_vertex.uv);
@@ -128,6 +138,7 @@ float4 fragment_shader(VOut a_vertex, float4 pos : SV_Position) : SV_Target {
   float32_t3 color = Fd + Fr;
   //return output_fragment_st ({1.0, 0.0, 0.0, 1.0});
   //return combined_image_samplers[push_constants.m_material_data.m_base_color_map].Sample(a_vertex.uv/* + sin((float32_t)push_constants.m_current_time * 0.25)*/);
+  //return {a_vertex.tbn[0], 1.0};
   return {(color * light.colorIntensity.rgb) * (light.colorIntensity.w * light.attenuation * NoL) /* * light.colorIntensity.rgb*/, 1.0};
   //return {mul(-push_constants.m_model_transformation, float4(pos.xyz, 1.0f)).xyz, 1.0};
 }

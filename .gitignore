@@ -9,3 +9,4 @@ source/std/*
 !vcpkg-configuration.json
 !vcpkg.json
 !.clang-format
+/vcpkg.json

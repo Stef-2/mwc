@@ -37,7 +37,7 @@ export namespace mwc {
       storage_t m_position;
     };
     struct vertex_normal_st {
-      using storage_t = normal_t<>;
+      using storage_t = direction_t<>;
       using array_t = array_t<storage_t::Scalar, storage_t::RowsAtCompileTime>;
 
       storage_t m_normal;

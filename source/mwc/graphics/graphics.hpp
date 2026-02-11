@@ -39,7 +39,7 @@ namespace mwc {
         uint32_t m_frames_in_flight;
       };
 
-      graphics_ct(const window_ct& a_window, const semantic_version_st& a_engine_version,
+      graphics_ct(window_ct* a_window, const semantic_version_st& a_engine_version,
                   const configuration_st& a_configuration = configuration_st::default_configuration());
 
       auto render() -> void;
@@ -50,7 +50,7 @@ namespace mwc {
       [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 
       private:
-      const window_ct& m_window;
+      window_ct* m_window;
       vulkan::context_st m_context;
       vulkan::instance_ct m_instance;
       vulkan::physical_device_ct m_physical_device;

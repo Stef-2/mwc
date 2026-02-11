@@ -1,4 +1,4 @@
-#include "eigen3/Eigen/Dense"
+//#include "eigen3/Eigen/Dense"
 
 #include "mwc/mwc.hpp"
 #include "mwc/ecs/component.hpp"
@@ -20,9 +20,7 @@ import mwc_geometry;
 import std;
 
 //import vkfw;
-
 int main() {
-  //mwc::output::write_text_file("/home/billy/new_file_bro.txt", "hello world bro hello there o/");
   using namespace mwc::ecs;
   mwc::initialize_subsystems();
   /*

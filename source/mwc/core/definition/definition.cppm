@@ -37,7 +37,7 @@ export namespace mwc {
   // byte / character / string types
   using byte_t = std::byte;
   using char_t = char;
-  using string_t = std::basic_string<char_t>;
+  using string_t = std::string;
   using string_view_t = std::basic_string_view<char_t>;
 
   // utility types

@@ -31,14 +31,18 @@ namespace mwc {
     struct position_st : public component_st<position_st, geometry::position_t<>::Scalar> {
       geometry::position_t<> m_position;
     };
+    struct orientation_st : public component_st<orientation_st, geometry::orientation_t<>::Scalar> {
+      geometry::orientation_t<> m_orientation;
+    };
+    struct scale_st : public component_st<scale_st, geometry::scale_t<>::Scalar> {
+      geometry::scale_t<> m_scale;
+    };
     struct transformation_st : public component_st<transformation_st, geometry::transformation_t<>::Scalar> {
       geometry::transformation_t<> m_transformation;
     };
     struct camera_projection_st : public component_st<camera_projection_st, geometry::transformation_t<>::Scalar> {
-      using storage_t
-        = geometry::transformation_t<>; //geometry::transformation_t<geometry::default_scalar_t, 3, math::dense_storage_type_et::e_projective>;
 
-      storage_t m_projection;
+      geometry::camera_projection_t m_projection;
     };
     struct camera_type_st : public component_st<camera_type_st, std::underlying_type_t<graphics::camera_projection_et>> {
       graphics::camera_projection_et m_projection_type;
