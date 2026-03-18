@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
 set(CMAKE_CXX_MODULE_STD TRUE)
 
 project(mwc LANGUAGES CXX)
-#include_directories(/opt/compiler-explorer/clang-ericwf-contracts-trunk-20250726/include/x86_64-unknown-linux-gnu/c++/v1/)
+
 # project configuration
 set(CXX_HEADER_FILE_EXTENSION ".hpp")
 set(CXX_SOURCE_FILE_EXTENSION ".cpp")
@@ -28,6 +28,9 @@ set(DATA_DIR ${ROOT_DIR}/data)
 set(DATA_IMAGE_DIR ${DATA_DIR}/image)
 set(DATA_MESH_DIR ${DATA_DIR}/mesh)
 set(DATA_SHADER_DIR ${DATA_DIR}/shader)
+
+# third party dependencies
+set(OPEN_USD_INSTALLATION_DIR "/opt/OpenUSD/")
 
 # if logging is enabled, attempt to find the logging directory, if not present, generate one
 if (${MWC_LOG})
@@ -57,6 +60,10 @@ add_compile_definitions(VULKAN_HPP_ENABLE_STD_MODULE)
 add_compile_definitions(VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1)
 add_compile_definitions(VKFW_NO_EXCEPTIONS)
 add_compile_definitions(VKFW_NO_STRUCT_CONSTRUCTORS)
+
+#-Wno-error=incompatible-pointer-types
+# maybe needed after with clang 22+
+
 #add_compile_definitions(VULKAN_HPP_NO_EXCEPTIONS 1)
 # vulkan library
 
@@ -102,19 +109,26 @@ target_link_libraries(vkfw_module PRIVATE VulkanHppModule)
 #
 
 #add_library(vma_module)
+#find_package(VulkanHeaders CONFIG REQUIRED)
 FetchContent_Declare(vma GIT_REPOSITORY https://github.com/YaaZ/VulkanMemoryAllocator-Hpp)
 FetchContent_MakeAvailable(vma)
 
+set(VKFW_ENABLE_STD_MODULE 1)
 set(VKFW_BUILD_CXX_MODULE 1)
 set(VKFW_NO_INCLUDE_VULKAN_HPP 1)
-set(VKFW_BUILD_WITH_VULKAN_MODULE 0)
+set(VKFW_ENABLE_VULKAN_HPP_MODULE 1)
 FetchContent_Declare(
         vkfw
         GIT_REPOSITORY https://github.com/Cvelth/vkfw
-        GIT_TAG gcc-16
+        GIT_TAG gcc-16#[[main]]
+
 )
 FetchContent_MakeAvailable(vkfw)
-find_package(glm REQUIRED)
+#target_compile_definitions(vkfw INTERFACE "-DVKFW_NO_INCLUDE_VULKAN_HPP=1 -DVKFW_ENABLE_VULKAN_HPP_MODULE=1")
+#target_compile_options(vkfw INTERFACE "-std=c++26")
+target_link_libraries(vkfw INTERFACE Vulkan-HppModule)
+find_package(glm CONFIG REQUIRED)
+find_package(slang CONFIG REQUIRED)
 #[[
 target_include_directories(vma_module PRIVATE ${vma_SOURCE_DIR}/include)
 target_sources(vma_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${vma_SOURCE_DIR} FILES ${vma_SOURCE_DIR}/include/vk_mem_alloc.cppm)
@@ -129,10 +143,8 @@ target_compile_definitions(vma_module PRIVATE
 )
 target_link_libraries(vma_module PRIVATE VulkanHppModule)
 ]]
-# fastgltf library
-add_library(fast_gltf_module)
-FetchContent_Declare(fastgltf GIT_REPOSITORY https://github.com/spnda/fastgltf GIT_TAG main)
-FetchContent_MakeAvailable(fastgltf)
+
+#[[
 target_include_directories(fast_gltf_module PRIVATE ${fastgltf_SOURCE_DIR}/include)
 target_sources(fast_gltf_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${fastgltf_SOURCE_DIR} FILES ${fastgltf_SOURCE_DIR}/src/fastgltf.ixx)
 target_compile_features(fast_gltf_module PUBLIC cxx_std_26)
@@ -140,9 +152,20 @@ target_compile_definitions(fast_gltf_module PRIVATE
         FASTGLTF_COMPILE_AS_CPP20
         FASTGLTF_USE_STD_MODULE
 )
-target_link_libraries(fast_gltf_module PRIVATE fastgltf)
+target_link_libraries(fast_gltf_module PRIVATE fastgltf)]]
 
-find_package(pxr CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
+find_package(Python REQUIRED COMPONENTS Development)
+find_package(pxr CONFIG REQUIRED NO_DEFAULT_PATH HINTS ${OPEN_USD_INSTALLATION_DIR})
+if (pxr_FOUND)
+    message("OpenUSD installation found at: " ${pxr_DIR})
+    cmake_print_properties(
+            TARGETS usd
+            PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES
+            INCLUDE_DIRECTORIES
+    )
+endif ()
 
 # project executable
 add_executable(${PROJECT_NAME})
@@ -170,18 +193,23 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         #VulkanHppModule
         #Vulkan
         vulkan
+        Vulkan-HppModule
         VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-HppModule
         glm::glm
         #VMA-Hpp
         glfw
         #Vulkan
         #vkfw_module
-        usd
-        usd_ms
+        #usd
+        #usd_ms
         vkfw-module
+        Python::Python
+        usd
+        /opt/OpenUSD/lib/libusd_ms.so
+        #usd_ms
         #vma
         #python
-        imgui
-        fast_gltf_module
-        shader-slang
+        imgui::imgui
+        #fast_gltf_module
+        slang::slang
 )

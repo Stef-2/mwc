@@ -39,6 +39,7 @@
         "COMPILER_CXX_DEBUG_DEFINITIONS": ""
       },
       "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
