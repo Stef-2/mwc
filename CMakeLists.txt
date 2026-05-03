@@ -1,16 +1,16 @@
-cmake_minimum_required(VERSION 4.0.3 FATAL_ERROR)
+cmake_minimum_required(VERSION 4.3.2 FATAL_ERROR)
 include(CMakePrintHelpers)
 include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 26)
-set(CMAKE_LINKER_TYPE LLD)
-set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")
 set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
+set(CMAKE_LINKER_TYPE LLD)
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "451f2fe2-a8a2-47c3-bc32-94786d8fc91b")
 set(CMAKE_CXX_MODULE_STD TRUE)
 
 project(mwc LANGUAGES CXX)
-#include_directories(/opt/compiler-explorer/clang-ericwf-contracts-trunk-20250726/include/x86_64-unknown-linux-gnu/c++/v1/)
 # project configuration
+set(OPEN_USD_INSTALL_DIR "/opt/OpenUSD/" CACHE PATH "open usd install directory")
 set(CXX_HEADER_FILE_EXTENSION ".hpp")
 set(CXX_SOURCE_FILE_EXTENSION ".cpp")
 set(CXX_MODULE_FILE_EXTENSION ".cppm")
@@ -111,7 +111,7 @@ set(VKFW_BUILD_WITH_VULKAN_MODULE 0)
 FetchContent_Declare(
         vkfw
         GIT_REPOSITORY https://github.com/Cvelth/vkfw
-        GIT_TAG gcc-16
+        GIT_TAG main
 )
 FetchContent_MakeAvailable(vkfw)
 find_package(glm REQUIRED)
@@ -130,6 +130,7 @@ target_compile_definitions(vma_module PRIVATE
 target_link_libraries(vma_module PRIVATE VulkanHppModule)
 ]]
 # fastgltf library
+#[[
 add_library(fast_gltf_module)
 FetchContent_Declare(fastgltf GIT_REPOSITORY https://github.com/spnda/fastgltf GIT_TAG main)
 FetchContent_MakeAvailable(fastgltf)
@@ -140,10 +141,10 @@ target_compile_definitions(fast_gltf_module PRIVATE
         FASTGLTF_COMPILE_AS_CPP20
         FASTGLTF_USE_STD_MODULE
 )
-target_link_libraries(fast_gltf_module PRIVATE fastgltf)
+target_link_libraries(fast_gltf_module PRIVATE fastgltf)]]
 
-find_package(pxr CONFIG REQUIRED)
-
+find_package(pxr CONFIG REQUIRED HINTS ${OPEN_USD_INSTALL_DIR})
+find_package(slang CONFIG REQUIRED)
 # project executable
 add_executable(${PROJECT_NAME})
 # project include directories
@@ -170,6 +171,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         #VulkanHppModule
         #Vulkan
         vulkan
+        Vulkan-HppModule
         VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-HppModule
         glm::glm
         #VMA-Hpp
@@ -182,6 +184,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         #vma
         #python
         imgui
-        fast_gltf_module
-        shader-slang
+        #fast_gltf_module
+        slang::slang
 )
