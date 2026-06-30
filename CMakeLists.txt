@@ -82,6 +82,7 @@ target_link_libraries(VulkanHppModule PUBLIC Vulkan::Headers)
 # vkfw library
 #add_library(vkfw_module)
 
+
 #[[
 target_include_directories(vkfw_module PRIVATE ${vkfw_SOURCE_DIR}/include)
 target_sources(vkfw_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${vkfw_SOURCE_DIR} FILES ${vkfw_SOURCE_DIR}/include/vkfw/vkfw.cppm)
