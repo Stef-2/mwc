@@ -2,13 +2,17 @@ cmake_minimum_required(VERSION 4.3.2 FATAL_ERROR)
 include(CMakePrintHelpers)
 include(FetchContent)
 
+# cmake configuration
+set(FETCHCONTENT_TRY_FIND_PACKAGE_MODE ALWAYS)
+
+# cxx configuration
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
-set(CMAKE_LINKER_TYPE LLD)
 set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "451f2fe2-a8a2-47c3-bc32-94786d8fc91b")
 set(CMAKE_CXX_MODULE_STD TRUE)
 
 project(mwc LANGUAGES CXX)
+
 # project configuration
 set(OPEN_USD_INSTALL_DIR "/opt/OpenUSD/" CACHE PATH "open usd install directory")
 set(CXX_HEADER_FILE_EXTENSION ".hpp")
