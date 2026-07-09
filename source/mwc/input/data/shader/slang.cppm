@@ -1,7 +1,7 @@
 module;
 
-#include <shader-slang/slang.h>
-#include <shader-slang/slang-com-ptr.h>
+#include <slang.h>
+#include <slang-com-ptr.h>
 
 export module mwc_slang;
 

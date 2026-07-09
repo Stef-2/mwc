@@ -1,15 +1,14 @@
-cmake_minimum_required(VERSION 4.3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 4.3.4 FATAL_ERROR)
 include(CMakePrintHelpers)
 include(FetchContent)
 
 # cmake configuration
 set(FETCHCONTENT_TRY_FIND_PACKAGE_MODE ALWAYS)
-
 # cxx configuration
-set(CMAKE_CXX_STANDARD 26)
-set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
-set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "451f2fe2-a8a2-47c3-bc32-94786d8fc91b")
-set(CMAKE_CXX_MODULE_STD TRUE)
+# set(CMAKE_CXX_STANDARD 26)
+# set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
+#set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "451f2fe2-a8a2-47c3-bc32-94786d8fc91b")
+# set(CMAKE_CXX_MODULE_STD TRUE)
 
 project(mwc LANGUAGES CXX)
 
@@ -25,6 +24,7 @@ set(MWC_LOG 1)
 set(ROOT_DIR ${PROJECT_SOURCE_DIR})
 set(SOURCE_DIR ${ROOT_DIR}/source)
 set(SOURCE_PROJECT_DIR ${SOURCE_DIR}/${PROJECT_NAME})
+set(EXTERNAL_SOURCE_DIR ${ROOT_DIR}/external)
 set(SOURCE_STD_DIR ${SOURCE_DIR}/std)
 set(MODULE_DIR ${SOURCE_DIR})
 set(LOG_DIR ${ROOT_DIR}/log)
@@ -32,6 +32,8 @@ set(DATA_DIR ${ROOT_DIR}/data)
 set(DATA_IMAGE_DIR ${DATA_DIR}/image)
 set(DATA_MESH_DIR ${DATA_DIR}/mesh)
 set(DATA_SHADER_DIR ${DATA_DIR}/shader)
+
+set(FETCHCONTENT_BASE_DIR ${EXTERNAL_SOURCE_DIR})
 
 # if logging is enabled, attempt to find the logging directory, if not present, generate one
 if (${MWC_LOG})
@@ -62,12 +64,23 @@ add_compile_definitions(VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1)
 add_compile_definitions(VKFW_NO_EXCEPTIONS)
 add_compile_definitions(VKFW_NO_STRUCT_CONSTRUCTORS)
 #add_compile_definitions(VULKAN_HPP_NO_EXCEPTIONS 1)
-# vulkan library
 
-#add_library(VulkanHppModule)
-#find_package(Vulkan REQUIRED)
+# vulkan library
+find_package(Vulkan REQUIRED)
+if( NOT TARGET Vulkan::HppModule )
+    add_library( Vulkan-HppModule OBJECT )
+    add_library( Vulkan::HppModule ALIAS Vulkan-HppModule )
+    target_sources( Vulkan-HppModule PUBLIC
+        FILE_SET CXX_MODULES
+        BASE_DIRS ${Vulkan_INCLUDE_DIR}
+        FILES
+            ${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm
+            ${Vulkan_INCLUDE_DIR}/vulkan/vulkan_video.cppm)
+    set_target_properties( Vulkan-HppModule PROPERTIES CXX_MODULE_STD ON )
+    target_include_directories( Vulkan-HppModule PUBLIC ${Vulkan_INCLUDE_DIR} )
+endif()
 #[[
-target_compile_definitions(VulkanHppModule PUBLIC
+target_compile_definitions(Vulkan::Headers INTERFACE
         VULKAN_HPP_NO_EXCEPTIONS
         VULKAN_HPP_RAII_NO_EXCEPTIONS
         VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
@@ -75,14 +88,13 @@ target_compile_definitions(VulkanHppModule PUBLIC
 
         VULKAN_HPP_ASSERT=${MWC_ASSERT}
         VULKAN_HPP_ASSERT_ON_RESULT=VULKAN_HPP_ASSERT
-)
-target_compile_definitions(VulkanHppModule PRIVATE
         VULKAN_HPP_STD_MODULE=std.compat
-)
-target_sources(VulkanHppModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${Vulkan_INCLUDE_DIR} FILES ${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm)
-target_compile_features(VulkanHppModule PUBLIC cxx_std_26)
-target_link_libraries(VulkanHppModule PUBLIC Vulkan::Headers)
-]]
+)]]
+
+# target_sources(VulkanHppModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${Vulkan_INCLUDE_DIR} FILES ${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm)
+# target_compile_features(VulkanHppModule PUBLIC cxx_std_26)
+# target_link_libraries(VulkanHppModule PUBLIC Vulkan::Headers)
+
 # vkfw library
 #add_library(vkfw_module)
 
@@ -107,19 +119,49 @@ target_link_libraries(vkfw_module PRIVATE VulkanHppModule)
 #
 
 #add_library(vma_module)
-FetchContent_Declare(vma GIT_REPOSITORY https://github.com/YaaZ/VulkanMemoryAllocator-Hpp)
-FetchContent_MakeAvailable(vma)
+
+FetchContent_Declare(vma GIT_REPOSITORY
+        https://github.com/YaaZ/VulkanMemoryAllocator-Hpp
+)
 
 set(VKFW_BUILD_CXX_MODULE 1)
 set(VKFW_NO_INCLUDE_VULKAN_HPP 1)
-set(VKFW_BUILD_WITH_VULKAN_MODULE 0)
+set(VKFW_BUILD_WITH_VULKAN_MODULE 1)
+set(VKFW_BUILD_WITH_STD_MODULE 1)
+
 FetchContent_Declare(
         vkfw
         GIT_REPOSITORY https://github.com/Cvelth/vkfw
         GIT_TAG main
 )
-FetchContent_MakeAvailable(vkfw)
+FetchContent_MakeAvailable(vkfw vma)
+#[[
+FetchContent_GetProperties(vkfw)
+if (NOT vkfw_POPULATED)
+        cmake_policy(SET CMP0169 OLD)
+        FetchContent_Populate(vkfw)
+endif()
+
+add_library(vkfw_module)
+target_compile_definitions(vkfw_module PRIVATE
+        VKFW_ENABLE_VULKAN_HPP_MODULE
+        VKFW_NO_EXCEPTIONS
+        VKFW_NO_STRUCT_CONSTRUCTORS
+        VKFW_ENABLE_STD_MODULE
+        VKFW_ASSERT=${MWC_ASSERT}
+        VKFW_ASSERT_ON_RESULT=VKFW_ASSERT
+        VKFW_INLINE=inline
+        assert=VKFW_ASSERT
+)
+target_include_directories(vkfw_module PRIVATE
+        ${vkfw_SOURCE_DIR}/include/vkfw
+        ${Vulkan_SOURCE_DIR}
+)
+target_sources(vkfw_module PRIVATE FILE_SET CXX_MODULES BASE_DIRS ${vkfw_SOURCE_DIR} FILES ${vkfw_SOURCE_DIR}/include/vkfw/vkfw.cppm)
+target_compile_features(vkfw_module PUBLIC cxx_std_26)
+target_link_libraries(vkfw_module PRIVATE Vulkan::Vulkan Vulkan::Headers)]]
 find_package(glm REQUIRED)
+find_package(imgui REQUIRED)
 #[[
 target_include_directories(vma_module PRIVATE ${vma_SOURCE_DIR}/include)
 target_sources(vma_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${vma_SOURCE_DIR} FILES ${vma_SOURCE_DIR}/include/vk_mem_alloc.cppm)
@@ -147,7 +189,8 @@ target_compile_definitions(fast_gltf_module PRIVATE
         FASTGLTF_USE_STD_MODULE
 )
 target_link_libraries(fast_gltf_module PRIVATE fastgltf)]]
-
+#[[
+]]
 find_package(pxr CONFIG REQUIRED HINTS ${OPEN_USD_INSTALL_DIR})
 find_package(slang CONFIG REQUIRED)
 # project executable
@@ -171,13 +214,15 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         MWC_ASSERT=${MWC_ASSERT}
 )
 # project libraries
-#target_link_directories(${PROJECT_NAME} PUBLIC "/home/billy/Downloads/usd.py312.manylinux_2_35_x86_64.usdview.release-v25.08.71e038c1/lib/")
 target_link_libraries(${PROJECT_NAME} PUBLIC
-        #VulkanHppModule
-        #Vulkan
+        VulkanHppModule
+        Vulkan::HppModule
+        vma
         vulkan
         Vulkan-HppModule
-        VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-HppModule
+        #vkfw_module
+        VulkanMemoryAllocator-HppModule
+        
         glm::glm
         #VMA-Hpp
         glfw
@@ -188,7 +233,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         vkfw-module
         #vma
         #python
-        imgui
+        imgui::imgui
         #fast_gltf_module
         slang::slang
 )

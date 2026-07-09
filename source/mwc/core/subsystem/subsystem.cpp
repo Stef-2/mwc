@@ -1,11 +1,10 @@
-module;
+module mwc_subsystem;
 
 #include "mwc/core/diagnostic/assert.hpp"
 #include "mwc/core/contract/definition.hpp"
 
 #include "mwc/core/diagnostic/log/subsystem.hpp"
 
-module mwc_subsystem;
 
 namespace mwc {
   subsystem_st::subsystem_st(const initializer_list_t<obs_ptr_t<subsystem_st>> a_dependencies, const string_view_t a_name)
