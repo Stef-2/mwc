@@ -21,7 +21,7 @@ namespace mwc {
           const auto sink_path
             = (file_path_t {logging_subsystem_directory()} /= event_severity_level_string(event_severity_et {i}))
             += file_extension_string_map(file_type_et::e_text);
-          log_files[i] = std::fopen(sink_path.c_str(), "w");
+          log_files[i] = std::fopen(sink_path.string().c_str(), "w");
           contract_assert(log_files[i]);
           // note: change this to proper std::filesystem::path formatting once clang implements it
           std::println("[{0}] {1}", i, sink_path.string());

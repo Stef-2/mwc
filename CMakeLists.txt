@@ -4,11 +4,6 @@ include(FetchContent)
 
 # cmake configuration
 set(FETCHCONTENT_TRY_FIND_PACKAGE_MODE ALWAYS)
-# cxx configuration
-# set(CMAKE_CXX_STANDARD 26)
-# set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
-#set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "451f2fe2-a8a2-47c3-bc32-94786d8fc91b")
-# set(CMAKE_CXX_MODULE_STD TRUE)
 
 project(mwc LANGUAGES CXX)
 
@@ -67,37 +62,30 @@ add_compile_definitions(VKFW_NO_STRUCT_CONSTRUCTORS)
 
 # vulkan library
 find_package(Vulkan REQUIRED)
-if( NOT TARGET Vulkan::HppModule )
-    add_library( Vulkan-HppModule OBJECT )
-    add_library( Vulkan::HppModule ALIAS Vulkan-HppModule )
-    target_sources( Vulkan-HppModule PUBLIC
+if(NOT TARGET Vulkan::HppModule)
+    add_library(vulkan_cxx_module OBJECT)
+    add_library(Vulkan::HppModule ALIAS vulkan_cxx_module)
+    target_sources(vulkan_cxx_module PUBLIC
         FILE_SET CXX_MODULES
         BASE_DIRS ${Vulkan_INCLUDE_DIR}
         FILES
             ${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm
             ${Vulkan_INCLUDE_DIR}/vulkan/vulkan_video.cppm)
-    set_target_properties( Vulkan-HppModule PROPERTIES CXX_MODULE_STD ON )
-    target_include_directories( Vulkan-HppModule PUBLIC ${Vulkan_INCLUDE_DIR} )
-endif()
-#[[
-target_compile_definitions(Vulkan::Headers INTERFACE
-        VULKAN_HPP_NO_EXCEPTIONS
+    set_target_properties(vulkan_cxx_module PROPERTIES CXX_MODULE_STD ON)
+    target_compile_definitions(vulkan_cxx_module PUBLIC
+    VULKAN_HPP_NO_EXCEPTIONS
         VULKAN_HPP_RAII_NO_EXCEPTIONS
         VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
         VULKAN_HPP_ENABLE_STD_MODULE
 
         VULKAN_HPP_ASSERT=${MWC_ASSERT}
         VULKAN_HPP_ASSERT_ON_RESULT=VULKAN_HPP_ASSERT
-        VULKAN_HPP_STD_MODULE=std.compat
-)]]
-
-# target_sources(VulkanHppModule PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${Vulkan_INCLUDE_DIR} FILES ${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm)
-# target_compile_features(VulkanHppModule PUBLIC cxx_std_26)
-# target_link_libraries(VulkanHppModule PUBLIC Vulkan::Headers)
+        VULKAN_HPP_STD_MODULE=std.compat)
+    target_include_directories(vulkan_cxx_module PUBLIC ${Vulkan_INCLUDE_DIR})
+endif()
 
 # vkfw library
 #add_library(vkfw_module)
-
 
 #[[
 target_include_directories(vkfw_module PRIVATE ${vkfw_SOURCE_DIR}/include)
@@ -133,8 +121,31 @@ FetchContent_Declare(
         vkfw
         GIT_REPOSITORY https://github.com/Cvelth/vkfw
         GIT_TAG main
+        SOURCE_SUBDIR "workaround for CMAKE_EXPERIMENTAL_CXX_IMPORT_STD"
 )
-FetchContent_MakeAvailable(vkfw vma)
+FetchContent_MakeAvailable(vkfw)
+add_library(vkfw_cxx_module OBJECT)
+target_sources(vkfw_cxx_module PUBLIC
+        FILE_SET CXX_MODULES
+        BASE_DIRS ${vkfw_SOURCE_DIR}
+        FILES
+        ${vkfw_SOURCE_DIR}/include/vkfw/vkfw.cppm
+)
+set_target_properties(vkfw_cxx_module PROPERTIES CXX_MODULE_STD ON)
+target_compile_definitions(vkfw_cxx_module PUBLIC
+        VKFW_BUILD_CXX_MODULE
+        VKFW_NO_EXCEPTIONS
+        VKFW_NO_STRUCT_CONSTRUCTORS
+        VKFW_ENABLE_STD_MODULE
+        VKFW_ENABLE_VULKAN_HPP_MODULE
+        VKFW_ASSERT=${MWC_ASSERT}
+        VKFW_ASSERT_ON_RESULT=VKFW_ASSERT
+        VULKAN_HPP_STD_MODULE=std.compat
+)
+target_include_directories(vkfw_cxx_module PUBLIC ${vkfw_SOURCE_DIR}/include/vkfw)
+target_link_libraries(vkfw_cxx_module PRIVATE vulkan_cxx_module)
+
+FetchContent_MakeAvailable(vma)
 #[[
 FetchContent_GetProperties(vkfw)
 if (NOT vkfw_POPULATED)
@@ -230,7 +241,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         #vkfw_module
         usd
         usd_ms
-        vkfw-module
+        vkfw_cxx_module
         #vma
         #python
         imgui::imgui

@@ -6,7 +6,7 @@
 #include "mwc/input/subsystem.hpp"
 
 import mwc_metaprogramming_utility;
-import mwc_ctti;
+import mwc_meta;
 
 namespace mwc {
   namespace graphics {
@@ -61,7 +61,7 @@ namespace mwc {
       // ecs
       if (ImGui::BeginChild("ecs", ImVec2 {0.0, 640.0}, ImGuiChildFlags_Borders)) {
         dear_imgui_ct::centered_text("ecs");
-        using component_tuple_t = typename decltype(ctti::observe_type_list<ecs::component_type_list_st>())::component_tuple_t;
+        using component_tuple_t = typename decltype(meta::observe_type_list<ecs::component_type_list_st>())::component_tuple_t;
         constexpr auto component_count = std::tuple_size_v<component_tuple_t>;
 
         constexpr auto table_flags = ImGuiTableFlags_Borders bitor ImGuiTableFlags_HighlightHoveredColumn

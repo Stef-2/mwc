@@ -12,7 +12,7 @@ namespace mwc {
       directory_map.m_storage[2] = {directory_et::e_root, std::invoke([] {
                                       auto cwd = std::filesystem::current_path();
                                       while (true) {
-                                        if (string_view_t {cwd.filename().c_str()} == project_name_string())
+                                        if (string_view_t {cwd.filename().string().c_str()} == project_name_string())
                                           return cwd;
                                         cwd = cwd.parent_path();
                                       }
@@ -37,7 +37,7 @@ namespace mwc {
           const auto directory_present = (directory_enumerator == e_current_working) or (directory_enumerator == e_root)
                                       or (directory_enumerator == e_temporary);
           const auto directory_name_match
-            = string_view_t {path.filename().c_str()} == directory_type_string(directory_enumerator);
+            = string_view_t {path.filename().string()} == directory_type_string(directory_enumerator);
           if (directory_name_match and not directory_present) {
             directory_map.m_storage[i] = {directory_enumerator, path};
             ++i;

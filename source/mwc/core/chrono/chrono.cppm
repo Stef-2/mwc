@@ -50,15 +50,15 @@ export namespace mwc {
     /*auto initialization_time() -> const time_point_t& {
       return chrono_subsystem_st::initialization_time;
     }*/
-    template <clock_c tp_clock = high_resolution_clock_t>
+    template <clock_c tp_clock>
     auto current_time() -> const tp_clock::time_point {
       return tp_clock::now();
     }
-    template <duration_c tp_duration = default_duration_t>
+    template <duration_c tp_duration>
     auto elapsed_time() -> const tp_duration {
       return {current_time() - initialization_time()};
     }
-    template <duration_c tp_duration = default_duration_t>
+    template <duration_c tp_duration>
     auto time_between(const time_point_t& a_first, const time_point_t& a_second) -> const tp_duration {
       return std::abs(tp_duration {a_first - a_second});
     }

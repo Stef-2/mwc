@@ -4,7 +4,7 @@
         {
             "name": "base",
             "hidden": true,
-            "binaryDir": "${sourceDir}/build/${presetName}",
+            "binaryDir": "${sourceDir}/build",
             "generator": "Ninja",
             "environment": {
                 "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1"
@@ -21,7 +21,7 @@
             "name": "gcc_debug",
             "inherits": "base",
             "environment": {
-                "PROJECT_CXX_FEATURE_FLAGS": "-std=c++26 -fcontracts -freflection -fstrict-enums --embed-dir=${sourceDir}",
+                "PROJECT_CXX_FEATURE_FLAGS": "-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums --embed-dir=${sourceDir}",
                 "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
                 "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree",
                 "COMPILER_CXX_DEBUG_DEFINITIONS": "-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG_BACKTRACE -D_GLIBCXX_ASSERTIONS"
@@ -46,28 +46,6 @@
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang",
                 "CMAKE_CXX_COMPILER": "clang++",
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
-                "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS} $env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
-            }
-        },
-        {
-            "name": "GCC 16.1.0 x86_64-w64-mingw32 (ucrt64)",
-            "displayName": "GCC 16.1.0 x86_64-w64-mingw32 (ucrt64)",
-            "inherits": "base",
-            "description": "Using compilers: C = C:\\Users\\stefan.stajcic\\dev\\msys64\\ucrt64\\bin\\gcc.exe, CXX = C:\\Users\\stefan.stajcic\\dev\\msys64\\ucrt64\\bin\\g++.exe",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "environment": {
-                "PROJECT_CXX_FEATURE_FLAGS": "-std=c++26 -freflection -fcontracts -fstrict-enums --embed-dir=${sourceDir}",
-                "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
-                "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree",
-                "COMPILER_CXX_DEBUG_DEFINITIONS": "-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG_BACKTRACE -D_GLIBCXX_ASSERTIONS"
-            },
-            "cacheVariables": {
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-                "CMAKE_C_COMPILER": "C:/Users/stefan.stajcic/dev/msys64/ucrt64/bin/gcc.exe",
-                "CMAKE_CXX_COMPILER": "C:/Users/stefan.stajcic/dev/msys64/ucrt64/bin/g++.exe",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
                 "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS} $env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
