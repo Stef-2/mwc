@@ -4,16 +4,12 @@
         {
             "name": "base",
             "hidden": true,
-            "binaryDir": "${sourceDir}/build",
+            "binaryDir": "${sourceDir}/build/",
             "generator": "Ninja",
             "environment": {
                 "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1"
             },
             "cacheVariables": {
-                "CMAKE_CXX_STANDARD": "26",
-                "CMAKE_CXX_STANDARD_REQUIRED": true,
-                "CMAKE_EXPERIMENTAL_CXX_IMPORT_STD": "451f2fe2-a8a2-47c3-bc32-94786d8fc91b",
-                "CMAKE_CXX_MODULE_STD": true,
                 "CMAKE_EXPORT_COMPILE_COMMANDS": true
             }
         },
@@ -21,7 +17,6 @@
             "name": "gcc_debug",
             "inherits": "base",
             "environment": {
-                "PROJECT_CXX_FEATURE_FLAGS": "-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums --embed-dir=${sourceDir}",
                 "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
                 "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree",
                 "COMPILER_CXX_DEBUG_DEFINITIONS": "-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG_BACKTRACE -D_GLIBCXX_ASSERTIONS"
@@ -31,7 +26,7 @@
                 "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
-                "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS} $env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
+                "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
             }
         },
         {

@@ -4,6 +4,8 @@ export module mwc_ct_counter;
 
 import mwc_incomplete_type;
 
+import std;
+
 export namespace mwc {
   namespace meta {
     template <typename tp>
