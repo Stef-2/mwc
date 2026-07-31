@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.4)
+cmake_minimum_required(VERSION 4.4 FATAL_ERROR)
 include(CMakePrintHelpers)
 include(FetchContent)
 
@@ -8,16 +8,16 @@ set(FETCHCONTENT_TRY_FIND_PACKAGE_MODE ALWAYS)
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-if( NOT CMAKE_EXPERIMENTAL_CXX_IMPORT_STD )
-    if( ${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.4 )
+if(NOT CMAKE_EXPERIMENTAL_CXX_IMPORT_STD)
+    if( ${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.4)
         set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD f35a9ac6-8463-4d38-8eec-5d6008153e7d)
-    elseif( ${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.3 )
+    elseif(${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.3)
         set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD 451f2fe2-a8a2-47c3-bc32-94786d8fc91b)
-    elseif( ${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.2 )
+    elseif(${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.2)
         set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD d0edc3af-4c50-42ea-a356-e2862fe7a444)
-    elseif( ${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.0 )
+    elseif(${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.0)
         set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD 1942b4fa-b2c5-4546-9385-83f254070067)
-    elseif( ${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.30 )
+    elseif(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.30)
         set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD 0e5b6991-d74f-4b3d-a41c-cf096e0b2508)
     endif()
 endif()
@@ -75,7 +75,7 @@ if (NOT EXISTS ${DATA_SHADER_DIR})
 endif ()
 
 # assert
-set(MWC_ASSERT contract_assert)
+set(MWC_ASSERT "contract_assert")
 
 # vulkan library
 find_package(Vulkan REQUIRED)
@@ -98,6 +98,7 @@ if (NOT TARGET Vulkan::HppModule)
             VULKAN_HPP_STD_MODULE=std.compat
             VULKAN_HPP_ASSERT=${MWC_ASSERT}
     )
+    target_compile_options(vulkan_cxx_module PRIVATE -w)
     target_include_directories(vulkan_cxx_module PUBLIC ${Vulkan_INCLUDE_DIR})
 endif ()
 
@@ -127,6 +128,7 @@ target_compile_definitions(vkfw_cxx_module PUBLIC
         VKFW_ASSERT=${MWC_ASSERT}
         VKFW_INLINE=inline
 )
+target_compile_options(vkfw_cxx_module PRIVATE -w)
 target_include_directories(vkfw_cxx_module PUBLIC ${vkfw_SOURCE_DIR}/include/vkfw)
 target_link_libraries(vkfw_cxx_module PRIVATE vulkan_cxx_module)
 
@@ -142,14 +144,31 @@ target_include_directories(vma_cxx_module PRIVATE
         ${vma_SOURCE_DIR}/VulkanMemoryAllocator/include
 )
 target_sources(vma_cxx_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${vma_SOURCE_DIR} FILES ${vma_SOURCE_DIR}/include/vk_mem_alloc.cppm)
-target_compile_definitions(vma_cxx_module PUBLIC
+target_compile_definitions(vma_cxx_module PRIVATE
         VULKAN_HPP_STD_MODULE=std
         VULKAN_HPP_NO_EXCEPTIONS
         VMA_ENABLE_VULKAN_HPP_MODULE
-        VMA_ASSERT=${MWC_ASSERT}
+        #VMA_ASSERT=${MWC_ASSERT}
         assert=VMA_ASSERT
 )
+target_compile_options(vma_cxx_module PRIVATE -w)
 target_link_libraries(vma_cxx_module PRIVATE vulkan_cxx_module)
+
+#glm library
+find_package(glm CONFIG REQUIRED)
+add_library(glm_cxx_module OBJECT)
+target_include_directories(glm_cxx_module PRIVATE
+    ${vma_SOURCE_DIR}
+)
+target_compile_definitions(glm_cxx_module PRIVATE
+    GLM_ENABLE_EXPERIMENTAL
+    GLM_GTC_INLINE_NAMESPACE
+    GLM_EXT_INLINE_NAMESPACE
+    GLM_GTX_INLINE_NAMESPACE
+)
+target_compile_options(glm_cxx_module PRIVATE -w)
+target_sources(glm_cxx_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${glm_SOURCE_DIR} FILES ${glm_SOURCE_DIR}/glm/glm.cppm)
+
 
 # fastgltf library
 #[[
@@ -166,7 +185,6 @@ target_compile_definitions(fast_gltf_module PRIVATE
 target_link_libraries(fast_gltf_module PRIVATE fastgltf)]]
 #[[
 ]]
-find_package(glm REQUIRED)
 find_package(imgui REQUIRED)
 find_package(pxr CONFIG REQUIRED HINTS ${OPEN_USD_INSTALL_DIR})
 find_package(slang CONFIG REQUIRED)
@@ -195,7 +213,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         vulkan_cxx_module
         vkfw_cxx_module
         vma_cxx_module
-        glm::glm
+        glm_cxx_module
         glfw
         usd
         usd_ms

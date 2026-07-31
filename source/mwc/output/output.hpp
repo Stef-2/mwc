@@ -1,10 +1,9 @@
 #pragma once
 
-#include "mwc/core/diagnostic/log/subsystem.hpp"
-#include "mwc/core/filesystem/subsystem.hpp"
-#include "mwc/core/filesystem/file_type.hpp"
-
 import mwc_definition;
+import mwc_log_subsystem;
+import mwc_file_subsystem;
+import mwc_file_type;
 
 import std;
 

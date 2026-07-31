@@ -10,6 +10,8 @@ export namespace mwc {
   // wrapper around a static array of characters
   template <size_t tp_count>
   struct static_string_st {
+    using storage_t = array_t<char_t, tp_count + 1>;
+
     constexpr static_string_st(const char_t (&a_string)[tp_count + 1]) : m_data {} {
       std::copy_n(a_string, tp_count + 1, std::data(m_data));
     }
@@ -20,7 +22,7 @@ export namespace mwc {
       return {std::data(m_data), tp_count};
     }
 
-    array_t<char_t, tp_count + 1> m_data;
+    storage_t m_data;
   };
 
   // explicit deduction guides

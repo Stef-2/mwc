@@ -1,9 +1,5 @@
 #pragma once
 
-#include "mwc/core/diagnostic/log/subsystem.hpp"
-#include "mwc/window/subsystem.hpp"
-#include "mwc/core/chrono/subsystem.hpp"
-#include "mwc/core/filesystem/subsystem.hpp"
 #include "mwc/core/container/data_span.hpp"
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/graphics/vulkan/physical_device.hpp"
@@ -17,6 +13,10 @@
 */
 import mwc_definition;
 import mwc_subsystem;
+import mwc_log_subsystem;
+import mwc_window_subsystem;
+import mwc_chrono_subsystem;
+import mwc_file_subsystem;
 import mwc_optional;
 //import mwc_host_mesh;
 import mwc_slang;

@@ -1,4 +1,8 @@
-#include "mwc/core/filesystem/subsystem.hpp"
+module;
+
+#include "mwc/core/diagnostic/log/logging.hpp"
+
+module mwc_file_subsystem;
 
 import mwc_memory_conversion;
 

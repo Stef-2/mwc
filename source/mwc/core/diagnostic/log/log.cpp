@@ -1,4 +1,6 @@
-#include "mwc/core/diagnostic/log/log.hpp"
+module;
+
+module mwc_log;
 
 namespace mwc::diagnostic::log {
   constexpr auto sink_st::operator==(const sink_st& a_other) const -> bool_t {

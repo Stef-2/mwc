@@ -28,19 +28,19 @@ namespace mwc {
     struct static_children_st : public component_st<static_children_st<tp_count>, entity_index_t> {
       array_t<entity_index_t, tp_count> m_children;
     };
-    struct position_st : public component_st<position_st, geometry::position_t<>::Scalar> {
+    struct position_st : public component_st<position_st, geometry::position_t<>::value_type> {
       geometry::position_t<> m_position;
     };
-    struct orientation_st : public component_st<orientation_st, geometry::orientation_t<>::Scalar> {
+    struct orientation_st : public component_st<orientation_st, geometry::orientation_t<>::value_type> {
       geometry::orientation_t<> m_orientation;
     };
-    struct scale_st : public component_st<scale_st, geometry::scale_t<>::Scalar> {
+    struct scale_st : public component_st<scale_st, geometry::scale_t<>::value_type> {
       geometry::scale_t<> m_scale;
     };
-    struct transformation_st : public component_st<transformation_st, geometry::transformation_t<>::Scalar> {
+    struct transformation_st : public component_st<transformation_st, geometry::transformation_t<>::value_type> {
       geometry::transformation_t<> m_transformation;
     };
-    struct camera_projection_st : public component_st<camera_projection_st, geometry::transformation_t<>::Scalar> {
+    struct camera_projection_st : public component_st<camera_projection_st, geometry::transformation_t<>::value_type> {
 
       geometry::camera_projection_t m_projection;
     };

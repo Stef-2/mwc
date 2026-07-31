@@ -1,6 +1,6 @@
-#pragma once
+module;
 
-#include "mwc/core/contract/definition.hpp"
+export module mwc_log;
 
 import mwc_definition;
 import mwc_event_severity;
@@ -15,7 +15,7 @@ import mwc_observer_ptr;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace diagnostic {
     namespace log {
       // possible sink types:

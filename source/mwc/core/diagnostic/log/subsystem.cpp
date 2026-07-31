@@ -1,7 +1,11 @@
-#include "mwc/core/diagnostic/log/subsystem.hpp"
-#include "mwc/core/filesystem/file_type.hpp"
+module;
+
+module mwc_log_subsystem;
 
 import mwc_output_stream;
+import mwc_file_type;
+import mwc_event_severity;
+import mwc_enum_bitwise_operators;
 
 namespace mwc {
   namespace diagnostic {
@@ -20,7 +24,7 @@ namespace mwc {
         for (auto i = std::underlying_type_t<event_severity_et> {0}; i < std::to_underlying(event_severity_et::end); ++i) {
           const auto sink_path
             = (file_path_t {logging_subsystem_directory()} /= event_severity_level_string(event_severity_et {i}))
-            += file_extension_string_map(file_type_et::e_text);
+            += filesystem::file_extension_string_map(filesystem::file_type_et::e_text);
           log_files[i] = std::fopen(sink_path.string().c_str(), "w");
           contract_assert(log_files[i]);
           // note: change this to proper std::filesystem::path formatting once clang implements it

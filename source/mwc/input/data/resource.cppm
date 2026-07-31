@@ -1,10 +1,9 @@
 module;
 
-#include "mwc/core/filesystem/file_type.hpp"
-
 export module mwc_input_resource;
 
 import mwc_definition;
+import mwc_file_type;
 import mwc_set_bit;
 import mwc_bit_mask;
 

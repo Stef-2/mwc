@@ -28,9 +28,8 @@ import std;
 
     // crtp type to be inherited by ecs component types
     template <typename tp, typename tp_underlying_pod = void>
-    struct component_st : public meta::type_index_st<tp, component_index_t>, meta::type_identity_st<tp> {
+    struct component_st : public meta::type_index_st<tp>, meta::type_name_identity_st<tp> {
       using underlying_pod_t = tp_underlying_pod;
-      using _ = decltype(meta::type_list_push_back<component_type_list_st, tp>());
     };
 
     // concept modeling component types

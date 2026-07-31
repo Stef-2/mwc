@@ -1,5 +1,6 @@
-#include "mwc/window/subsystem.hpp"
-#include "mwc/core/diagnostic/assert.hpp"
+module;
+
+module mwc_window_subsystem;
 
 namespace mwc {
   auto window_subsystem_st::initialize() -> void {

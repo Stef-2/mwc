@@ -1,4 +1,6 @@
-#include "mwc/core/chrono/subsystem.hpp"
+module;
+
+module mwc_chrono_subsystem;
 
 namespace mwc {
   namespace chrono {

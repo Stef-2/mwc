@@ -1,11 +1,13 @@
-#pragma once
+module;
 
-#include "mwc/core/diagnostic/log/subsystem.hpp"
-#include "mwc/core/chrono/subsystem.hpp"
 #include "mwc/core/container/static_bi_map.hpp"
+
+export module mwc_file_subsystem;
 
 import mwc_definition;
 import mwc_subsystem;
+import mwc_log_subsystem;
+import mwc_chrono_subsystem;
 import mwc_directory;
 import mwc_enum_range;
 import mwc_contract_assertion;

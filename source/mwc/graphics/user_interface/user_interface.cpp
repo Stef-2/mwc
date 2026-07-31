@@ -1,11 +1,11 @@
 #include "mwc/graphics/user_interface/user_interface.hpp"
 #include "mwc/graphics/user_interface/data_render.hpp"
 #include "mwc/ecs/definition.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
 #include "mwc/ecs/subsystem.hpp"
 #include "mwc/input/subsystem.hpp"
 
 import mwc_metaprogramming_utility;
+import mwc_log_subsystem;
 import mwc_meta;
 
 namespace mwc {

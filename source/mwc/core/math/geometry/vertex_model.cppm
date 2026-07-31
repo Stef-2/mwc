@@ -1,6 +1,5 @@
 module;
 
-#include "mwc/core/diagnostic/assert.hpp"
 #include "mwc/core/contract/definition.hpp"
 
 export module mwc_vertex_model;
@@ -12,7 +11,7 @@ import mwc_set_bit;
 import mwc_concept;
 import mwc_geometry;
 
-import fastgltf;
+// import fastgltf;
 
 import std;
 
@@ -32,43 +31,43 @@ export namespace mwc {
     // vertex components
     struct vertex_position_st {
       using storage_t = position_t<>;
-      using array_t = array_t<storage_t::Scalar, storage_t::RowsAtCompileTime>;
+      using array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_position;
     };
     struct vertex_normal_st {
       using storage_t = direction_t<>;
-      using array_t = array_t<storage_t::Scalar, storage_t::RowsAtCompileTime>;
+      using array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_normal;
     };
     struct vertex_tangent_st {
-      using storage_t = math::vector_t<vertex_normal_st::storage_t::Scalar, 4>;
-      using array_t = array_t<storage_t::Scalar, storage_t::RowsAtCompileTime>;
+      using storage_t = math::vector_t<vertex_normal_st::storage_t::value_type, 4>;
+      using array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_tangent;
     };
     struct vertex_uv_st {
       using storage_t = math::vector_t<float32_t, 2>;
-      using array_t = array_t<storage_t::Scalar, storage_t::RowsAtCompileTime>;
+      using array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_uv;
     };
     struct vertex_color_st {
       using storage_t = math::vector_t<float32_t, 3>;
-      using array_t = array_t<storage_t::Scalar, storage_t::RowsAtCompileTime>;
+      using array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_color;
     };
     struct vertex_joints_st {
       using storage_t = math::vector_t<uint16_t, 4>;
-      using array_t = array_t<storage_t::Scalar, storage_t::RowsAtCompileTime>;
+      using array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_joints;
     };
     struct vertex_weights_st {
       using storage_t = math::vector_t<float32_t, 4>;
-      using array_t = array_t<storage_t::Scalar, storage_t::RowsAtCompileTime>;
+      using array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_weights;
     };
@@ -100,7 +99,7 @@ export namespace mwc {
     concept vertex_c = specialization_of_v<tp, vertex_st>;
 
     // gltf vertex component identification
-    constexpr auto gltf_vertex_component_string(const geometry::vertex_component_bit_mask_et a_component) {
+    /*constexpr auto gltf_vertex_component_string(const geometry::vertex_component_bit_mask_et a_component) {
       switch (a_component) {
         using enum geometry::vertex_component_bit_mask_et;
         case e_position : return "POSITION";
@@ -113,9 +112,9 @@ export namespace mwc {
         default : contract_assert(false); std::unreachable();
       }
     }
+  }*/
   }
-}
-export {
+  /*export {
   // fastgltf vertex component specializations
   template <>
   struct fastgltf::ElementTraits<mwc::geometry::vertex_uv_st::array_t>
@@ -132,5 +131,5 @@ export {
   template <>
   struct fastgltf::ElementTraits<mwc::geometry::vertex_joints_st::array_t>
   : fastgltf::ElementTraitsBase<mwc::geometry::vertex_joints_st::array_t, AccessorType::Vec4,
-                                mwc::geometry::vertex_joints_st::array_t::value_type> {};
+                                mwc::geometry::vertex_joints_st::array_t::value_type> {};*/
 }

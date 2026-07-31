@@ -27,7 +27,7 @@ namespace mwc {
         template <typename tp_this>
         auto operator->(this tp_this&& a_this) -> decltype(auto) pre(*a_this.m_vulkan_handle);
         template <typename tp_this>
-        [[nodiscard]] auto unique_handle(this tp_this&& a_this) -> decltype(auto) pre(*a_this.m_vulkan_handle);
+        [[nodiscard]] auto unique_handle(this tp_this&& a_this) -> decltype(auto) /*pre(*a_this.m_vulkan_handle)*/;
         template <typename tp_this>
         [[nodiscard]] auto native_handle(this tp_this&& a_this) -> decltype(auto) pre(*a_this.m_vulkan_handle);
 
@@ -50,11 +50,12 @@ namespace mwc {
       }
       template <typename tp_vulkan_handle>
       auto handle_ct<tp_vulkan_handle>::operator->(this auto&& a_this) -> decltype(auto) {
-        return std::addressof(std::forward_like<decltype(a_this)>(a_this.m_vulkan_handle));
+        return std::forward_like<decltype(a_this)>(a_this.m_vulkan_handle);
       }
       template <typename tp_vulkan_handle>
       auto handle_ct<tp_vulkan_handle>::unique_handle(this auto&& a_this) -> decltype(auto) {
         return std::forward_like<decltype(a_this)>(a_this.m_vulkan_handle);
+        //return m_vulkan_handle;
       }
       template <typename tp_vulkan_handle>
       auto handle_ct<tp_vulkan_handle>::native_handle(this auto&& a_this) -> decltype(auto) {

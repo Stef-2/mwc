@@ -1,10 +1,9 @@
+module;
+
+// #define CIRC_DEP_GUARD
+
+#include "mwc/core/diagnostic/log/logging.hpp"
 module mwc_subsystem;
-
-#include "mwc/core/diagnostic/assert.hpp"
-#include "mwc/core/contract/definition.hpp"
-
-#include "mwc/core/diagnostic/log/subsystem.hpp"
-
 
 namespace mwc {
   subsystem_st::subsystem_st(const initializer_list_t<obs_ptr_t<subsystem_st>> a_dependencies, const string_view_t a_name)
@@ -32,10 +31,11 @@ namespace mwc {
     return dependency_found;
   }
   auto initialize_subsystems() -> void {
-    // at this point, the logging
+    // at this point, the logging subsystem has not been initialized yet, redirect diagnostics to standard output
     std::println("initializing {0} subsystems", subsystem_st::subsystem_registry.size());
+    auto logging_subsystem_initialized = bool_t {false};
 
-    const auto initializer = [](this auto&& a_this) -> void {
+    const auto initializer = [&logging_subsystem_initialized](this auto&& a_this) -> void {
       for (auto& subsystem : subsystem_st::subsystem_registry) {
         auto dependencies_initialized = true;
         // check if all subsystems dependencies are initialized
@@ -47,12 +47,17 @@ namespace mwc {
         }
         // if a subsystem is not initialized but all of its dependencies are, initialize
         if (not subsystem->m_initialized and dependencies_initialized) {
-          const auto logging_subsystem_initialized = diagnostic::log::global::logging_subsystem.m_initialized;
+
           if (logging_subsystem_initialized)
             information(std::format("initializing {0}", subsystem->m_name));
           else
             std::println("initializing {0}", subsystem->m_name);
+
           subsystem->initialize();
+          // register log subsystem as initialized
+          if (subsystem->m_name == string_view_t {"log subsystem"})
+            logging_subsystem_initialized = true;
+
           if (logging_subsystem_initialized)
             information(std::format("{0} initialized", subsystem->m_name));
           else

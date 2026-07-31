@@ -1,12 +1,13 @@
-#pragma once
+module;
 
-#include "mwc/core/diagnostic/log/subsystem.hpp"
+export module mwc_window_subsystem;
+
+import mwc_subsystem;
+import mwc_log_subsystem;
 
 import vkfw;
 
-import mwc_subsystem;
-
-namespace mwc {
+export namespace mwc {
   struct window_subsystem_st : public subsystem_st {
     using subsystem_st::subsystem_st;
 

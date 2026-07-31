@@ -1,13 +1,13 @@
-#pragma once
+module;
 
-//
+export module mwc_chrono_subsystem;
 
-import mwc_subsystem;
 import mwc_definition;
+import mwc_subsystem;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace chrono {
     struct chrono_subsystem_st : public subsystem_st {
       using subsystem_st::subsystem_st;

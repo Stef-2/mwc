@@ -2,7 +2,6 @@
 
 #include "mwc/mwc.hpp"
 #include "mwc/ecs/component.hpp"
-#include "mwc/core/filesystem/subsystem.hpp"
 #include "mwc/ecs/subsystem.hpp"
 #include "mwc/ecs/archetype.hpp"
 #include "mwc/input/subsystem.hpp"
@@ -15,6 +14,7 @@ import mwc_subsystem;
 //import mwc_meta;
 import mwc_vertex_model;
 import mwc_math_definition;
+import mwc_file_subsystem;
 import mwc_geometry;
 
 import std;

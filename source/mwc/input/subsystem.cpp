@@ -1,9 +1,9 @@
 #include "mwc/input/subsystem.hpp"
-#include "mwc/core/filesystem/subsystem.hpp"
 #include "mwc/graphics/vulkan/shader_object.hpp"
 #include "mwc/output/output.hpp"
 #include "mwc/graphics/camera/camera.hpp"
 
+import mwc_file_subsystem;
 import mwc_breakpoint;
 import mwc_vertex_model;
 import mwc_stb_image;

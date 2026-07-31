@@ -1,6 +1,6 @@
 #include "mwc/graphics/vulkan/context.hpp"
 
-#include "vulkan/vulkan_hpp_macros.hpp"
+import mwc_vk_default_dispatcher;
 
 namespace mwc {
   namespace graphics {
@@ -10,7 +10,7 @@ namespace mwc {
         m_engine_version {a_configuration.m_engine_version},
         m_vulkan_api_version {m_context.enumerateInstanceVersion().value} {
         // basic initialization of vulkan dynamic dispatcher
-        VULKAN_HPP_DEFAULT_DISPATCHER.init();
+        default_dispatcher().init();
       }
     }
   }

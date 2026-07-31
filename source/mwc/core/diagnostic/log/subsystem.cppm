@@ -1,16 +1,17 @@
-#pragma once
+module;
 
-#include "mwc/core/chrono/subsystem.hpp"
-#include "mwc/core/diagnostic/log/log.hpp"
-//#include "mwc/core/filesystem/file_type.hpp"
+export module mwc_log_subsystem;
 
+import mwc_definition;
 import mwc_subsystem;
+import mwc_chrono_subsystem;
+import mwc_log;
 import mwc_empty_type;
 import mwc_logging_subsystem_switch;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace diagnostic {
     namespace log {
       struct log_subsystem_st : public subsystem_st {

@@ -4,11 +4,11 @@
 #include "mwc/ecs/archetype.hpp"
 #include "mwc/ecs/definition.hpp"
 #include "mwc/ecs/component.hpp"
-#include "mwc/core/diagnostic/log/subsystem.hpp"
 #include "mwc/ecs/archetype.hpp"
 
 import mwc_definition;
 import mwc_subsystem;
+import mwc_log_subsystem;
 //import mwc_geometry;
 //import mwc_ecs_definition;
 //import mwc_ecs_component;
