@@ -30,7 +30,6 @@ namespace mwc {
       constexpr auto context_st::configuration_st::default_configuration() -> configuration_st {
         return configuration_st {.m_engine_version = {0, 3, 1}};
       }
-
     }
   }
 }

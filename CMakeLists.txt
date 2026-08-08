@@ -80,7 +80,7 @@ set(MWC_ASSERT "contract_assert")
 # vulkan library
 find_package(Vulkan REQUIRED)
 if (NOT TARGET Vulkan::HppModule)
-    add_library(vulkan_cxx_module OBJECT)
+    add_library(vulkan_cxx_module STATIC)
     add_library(Vulkan::HppModule ALIAS vulkan_cxx_module)
     target_sources(vulkan_cxx_module PUBLIC
             FILE_SET CXX_MODULES
@@ -110,7 +110,7 @@ FetchContent_Declare(
         SOURCE_SUBDIR "workaround for CMAKE_EXPERIMENTAL_CXX_IMPORT_STD"
 )
 FetchContent_MakeAvailable(vkfw)
-add_library(vkfw_cxx_module OBJECT)
+add_library(vkfw_cxx_module STATIC)
 target_sources(vkfw_cxx_module PUBLIC
         FILE_SET CXX_MODULES
         BASE_DIRS ${vkfw_SOURCE_DIR}
@@ -138,7 +138,7 @@ FetchContent_Declare(vma GIT_REPOSITORY
         SOURCE_SUBDIR "workaround for CMAKE_EXPERIMENTAL_CXX_IMPORT_STD"
 )
 FetchContent_MakeAvailable(vma)
-add_library(vma_cxx_module OBJECT)
+add_library(vma_cxx_module STATIC)
 target_include_directories(vma_cxx_module PRIVATE
         ${vma_SOURCE_DIR}/include
         ${vma_SOURCE_DIR}/VulkanMemoryAllocator/include
@@ -156,7 +156,7 @@ target_link_libraries(vma_cxx_module PRIVATE vulkan_cxx_module)
 
 #glm library
 find_package(glm CONFIG REQUIRED)
-add_library(glm_cxx_module OBJECT)
+add_library(glm_cxx_module STATIC)
 target_include_directories(glm_cxx_module PRIVATE
     ${vma_SOURCE_DIR}
 )
