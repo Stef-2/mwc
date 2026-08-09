@@ -156,6 +156,7 @@ target_link_libraries(vma_cxx_module PRIVATE vulkan_cxx_module)
 
 #glm library
 find_package(glm CONFIG REQUIRED)
+get_target_property(glm_INCLUDE_DIR glm::glm-header-only INTERFACE_INCLUDE_DIRECTORIES)
 add_library(glm_cxx_module OBJECT)
 target_include_directories(glm_cxx_module PRIVATE
     ${vma_SOURCE_DIR}
@@ -167,7 +168,7 @@ target_compile_definitions(glm_cxx_module PRIVATE
     GLM_GTX_INLINE_NAMESPACE
 )
 target_compile_options(glm_cxx_module PRIVATE -w)
-target_sources(glm_cxx_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${glm_SOURCE_DIR} FILES ${glm_SOURCE_DIR}/glm/glm.cppm)
+target_sources(glm_cxx_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${glm_INCLUDE_DIR} FILES ${glm_INCLUDE_DIR}/glm/glm.cppm)
 
 
 # fastgltf library

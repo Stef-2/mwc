@@ -1,8 +1,5 @@
 #pragma once
 
-#include "mwc/core/diagnostic/assert.hpp"
-#include "mwc/core/contract/definition.hpp"
-
 import mwc_definition;
 import mwc_debug;
 

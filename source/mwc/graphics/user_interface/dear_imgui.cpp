@@ -1,6 +1,3 @@
-#include "mwc/core/diagnostic/assert.hpp"
-#include "mwc/core/contract/definition.hpp"
-
 #include "mwc/graphics/user_interface/dear_imgui.hpp"
 #include "mwc/core/diagnostic/log/logging.hpp"
 

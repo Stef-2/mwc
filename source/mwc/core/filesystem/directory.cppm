@@ -1,7 +1,5 @@
 module;
 
-#include "mwc/core/diagnostic/assert.hpp"
-
 export module mwc_directory;
 
 import mwc_definition;

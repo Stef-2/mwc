@@ -1,5 +1,5 @@
 #pragma once
-#include "mwc/core/diagnostic/assert.hpp"
+
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/graphics/vulkan/physical_device.hpp"
 

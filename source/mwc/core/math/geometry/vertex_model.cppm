@@ -1,7 +1,5 @@
 module;
 
-#include "mwc/core/contract/definition.hpp"
-
 export module mwc_vertex_model;
 
 import mwc_definition;
