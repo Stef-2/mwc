@@ -51,7 +51,7 @@ set(DATA_SHADER_DIR ${DATA_DIR}/shader)
 set(FETCHCONTENT_BASE_DIR ${EXTERNAL_SOURCE_DIR})
 
 # compile features
-add_compile_options(-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums --embed-dir=${SOURCE_DIR})
+add_compile_options(-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums -fmax-errors=8 --embed-dir=${SOURCE_DIR})
 
 # if logging is enabled, attempt to find the logging directory, if not present, generate one
 if (${MWC_LOG})
@@ -92,7 +92,6 @@ if (NOT TARGET Vulkan::HppModule)
     target_compile_definitions(vulkan_cxx_module PUBLIC
             VULKAN_HPP_NO_EXCEPTIONS
             VULKAN_HPP_RAII_NO_EXCEPTIONS
-            VULKAN_HPP_NO_TO_STRING
             VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
             VULKAN_HPP_ENABLE_STD_MODULE
             VULKAN_HPP_STD_MODULE=std.compat

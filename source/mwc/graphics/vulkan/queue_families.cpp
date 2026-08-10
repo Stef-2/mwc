@@ -4,7 +4,7 @@ namespace mwc {
   namespace graphics {
     namespace vulkan {
       queue_families_ct::queue_families_ct(const physical_device_ct& a_physical_device, const surface_ct& a_surface,
-                                           const configuration_st& a_configuration)
+                                           const configuration_st& a_configuration) noexcept
       : m_graphics {std::numeric_limits<family_st::index_t>::max(), a_configuration.m_graphics},
         m_present {std::numeric_limits<family_st::index_t>::max(), a_configuration.m_present},
         m_compute {std::numeric_limits<family_st::index_t>::max(), a_configuration.m_compute},
@@ -12,8 +12,8 @@ namespace mwc {
         m_combined_graphics_and_present_family {false},
         m_dedicated_compute_family {false},
         m_dedicated_transfer_family {false},
-        m_properties {std::invoke([&a_physical_device] -> properties_st {
-          return properties_st {a_physical_device->getQueueFamilyProperties2<properties_st::properties_chain_t>()};
+        m_properties {std::invoke([&a_physical_device] noexcept -> properties_st {
+          return properties_st {a_physical_device.unique_handle().getQueueFamilyProperties2<properties_st::properties_chain_t>()};
         })},
         m_configuration {a_configuration} {
         for (auto i = family_st::index_t {0}; const auto& queue_family_property : m_properties.m_properties) {
@@ -27,7 +27,7 @@ namespace mwc {
           ++i;
         }
         for (auto i = family_st::index_t {0}; i < std::numeric_limits<family_st::index_t>::max(); ++i)
-          if (a_physical_device->getSurfaceSupportKHR(i, a_surface.native_handle()).value) {
+          if (a_physical_device.unique_handle().getSurfaceSupportKHR(i, a_surface.native_handle()).value) {
             m_present.m_index = i;
             break;
           }

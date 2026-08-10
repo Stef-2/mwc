@@ -2,6 +2,7 @@ module;
 
 export module mwc_window_subsystem;
 
+import mwc_definition;
 import mwc_subsystem;
 import mwc_log_subsystem;
 

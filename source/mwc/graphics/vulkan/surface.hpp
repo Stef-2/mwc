@@ -33,7 +33,7 @@ namespace mwc {
         };
 
         surface_ct(const window_ct& a_window, const instance_ct& a_instance, const physical_device_ct& a_physical_device,
-                   const configuration_st& a_configuration = configuration_st::default_configuration());
+                   const configuration_st& a_configuration = configuration_st::default_configuration()) noexcept;
 
         [[nodiscard]] auto extent() const -> const extent_t&;
         [[nodiscard]] auto capabilities() const -> const capabilities_st&;

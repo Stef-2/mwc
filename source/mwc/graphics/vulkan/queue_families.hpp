@@ -19,7 +19,7 @@ namespace mwc {
 
         struct family_st {
           using index_t = uint32_t;
-          using priority_t = float32_t;
+          using priority_t = float;
 
           index_t m_index;
           priority_t m_priority;
@@ -41,7 +41,7 @@ namespace mwc {
         };
 
         queue_families_ct(const physical_device_ct& a_physical_device, const surface_ct& a_surface,
-                          const configuration_st& a_configuration = configuration_st::default_configuration());
+                          const configuration_st& a_configuration = configuration_st::default_configuration()) noexcept;
 
         template <typename tp_this>
         [[nodiscard]] auto graphics(this tp_this&& a_this) -> decltype(auto);
@@ -75,7 +75,7 @@ namespace mwc {
       };
       // implementation
       constexpr auto queue_families_ct::configuration_st::default_configuration() -> configuration_st {
-        constexpr auto default_queue_family_priority = float32_t {1.0};
+        constexpr auto default_queue_family_priority = float32_t {1};
 
         return configuration_st {.m_graphics = default_queue_family_priority,
                                  .m_present = default_queue_family_priority,

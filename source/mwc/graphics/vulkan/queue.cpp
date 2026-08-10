@@ -10,7 +10,7 @@ namespace mwc {
           const auto queue_index = 0;
           information(std::format("initializing vulkan device queue" SUB "queue family index: {0}" SUB "queue index: {1}",
                                   a_configuration.m_family_index, queue_index));
-          auto queue = a_logical_device->getQueue2(
+          auto queue = a_logical_device.unique_handle().getQueue2(
             vk::DeviceQueueInfo2 {vk::DeviceQueueCreateFlags {}, a_configuration.m_family_index, queue_index});
 
           return std::move(queue);

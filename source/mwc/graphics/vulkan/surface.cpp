@@ -4,8 +4,8 @@
 namespace {
   auto select_surface_present_mode(const mwc::graphics::vulkan::physical_device_ct& a_physical_device,
                                    const mwc::graphics::vulkan::surface_ct& a_surface,
-                                   vk::PresentModeKHR a_requested_present_mode) {
-    const auto surface_present_modes = a_physical_device->getSurfacePresentModesKHR(a_surface.native_handle());
+                                   vk::PresentModeKHR a_requested_present_mode) noexcept {
+    const auto surface_present_modes = a_physical_device.unique_handle().getSurfacePresentModesKHR(a_surface.native_handle());
     contract_assert(surface_present_modes.result == vk::Result::eSuccess);
     if (not std::ranges::contains(surface_present_modes.value, a_requested_present_mode)) [[unlikely]]
       return surface_present_modes.value.front();
@@ -18,8 +18,8 @@ namespace mwc {
   namespace graphics {
     namespace vulkan {
       surface_ct::surface_ct(const window_ct& a_window, const instance_ct& a_instance,
-                             const physical_device_ct& a_physical_device, const configuration_st& a_configuration)
-      : handle_ct {std::invoke([&a_window, &a_instance] -> handle_ct::handle_t {
+                             const physical_device_ct& a_physical_device, const configuration_st& a_configuration) noexcept
+      : handle_ct {std::invoke([&a_window, &a_instance] noexcept -> handle_ct::handle_t {
           information(std::format("initializing vulkan surface for window titled: {0}", a_window.title()));
           const auto surface = vkfw::createWindowSurface(a_instance.native_handle(), *a_window.vkfw_window());
 
@@ -28,7 +28,7 @@ namespace mwc {
         m_extent {a_window.resolution().m_width, a_window.resolution().m_height},
         m_capabilities {
         std::invoke([this, &a_physical_device, &a_configuration](
-                      [[maybe_unused]] this auto&& a_template_synthesizer) -> capabilities_st::capabilities_chain_t {
+                      [[maybe_unused]] this auto&& a_template_synthesizer) noexcept -> capabilities_st::capabilities_chain_t {
           auto surface_information_chain = capabilities_st::information_chain_t {};
           // structure chain type deduction
           auto&& [... capabilities_pack]
@@ -38,14 +38,14 @@ namespace mwc {
             = select_surface_present_mode(a_physical_device, *this, a_configuration.m_present_mode);
 
           return a_physical_device
-            ->getSurfaceCapabilities2KHR<decltype(capabilities_pack)...>(
+            .unique_handle().getSurfaceCapabilities2KHR<decltype(capabilities_pack)...>(
               surface_information_chain.get<vk::PhysicalDeviceSurfaceInfo2KHR>())
             .value;
         })},
-        m_configuration {std::invoke([this, &a_physical_device, &a_configuration] -> configuration_st {
-          const auto available_formats = a_physical_device->getSurfaceFormats2KHR(this->native_handle());
+        m_configuration {std::invoke([this, &a_physical_device, &a_configuration] noexcept -> configuration_st {
+          const auto available_formats = a_physical_device.unique_handle().getSurfaceFormats2KHR(this->native_handle());
           contract_assert(available_formats.result == vk::Result::eSuccess and not available_formats.value.empty());
-          const auto available_present_modes = a_physical_device->getSurfacePresentModesKHR(this->native_handle());
+          const auto available_present_modes = a_physical_device.unique_handle().getSurfacePresentModesKHR(this->native_handle());
           contract_assert(available_present_modes.result == vk::Result::eSuccess and not available_present_modes.value.empty());
 
           auto configuration = configuration_st {a_configuration};

@@ -1,7 +1,7 @@
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/core/diagnostic/log/logging.hpp"
 
-#include "vulkan/vulkan_hpp_macros.hpp"
+import mwc_vk_default_dispatcher;
 
 namespace {
   auto generate_device_queue_information(const mwc::graphics::vulkan::queue_families_ct& a_queue_families) {
@@ -14,15 +14,20 @@ namespace {
 
     auto queue_family_count = 0;
     // graphics queue is mandatory
+    using queue_priority_t = mwc::graphics::vulkan::queue_families_ct::family_st::priority_t;
+    const auto queue_priorities = mwc::array_t <const queue_priority_t, 1>{a_queue_families.graphics().m_priority};
     auto queues = mwc::vector_t<vk::DeviceQueueCreateInfo> {vk::DeviceQueueCreateInfo {
-      vk::DeviceQueueCreateFlags {}, a_queue_families.graphics().m_index, queue_count, &a_queue_families.graphics().m_priority}};
+      vk::DeviceQueueCreateFlags {}, a_queue_families.graphics().m_index, queue_priorities}};
     std::format_to(std::back_inserter(buffer), "[{0}] graphics queue:" SUB "queue index: {1}" SUB "queue count: {2}" SUB "",
                    queue_family_count++, a_queue_families.graphics().m_index, queue_count);
     // in case the device does not support combined graphics and present queue family
     // generate a presentation specific queue
     if (not a_queue_families.supports_combined_graphics_and_present_family()) {
-      queues.emplace_back(vk::DeviceQueueCreateFlags {}, a_queue_families.present().m_index, queue_count,
-                          &a_queue_families.present().m_priority);
+      const auto queue_priorities = mwc::array_t <const queue_priority_t, 1>{a_queue_families.present().m_priority};
+      queues.emplace_back(vk::DeviceQueueCreateInfo {
+        vk::DeviceQueueCreateFlags {}, a_queue_families.present().m_index,
+        queue_priorities
+      });
       std::format_to(std::back_inserter(buffer),
                      "selected device does not support combined graphics and present queues, generating:" SUB "[{0}] present "
                      "queue:" SUB "queue index: {1}" SUB "queue count: {2}" SUB "",
@@ -30,8 +35,8 @@ namespace {
     }
     // dedicated compute queue
     if (a_queue_families.supports_dedicated_compute_family()) {
-      queues.emplace_back(vk::DeviceQueueCreateFlags {}, a_queue_families.compute().m_index, queue_count,
-                          &a_queue_families.compute().m_priority);
+      const auto queue_priorities = mwc::array_t <const queue_priority_t, 1>{a_queue_families.compute().m_priority};
+      queues.emplace_back(vk::DeviceQueueCreateFlags {}, a_queue_families.compute().m_index, queue_priorities);
       std::format_to(std::back_inserter(buffer),
                      "selected device supports dedicated compute queue, generating:" SUB "[{0}] compute queues:" SUB
                      "queue index: {1}" SUB "queue count: {2}" SUB "",
@@ -39,10 +44,12 @@ namespace {
     }
     // dedicated transfer queue
     if (a_queue_families.supports_dedicated_transfer_family()) {
-      queues.emplace_back(vk::DeviceQueueCreateFlags {},
-                          a_queue_families.transfer().m_index,
-                          queue_count,
-                          &a_queue_families.transfer().m_priority);
+      const auto queue_priorities = mwc::array_t <const queue_priority_t, 1>{a_queue_families.transfer().m_priority};
+      queues.emplace_back(vk::DeviceQueueCreateInfo {
+        vk::DeviceQueueCreateFlags {},
+a_queue_families.transfer().m_index,
+        queue_priorities
+      });
       std::format_to(std::back_inserter(buffer),
                      "selected device supports dedicated transfer queue, generating:" SUB "[{0}] transfer queues:" SUB
                      "queue index: {1}" SUB "queue count: {2}",
@@ -58,7 +65,7 @@ namespace mwc {
     namespace vulkan {
       logical_device_ct::logical_device_ct(const physical_device_ct& a_physical_device,
                                            const queue_families_ct& a_queue_families, const configuration_st& a_configuration)
-      : handle_ct {std::invoke([&a_physical_device, &a_queue_families, &a_configuration] -> handle_t {
+      : handle_ct {std::invoke([&a_physical_device, &a_queue_families, &a_configuration] noexcept -> handle_t {
           auto buffer = string_t {"initializing vulkan logical device:" SUB "required extensions:"};
           buffer.reserve(
             buffer.size()
@@ -76,7 +83,7 @@ namespace mwc {
           // generate device queue information
           const auto device_queue_information = generate_device_queue_information(a_queue_families);
           // assert that the device supports all the required extensions
-          const auto available_extensions = a_physical_device->enumerateDeviceExtensionProperties();
+          const auto available_extensions = a_physical_device.unique_handle().enumerateDeviceExtensionProperties();
           contract_assert(available_extensions.result == vk::Result::eSuccess and not available_extensions.value.empty());
 
           for (const auto& required_extension : a_configuration.m_required_extensions) {
@@ -98,11 +105,11 @@ namespace mwc {
                                     a_configuration.m_required_extensions,
                                     {/* features field is deprecated */},
                                     std::addressof(device_features.m_default_features_chain.get<vk::PhysicalDeviceFeatures2>())};
-          auto logical_device = a_physical_device->createDevice(logical_device_create_info);
+          auto logical_device = a_physical_device.unique_handle().createDevice(logical_device_create_info);
           contract_assert(logical_device.result == vk::Result::eSuccess);
 
           // initialize vulkan dynamic dispatcher with device level function pointers
-          VULKAN_HPP_DEFAULT_DISPATCHER.init(*logical_device.value);
+          default_dispatcher().init(*logical_device.value);
 
           return handle_t {std::move(logical_device.value)};
         })},

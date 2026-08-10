@@ -36,7 +36,7 @@ namespace mwc {
             }
           }
 
-          auto expected = a_logical_device->createCommandPool(
+          auto expected = a_logical_device.unique_handle().createCommandPool(
             vk::CommandPoolCreateInfo {a_configuration.m_command_pool_create_flags, m_queue_family_index});
           contract_assert(expected.result == vk::Result::eSuccess);
 

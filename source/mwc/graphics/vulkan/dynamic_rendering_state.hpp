@@ -75,7 +75,7 @@ namespace mwc {
                                  .m_primitive_topology = vk::PrimitiveTopology::eTriangleList,
                                  .m_rasterizer_discard_enable = false,
                                  .m_polygon_mode = vk::PolygonMode::eFill,
-                                 .m_line_width = float32_t {1.0},
+                                 .m_line_width = float32_t {1},
                                  .m_sample_count = vk::SampleCountFlagBits::e1,
                                  .m_sample_mask
                                  = pair_t<vk::SampleCountFlagBits, array_t<uint32_t, 1>> {vk::SampleCountFlagBits::e1, {1}},

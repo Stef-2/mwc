@@ -1,12 +1,15 @@
 #include "mwc/graphics/vulkan/pipeline_layout.hpp"
 #include "mwc/core/diagnostic/log/logging.hpp"
+
+import std;
+
 namespace {
   auto clamp_descriptor_count(const mwc::graphics::vulkan::physical_device_ct& a_physical_device,
                               const mwc::graphics::vulkan::pipeline_layout_ct::descriptor_count_t a_requested_descriptor_count) {
     const auto descriptor_indexing_properties
       = a_physical_device.properties().m_default_properties_chain.get<vk::PhysicalDeviceDescriptorIndexingProperties>();
 
-    return std::saturate_cast<mwc::graphics::vulkan::pipeline_layout_ct::descriptor_count_t>(
+    return std::saturating_cast<mwc::graphics::vulkan::pipeline_layout_ct::descriptor_count_t>(
       std::min(static_cast<mwc::uint32_t>(a_requested_descriptor_count),
                descriptor_indexing_properties.maxDescriptorSetUpdateAfterBindSampledImages));
   }
@@ -20,7 +23,7 @@ namespace mwc {
       // requires other members for initialization
       : handle_ct {nullptr},
         m_combined_image_sampler_layout {
-        std::invoke([&a_physical_device, &a_logical_device, &a_configuration] -> decltype(m_combined_image_sampler_layout) {
+        std::invoke([&a_physical_device, &a_logical_device, &a_configuration] noexcept -> decltype(m_combined_image_sampler_layout) {
           const auto descriptor_indexing_flags = vk::DescriptorBindingFlags {
             vk::DescriptorBindingFlagBits::ePartiallyBound bitor vk::DescriptorBindingFlagBits::eUpdateAfterBind};
           const auto descriptor_indexing_bindings = vk::DescriptorSetLayoutBindingFlagsCreateInfo {descriptor_indexing_flags};
@@ -30,7 +33,7 @@ namespace mwc {
             /*descriptor_count*/ clamp_descriptor_count(a_physical_device, a_configuration.m_combined_image_sampler_count),
             vk::ShaderStageFlagBits::eAll};
 
-          auto descriptor_set_layout = a_logical_device->createDescriptorSetLayout(vk::DescriptorSetLayoutCreateInfo {
+          auto descriptor_set_layout = a_logical_device.unique_handle().createDescriptorSetLayout(vk::DescriptorSetLayoutCreateInfo {
             vk::DescriptorSetLayoutCreateFlags {vk::DescriptorSetLayoutCreateFlagBits::eUpdateAfterBindPool},
             combined_image_sampler_binding, &descriptor_indexing_bindings});
           contract_assert(descriptor_set_layout.result == vk::Result::eSuccess);
@@ -42,14 +45,14 @@ namespace mwc {
             = vk::DescriptorPoolSize {vk::DescriptorType::eCombinedImageSampler, /*descriptor_count*/ clamp_descriptor_count(
                                         a_physical_device, a_configuration.m_combined_image_sampler_count)};
 
-          auto descriptor_pool = a_logical_device->createDescriptorPool(
+          auto descriptor_pool = a_logical_device.unique_handle().createDescriptorPool(
             vk::DescriptorPoolCreateInfo {vk::DescriptorPoolCreateFlagBits::eUpdateAfterBind, /*max_sets*/ 1, descriptor_size});
           contract_assert(descriptor_pool.result == vk::Result::eSuccess);
 
           return std::move(descriptor_pool.value);
         })},
         m_combined_image_sampler_set {std::invoke([this, &a_logical_device] {
-          auto descriptor_set = a_logical_device->allocateDescriptorSets(
+          auto descriptor_set = a_logical_device.unique_handle().allocateDescriptorSets(
             vk::DescriptorSetAllocateInfo {m_combined_image_sampler_pool, *m_combined_image_sampler_layout});
 
           contract_assert(descriptor_set.result == vk::Result::eSuccess);
@@ -66,7 +69,7 @@ namespace mwc {
         information(std::format("initializing vulkan pipeline layout:" SUB "combined image sampler descriptor count: {0}" SUB
                                 "push constant range size: {1} bytes",
                                 m_configuration.m_combined_image_sampler_count, m_push_constant_range.size));
-        auto pipeline_layout = a_logical_device->createPipelineLayout(vk::PipelineLayoutCreateInfo {
+        auto pipeline_layout = a_logical_device.unique_handle().createPipelineLayout(vk::PipelineLayoutCreateInfo {
           vk::PipelineLayoutCreateFlags {}, *m_combined_image_sampler_layout, m_push_constant_range});
         contract_assert(pipeline_layout.result == vk::Result::eSuccess);
 

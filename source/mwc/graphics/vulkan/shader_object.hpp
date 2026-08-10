@@ -3,8 +3,6 @@
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/graphics/vulkan/physical_device.hpp"
 
-#include <vulkan/vulkan_core.h>
-
 import mwc_definition;
 import mwc_extent;
 import mwc_type_mobility;
@@ -73,19 +71,20 @@ namespace mwc {
                                                                       const physical_device_ct& a_physical_device,
                                                                       const configuration_st& a_configuration)
       : m_logical_device {a_logical_device},
-        m_storage {std::invoke([this, &a_logical_device, &a_configuration] -> storage_t {
+        m_storage {std::invoke([this, &a_configuration] -> storage_t {
           auto storage = storage_t {};
           if constexpr (tp_extent == std::dynamic_extent)
             storage.resize(a_configuration.m_shader_create_info.size());
 
-          const auto native_create_info_ptr
+          /*const auto native_create_info_ptr
             = std::bit_cast<const VkShaderCreateInfoEXT*>(a_configuration.m_shader_create_info.data());
           const auto native_storage_ptr = std::bit_cast<VkShaderEXT*>(storage.data());
 
           const auto dispatcher = m_logical_device->getDispatcher();
           const auto result = static_cast<vk::Result>(
             dispatcher->vkCreateShadersEXT(m_logical_device.native_handle(), a_configuration.m_shader_create_info.size(),
-                                           native_create_info_ptr, nullptr, native_storage_ptr));
+                                           native_create_info_ptr, nullptr, native_storage_ptr));*/
+          const auto result = m_logical_device.unique_handle().createShadersEXT(a_configuration.m_shader_create_info);
           contract_assert(result == vk::Result::eSuccess);
 
           for (const auto& shader_object : storage)

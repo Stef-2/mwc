@@ -2,6 +2,8 @@ module;
 
 module mwc_window_subsystem;
 
+import std;
+
 namespace mwc {
   auto window_subsystem_st::initialize() -> void {
     const auto vkfw_initialization = vkfw::init();

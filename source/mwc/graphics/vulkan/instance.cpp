@@ -1,7 +1,7 @@
 #include "mwc/graphics/vulkan/instance.hpp"
 #include "mwc/core/diagnostic/log/logging.hpp"
 
-#include "vulkan/vulkan_hpp_macros.hpp"
+import mwc_vk_default_dispatcher;
 
 import vkfw;
 
@@ -58,7 +58,7 @@ namespace mwc {
                                                                     a_configuration.m_required_layers, combined_extensions};
           const auto [result, instance] = vk::createInstance(instance_create_info);
           // initialize vulkan dynamic dispatcher with instance level function pointers
-          VULKAN_HPP_DEFAULT_DISPATCHER.init(instance);
+          default_dispatcher().init(instance);
 
           return vk::raii::Instance {a_context.m_context, instance};
         })} {}
