@@ -46,7 +46,7 @@ namespace mwc {
   auto window_ct::full_screen() const -> bool_t {
     return m_configuration.m_full_screen;
   }
-  auto window_ct::full_screen(bool_t a_full_screen) -> void {
+  auto window_ct::full_screen(const bool_t a_full_screen) -> void {
     if (m_configuration.m_full_screen != a_full_screen) {
       const auto [work_area_offset_x, work_area_offset_y, work_area_size_x, work_area_size_y] = m_monitor.getWorkarea().value;
       const auto result = m_window->setMonitor(a_full_screen ? m_monitor : nullptr, work_area_offset_x, work_area_offset_y,
@@ -61,7 +61,7 @@ namespace mwc {
     return m_window->shouldClose().value;
   }
   auto window_ct::request_closing() const -> void {
-    m_window->setShouldClose(true);
+    std::ignore = m_window->setShouldClose(true);
   }
   auto window_ct::vkfw_monitor() const -> const vkfw::Monitor& {
     return m_monitor;

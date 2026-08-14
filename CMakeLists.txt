@@ -3,8 +3,6 @@ include(CMakePrintHelpers)
 include(FetchContent)
 
 # cmake configuration
-set(FETCHCONTENT_TRY_FIND_PACKAGE_MODE ALWAYS)
-
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
@@ -51,7 +49,7 @@ set(DATA_SHADER_DIR ${DATA_DIR}/shader)
 set(FETCHCONTENT_BASE_DIR ${EXTERNAL_SOURCE_DIR})
 
 # compile features
-add_compile_options(-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums -fmax-errors=8 --embed-dir=${SOURCE_DIR})
+add_compile_options(-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums -fmax-errors=8 -mnop-fun-dllimport --embed-dir=${SOURCE_DIR})
 
 # if logging is enabled, attempt to find the logging directory, if not present, generate one
 if (${MWC_LOG})
@@ -80,7 +78,7 @@ set(MWC_ASSERT "contract_assert")
 # vulkan library
 find_package(Vulkan REQUIRED)
 if (NOT TARGET Vulkan::HppModule)
-    add_library(vulkan_cxx_module OBJECT)
+    add_library(vulkan_cxx_module STATIC)
     add_library(Vulkan::HppModule ALIAS vulkan_cxx_module)
     target_sources(vulkan_cxx_module PUBLIC
             FILE_SET CXX_MODULES
@@ -97,8 +95,15 @@ if (NOT TARGET Vulkan::HppModule)
             VULKAN_HPP_STD_MODULE=std.compat
             VULKAN_HPP_ASSERT=${MWC_ASSERT}
     )
+    set_target_properties(vulkan_cxx_module PROPERTIES
+            CXX_MODULE_STD FALSE
+    )
     target_compile_options(vulkan_cxx_module PRIVATE -w)
+    if (WIN32)
+        target_compile_definitions(vulkan_cxx_module PUBLIC VK_USE_PLATFORM_WIN32_KHR)
+    endif()
     target_include_directories(vulkan_cxx_module PUBLIC ${Vulkan_INCLUDE_DIR})
+    target_link_libraries(vulkan_cxx_module PUBLIC Vulkan::Vulkan)
 endif ()
 
 # vkfw library
@@ -109,7 +114,7 @@ FetchContent_Declare(
         SOURCE_SUBDIR "workaround for CMAKE_EXPERIMENTAL_CXX_IMPORT_STD"
 )
 FetchContent_MakeAvailable(vkfw)
-add_library(vkfw_cxx_module OBJECT)
+add_library(vkfw_cxx_module STATIC)
 target_sources(vkfw_cxx_module PUBLIC
         FILE_SET CXX_MODULES
         BASE_DIRS ${vkfw_SOURCE_DIR}
@@ -125,6 +130,7 @@ target_compile_definitions(vkfw_cxx_module PUBLIC
         VKFW_BUILD_WITH_VULKAN_MODULE
         VKFW_BUILD_MODULE_VULKAN_DYNAMIC
         VKFW_ASSERT=${MWC_ASSERT}
+        assert=${MWC_ASSERT}
         VKFW_INLINE=inline
 )
 target_compile_options(vkfw_cxx_module PRIVATE -w)
@@ -137,7 +143,7 @@ FetchContent_Declare(vma GIT_REPOSITORY
         SOURCE_SUBDIR "workaround for CMAKE_EXPERIMENTAL_CXX_IMPORT_STD"
 )
 FetchContent_MakeAvailable(vma)
-add_library(vma_cxx_module OBJECT)
+add_library(vma_cxx_module STATIC)
 target_include_directories(vma_cxx_module PRIVATE
         ${vma_SOURCE_DIR}/include
         ${vma_SOURCE_DIR}/VulkanMemoryAllocator/include
@@ -156,7 +162,7 @@ target_link_libraries(vma_cxx_module PRIVATE vulkan_cxx_module)
 #glm library
 find_package(glm CONFIG REQUIRED)
 get_target_property(glm_INCLUDE_DIR glm::glm-header-only INTERFACE_INCLUDE_DIRECTORIES)
-add_library(glm_cxx_module OBJECT)
+add_library(glm_cxx_module STATIC)
 target_include_directories(glm_cxx_module PRIVATE
     ${vma_SOURCE_DIR}
 )
@@ -185,7 +191,47 @@ target_compile_definitions(fast_gltf_module PRIVATE
 target_link_libraries(fast_gltf_module PRIVATE fastgltf)]]
 #[[
 ]]
-find_package(imgui REQUIRED)
+# imgui library
+FetcHContent_Declare(imgui GIT_REPOSITORY
+    https://github.com/ocornut/imgui
+)
+FetchContent_MakeAvailable(imgui)
+add_library(imgui_static STATIC)
+target_include_directories(imgui_static PRIVATE
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+)
+target_sources(imgui_static PRIVATE
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+)
+FetchContent_Declare(imgui_module GIT_REPOSITORY
+        https://github.com/stripe2933/imgui-module
+        GIT_TAG main
+        # disable submodules, we're pulling them ourselves
+        #GIT_SUBMODULES ""
+        SOURCE_SUBDIR "workaround for CMAKE_EXPERIMENTAL_CXX_IMPORT_STD"
+)
+FetchContent_MakeAvailable(imgui_module)
+add_library(imgui_cxx_module STATIC)
+target_include_directories(imgui_cxx_module PRIVATE
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+)
+target_sources(imgui_cxx_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${imgui_module_SOURCE_DIR} FILES
+    ${imgui_module_SOURCE_DIR}/generated/imgui.cppm
+    # ${imgui_module_SOURCE_DIR}/generated/imgui_internal.cppm
+    ${imgui_module_SOURCE_DIR}/generated/backends/imgui_impl_glfw.cppm
+    ${imgui_module_SOURCE_DIR}/generated/backends/imgui_impl_vulkan.cppm
+)
+target_link_libraries(imgui_cxx_module PRIVATE
+imgui_static
+    vulkan_cxx_module
+)
+
 find_package(pxr CONFIG REQUIRED HINTS ${OPEN_USD_INSTALL_DIR})
 find_package(slang CONFIG REQUIRED)
 # project executable
@@ -217,6 +263,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         glfw
         usd
         usd_ms
-        imgui::imgui
+        imgui_cxx_module
         slang::slang
 )

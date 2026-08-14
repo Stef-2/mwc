@@ -15,7 +15,7 @@ import mwc_project_name_string;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace filesystem {
     struct file_subsystem_st : public subsystem_st {
       static constexpr auto directory_track_count = std::to_underlying(directory_et::end);

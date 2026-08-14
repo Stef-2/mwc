@@ -26,6 +26,7 @@ import mwc_geometry;
 import mwc_host_mesh;
 
 import vulkan;
+import imgui;
 
 import std;
 

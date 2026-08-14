@@ -26,7 +26,7 @@ import mwc_input_shader_source;
 import mwc_color;
 
 //import vkfw;
-import fastgltf;
+// import fastgltf;
 
 namespace mwc {
   namespace input {
@@ -80,7 +80,7 @@ namespace mwc {
           bool_t m_cache_reflection_data_to_filesystem;
           bool_t m_cache_shader_pipeline_to_filesystem;
         };
-        static inline auto gltf_parser = fastgltf::Parser {};
+        // static inline auto gltf_parser = fastgltf::Parser {};
         static inline auto slang_global_session = Slang::ComPtr<slang::IGlobalSession> {};
         static inline auto slang_session = Slang::ComPtr<slang::ISession> {};
         static inline auto scene_registry = vector_t<scene_st> {};
@@ -101,7 +101,7 @@ namespace mwc {
     namespace global {
       inline auto input_subsystem
         = input_subsystem_st {{&diagnostic::log::global::logging_subsystem, &mwc::global::window_subsystem,
-                               &chrono::global::chrono_subsystem, &filesystem::global::file_subsystem},
+                               &mwc::chrono::global::chrono_subsystem, &mwc::filesystem::global::file_subsystem},
                               string_view_t {"input subsystem"}};
     }
 

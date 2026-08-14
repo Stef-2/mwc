@@ -34,7 +34,7 @@ namespace mwc {
     auto children(const index_t a_index) const -> vector_t<index_t> pre(a_index < node_count());
     auto node_count() const -> index_t;
     template <typename tp_this>
-    auto operator[](this tp_this&& a_this, const index_t a_index) -> decltype(auto) pre(a_index < node_count());
+    auto operator[](this tp_this&& a_this, const index_t a_index) -> decltype(auto) pre(a_index < a_this.node_count());
     template <typename tp_this>
     auto begin(this tp_this&& a_this) -> decltype(auto);
     template <typename tp_this>

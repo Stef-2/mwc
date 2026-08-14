@@ -32,9 +32,9 @@ namespace mwc {
     [[nodiscard]] constexpr auto span(this tp_this&& a_this) post(r : contract::validate_storage(r));
 
     template <typename tp_this>
-    constexpr auto begin(this tp_this&& a_this) pre(m_size != 0) post(r : r != nullptr);
+    constexpr auto begin(this tp_this&& a_this) pre(a_this.m_size != 0) post(r : r != nullptr);
     template <typename tp_this>
-    constexpr auto end(this tp_this&& a_this) pre(m_size != 0) post(r : r != nullptr and r != begin());
+    constexpr auto end(this tp_this&& a_this) pre(a_this.m_size != 0) post(r : r != nullptr and r != a_this.begin());
 
     obs_ptr_t<tp> m_data;
     size_t m_size;

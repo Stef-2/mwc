@@ -21,6 +21,7 @@ namespace mwc {
 
         context_st(const configuration_st& a_configuration = configuration_st::default_configuration());
 
+        // note: what v
         vk::raii::Context m_context;
         semantic_version_st m_engine_version;
         semantic_version_st m_vulkan_api_version;

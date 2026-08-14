@@ -1,10 +1,11 @@
 #pragma once
 
 #include "mwc/ecs/component.hpp"
-#include "imgui.h"
 
 import mwc_definition;
 import mwc_metaprogramming_utility;
+
+import imgui;
 
 import std;
 
