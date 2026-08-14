@@ -6,7 +6,7 @@
 
 import mwc_metaprogramming_utility;
 import mwc_log_subsystem;
-import mwc_meta;
+// import mwc_meta;
 
 namespace mwc {
   namespace graphics {

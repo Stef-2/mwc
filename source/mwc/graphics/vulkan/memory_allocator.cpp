@@ -25,7 +25,7 @@ namespace {
 #else
         return {};
 #endif
-        // this flag does not map to any logica device extension
+      // this flag does not map to any logical device extension
       case eExternallySynchronized : contract_assert(false); std::unreachable();
     }
   }

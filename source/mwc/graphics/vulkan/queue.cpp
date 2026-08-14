@@ -13,7 +13,7 @@ namespace mwc {
           auto queue = a_logical_device.unique_handle().getQueue2(
             vk::DeviceQueueInfo2 {vk::DeviceQueueCreateFlags {}, a_configuration.m_family_index, queue_index});
 
-          return std::move(queue);
+          return handle_t {queue};
         })},
         m_logical_device {a_logical_device},
         //m_command_pool {a_logical_device, a_queue_families, a_configuration.m_command_pool_configuration},

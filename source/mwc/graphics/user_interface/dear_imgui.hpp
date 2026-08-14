@@ -9,14 +9,17 @@
 #include "mwc/graphics/vulkan/queue.hpp"
 #include "mwc/graphics/vulkan/swapchain.hpp"
 
-#include "imgui.h"
-
 import mwc_definition;
 import mwc_type_mobility;
 
 import vulkan;
+import imgui;
 
 import std;
+
+// forward declaration
+// avoids compiling and importing imgui_impl.cppm
+struct ImGuiContext;
 
 namespace mwc {
   namespace graphics {

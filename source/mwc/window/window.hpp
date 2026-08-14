@@ -15,6 +15,7 @@ namespace mwc {
     public:
     struct configuration_st {
       static constexpr auto default_configuration() -> const configuration_st;
+
       resolution_st m_resolution;
       string_view_t m_title;
       vkfw::WindowHints m_window_hints;
@@ -30,7 +31,7 @@ namespace mwc {
     auto resolution() const -> resolution_st;
     auto aspect_ratio() const -> resolution_st::aspect_ratio_t;
     auto full_screen() const -> bool_t;
-    auto full_screen(bool_t a_full_screen) -> void;
+    auto full_screen(const bool_t a_full_screen) -> void;
     auto closing_requested() const -> bool_t;
     auto request_closing() const -> void;
     auto vkfw_monitor() const -> const vkfw::Monitor&;

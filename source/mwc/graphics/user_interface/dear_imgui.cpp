@@ -1,8 +1,11 @@
+// #include <vulkan/vulkan.h>
 #include "mwc/graphics/user_interface/dear_imgui.hpp"
 #include "mwc/core/diagnostic/log/logging.hpp"
 
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_vulkan.h>
+import vulkan;
+import imgui_impl_glfw;
+import imgui_impl_vulkan;
+import mwc_vk_null_handle;
 
 namespace mwc {
   namespace graphics {
@@ -34,31 +37,37 @@ namespace mwc {
       m_imgui_context {ImGui::CreateContext()} {
       information("initializing dear imgui");
 
+      const auto glfw_initialization = ImGui_ImplGlfw_InitForVulkan(*a_window.vkfw_window(), /*install_callbacks*/ true);
+      contract_assert(glfw_initialization);
+
       const auto pipeline_rendering_create_info = vk::PipelineRenderingCreateInfo {
         /*view_mask*/ 0, a_swapchain.surface().configuration().m_surface_format.surfaceFormat.format,
         a_swapchain.configuration().m_depth_stencil_attachment_configuration.m_format,
         a_swapchain.configuration().m_depth_stencil_attachment_configuration.m_format};
-      const auto glfw_initialization = ImGui_ImplGlfw_InitForVulkan(*a_window.vkfw_window(), /*install_callbacks*/ true);
 
-      contract_assert(glfw_initialization);
-      auto imgui_vulkan_initialization_info
-        = ImGui_ImplVulkan_InitInfo {a_context.m_vulkan_api_version.m_version,
-                                     a_instance.native_handle(),
-                                     a_physical_device.native_handle(),
-                                     a_logical_device.native_handle(),
-                                     a_queue_family.m_index,
-                                     a_queue.native_handle(),
-                                     *m_descriptor_pool,
-                                     /*render_pass*/ nullptr,
-                                     a_swapchain.image_count(),
-                                     a_swapchain.image_count(),
-                                     static_cast<VkSampleCountFlagBits>(a_configuration.m_sample_count),
-                                     /*pipeline_cache*/ nullptr,
-                                     /*subpass*/ 0,
-                                     /*internal_descriptor_pool_size*/ 0,
-                                     /*use_dynamic_rendering*/ true,
-                                     pipeline_rendering_create_info,
-                                     /*allocator*/ nullptr};
+      const auto pipeline_rendering = ImGui_ImplVulkan_PipelineInfo {
+        .RenderPass = graphics::vulkan::null_handle,
+        .Subpass = 0,
+        .MSAASamples = static_cast<typename vk::FlagTraits<vk::SampleCountFlagBits>::WrappedType>(a_configuration.m_sample_count),
+        .ExtraDynamicStates = {},
+        .PipelineRenderingCreateInfo = pipeline_rendering_create_info};
+
+      auto imgui_vulkan_initialization_info = ImGui_ImplVulkan_InitInfo {.ApiVersion = a_context.m_vulkan_api_version.m_version,
+                                                                         .Instance = a_instance.native_handle(),
+                                                                         .PhysicalDevice = a_physical_device.native_handle(),
+                                                                         .Device = a_logical_device.native_handle(),
+                                                                         .QueueFamily = a_queue_family.m_index,
+                                                                         .Queue = a_queue.native_handle(),
+                                                                         .DescriptorPool = *m_descriptor_pool,
+                                                                         .DescriptorPoolSize = 1,
+                                                                         .MinImageCount = a_swapchain.image_count(),
+                                                                         .ImageCount = a_swapchain.image_count(),
+                                                                         .PipelineCache = graphics::vulkan::null_handle,
+                                                                         .PipelineInfoMain = pipeline_rendering,
+                                                                         .UseDynamicRendering = true,
+                                                                         .Allocator = nullptr,
+                                                                         .CheckVkResultFn = nullptr,
+                                                                         .MinAllocationSize = 0};
 
       const auto vulkan_initialization = ImGui_ImplVulkan_Init(&imgui_vulkan_initialization_info);
       contract_assert(vulkan_initialization);
