@@ -20,7 +20,7 @@ import mwc_geometry;
 import std;
 
 //import vkfw;
-int main() {
+auto main() -> int {
   using namespace mwc::ecs;
   mwc::initialize_subsystems();
   /*

@@ -49,7 +49,11 @@ set(DATA_SHADER_DIR ${DATA_DIR}/shader)
 set(FETCHCONTENT_BASE_DIR ${EXTERNAL_SOURCE_DIR})
 
 # compile features
-add_compile_options(-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums -fmax-errors=8 -mnop-fun-dllimport --embed-dir=${SOURCE_DIR})
+add_compile_options(-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums -fmax-errors=8 --embed-dir=${SOURCE_DIR})
+if(MINGW)
+    # fix OpenUSD dllimport declarations when compiling with mingw
+    add_compile_options(-mnop-fun-dllimport)
+endif()
 
 # if logging is enabled, attempt to find the logging directory, if not present, generate one
 if (${MWC_LOG})
@@ -95,13 +99,13 @@ if (NOT TARGET Vulkan::HppModule)
             VULKAN_HPP_STD_MODULE=std.compat
             VULKAN_HPP_ASSERT=${MWC_ASSERT}
     )
-    set_target_properties(vulkan_cxx_module PROPERTIES
-            CXX_MODULE_STD FALSE
-    )
-    target_compile_options(vulkan_cxx_module PRIVATE -w)
     if (WIN32)
+        set_target_properties(vulkan_cxx_module PROPERTIES
+                CXX_MODULE_STD FALSE
+        )
         target_compile_definitions(vulkan_cxx_module PUBLIC VK_USE_PLATFORM_WIN32_KHR)
     endif()
+    target_compile_options(vulkan_cxx_module PRIVATE -w)
     target_include_directories(vulkan_cxx_module PUBLIC ${Vulkan_INCLUDE_DIR})
     target_link_libraries(vulkan_cxx_module PUBLIC Vulkan::Vulkan)
 endif ()
@@ -234,6 +238,7 @@ imgui_static
 
 find_package(pxr CONFIG REQUIRED HINTS ${OPEN_USD_INSTALL_DIR})
 find_package(slang CONFIG REQUIRED)
+
 # project executable
 add_executable(${PROJECT_NAME})
 # project include directories

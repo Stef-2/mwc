@@ -1,11 +1,10 @@
 module;
 
-#include "mwc/input/data/scene/image/image.hpp"
-
 export module mwc_material;
 
 import mwc_definition;
 import mwc_observer_ptr;
+import mwc_input_image;
 import mwc_color;
 
 import std;

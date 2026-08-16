@@ -67,7 +67,8 @@ namespace mwc {
                                                                          .UseDynamicRendering = true,
                                                                          .Allocator = nullptr,
                                                                          .CheckVkResultFn = nullptr,
-                                                                         .MinAllocationSize = 0};
+                                                                         .MinAllocationSize = 0,
+      .CustomShaderVertCreateInfo = {}, .CustomShaderFragCreateInfo = {}};
 
       const auto vulkan_initialization = ImGui_ImplVulkan_Init(&imgui_vulkan_initialization_info);
       contract_assert(vulkan_initialization);

@@ -1,10 +1,12 @@
-#pragma once
+module;
+
+export module mwc_input_image;
 
 import mwc_input_resource;
 import mwc_host_image;
 import mwc_device_image;
 
-namespace mwc {
+export namespace mwc {
   namespace input {
     struct image_st : public resource_st {
       dynamic_host_image_st m_host_image;

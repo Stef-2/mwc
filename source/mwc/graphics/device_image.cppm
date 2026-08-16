@@ -1,9 +1,11 @@
 module;
 
-#include "mwc/graphics/vulkan/image.hpp"
 //#include "mwc/graphics/vulkan/pipeline_layout.hpp"
 
 export module mwc_device_image;
+
+import mwc_definition;
+import mwc_graphics.vulkan.image;
 
 import vulkan;
 

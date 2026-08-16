@@ -1,8 +1,10 @@
-#pragma once
+module;
 
 #include "mwc/graphics/vulkan/handle.hpp"
 #include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/graphics/vulkan/memory_allocator.hpp"
+
+export module mwc_graphics.vulkan.image;
 
 import mwc_definition;
 
@@ -11,7 +13,7 @@ import vk_mem_alloc;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace graphics {
     namespace vulkan {
       class image_ct : public handle_ct<vk::raii::Image> {

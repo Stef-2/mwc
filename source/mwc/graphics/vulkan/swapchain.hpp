@@ -6,9 +6,9 @@
 #include "mwc/graphics/vulkan/surface.hpp"
 #include "mwc/graphics/vulkan/queue_families.hpp"
 #include "mwc/graphics/vulkan/memory_allocator.hpp"
-#include "mwc/graphics/vulkan/image.hpp"
 
 import mwc_definition;
+import mwc_graphics.vulkan.image;
 
 import vulkan;
 

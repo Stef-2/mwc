@@ -38,10 +38,10 @@ namespace mwc {
         // dynamic constructor
         frame_synchornizer_st(const logical_device_ct& a_logical_device,
                               const command_pool_ct& a_command_pool,
-                              const configuration_st& a_configuration) pre(a_configuration.m_frame_count >= minimum_frame_count)
-          requires(tp_frame_count == std::dynamic_extent);
-        auto frame_count() const -> frame_count_t;
+                              const configuration_st& a_configuration)
+          requires(tp_frame_count == std::dynamic_extent) pre(a_configuration.m_frame_count >= minimum_frame_count);
 
+        auto frame_count() const -> frame_count_t;
         auto generate_data(const logical_device_ct& a_logical_device,
                            const command_pool_ct& a_command_pool,
                            const frame_index_t m_frame_count);

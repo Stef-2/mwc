@@ -22,33 +22,6 @@ namespace mwc {
       static constexpr auto default_projection_type = camera_projection_et::e_perspective;
       template <camera_projection_et tp_camera_projection = default_projection_type>
       struct configuration_st {};
-      template <>
-      struct configuration_st<camera_projection_et::e_perspective> {
-        static constexpr auto default_configuration() -> configuration_st<camera_projection_et::e_perspective>;
-
-        geometry::position_t<> m_position;
-        geometry::orientation_t<> m_orientation;
-        geometry::scale_t<> m_scale;
-
-        scalar_t m_aspect_ratio;
-        scalar_t m_field_of_view_degrees;
-        scalar_t m_near_clip;
-        scalar_t m_far_clip;
-      };
-      template <>
-      struct configuration_st<camera_projection_et::e_orthographic> {
-        static constexpr auto default_configuration() -> configuration_st<camera_projection_et::e_orthographic>;
-        geometry::position_t<> m_position;
-        geometry::orientation_t<> m_orientation;
-        geometry::scale_t<> m_scale;
-
-        scalar_t m_left_clip;
-        scalar_t m_right_clip;
-        scalar_t m_bottom_clip;
-        scalar_t m_top_clip;
-        scalar_t m_near_clip;
-        scalar_t m_far_clip;
-      };
 
       template <camera_projection_et tp_camera_projection = default_projection_type>
       constexpr camera_ct(const configuration_st<tp_camera_projection>& a_configuration
@@ -60,6 +33,33 @@ namespace mwc {
     };
 
     // implementation
+    template <>
+      struct camera_ct::configuration_st<camera_projection_et::e_perspective> {
+      static constexpr auto default_configuration() -> configuration_st<camera_projection_et::e_perspective>;
+
+      geometry::position_t<> m_position;
+      geometry::orientation_t<> m_orientation;
+      geometry::scale_t<> m_scale;
+
+      scalar_t m_aspect_ratio;
+      scalar_t m_field_of_view_degrees;
+      scalar_t m_near_clip;
+      scalar_t m_far_clip;
+    };
+    template <>
+    struct camera_ct::configuration_st<camera_projection_et::e_orthographic> {
+      static constexpr auto default_configuration() -> configuration_st<camera_projection_et::e_orthographic>;
+      geometry::position_t<> m_position;
+      geometry::orientation_t<> m_orientation;
+      geometry::scale_t<> m_scale;
+
+      scalar_t m_left_clip;
+      scalar_t m_right_clip;
+      scalar_t m_bottom_clip;
+      scalar_t m_top_clip;
+      scalar_t m_near_clip;
+      scalar_t m_far_clip;
+    };
     constexpr auto camera_ct::configuration_st<camera_projection_et::e_perspective>::default_configuration()
       -> configuration_st<camera_projection_et::e_perspective> {
       return configuration_st<camera_projection_et::e_perspective> {

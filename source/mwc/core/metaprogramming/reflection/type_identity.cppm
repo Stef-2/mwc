@@ -20,7 +20,7 @@ export namespace mwc {
 
         return std::meta::identifier_of(type_name);
       }
-      static constexpr auto type_name_hash() {
+      static constexpr auto type_name_hash() -> size_t {
         constexpr auto name = type_name(/*include_namespace*/ true);
 
         return polynomial_rolling_hash(span_t<const char_t> {name.data(), name.size()});
@@ -57,7 +57,7 @@ export namespace mwc {
     // definition
     template <typename tp>
     struct type_index_st {
-      static constexpr auto index = size_t {mwc::meta::index<tp>()};
+      static constexpr auto index = size_t {meta::index<tp>()};
     };
   }
 }

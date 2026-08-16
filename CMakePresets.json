@@ -49,11 +49,12 @@
     ],
     "buildPresets": [
         {
-            "name": "gcc_debug",
-            "configurePreset": "gcc_debug"
+            "name": "gcc_debug_build",
+            "configurePreset": "gcc_debug",
+            "nativeToolOptions": []
         },
         {
-            "name": "clang_debug",
+            "name": "clang_debug_build",
             "configurePreset": "clang_debug"
         }
     ]

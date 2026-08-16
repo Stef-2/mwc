@@ -8,6 +8,7 @@ import mwc_operating_system;
 namespace {
   constexpr auto vma_extension_map(const vma::AllocatorCreateFlagBits a_flag_bit) -> mwc::string_t {
     using enum vma::AllocatorCreateFlagBits;
+
     switch (a_flag_bit) {
       case eKhrDedicatedAllocation : return {vk::KHRDedicatedAllocationExtensionName};
       case eKhrBindMemory2 : return {vk::KHRBindMemory2ExtensionName};
@@ -26,7 +27,8 @@ namespace {
         return {};
 #endif
       // this flag does not map to any logical device extension
-      case eExternallySynchronized : contract_assert(false); std::unreachable();
+      case eExternallySynchronized : contract_assert(false); return {};
+      default: contract_assert(false); return {};
     }
   }
 }

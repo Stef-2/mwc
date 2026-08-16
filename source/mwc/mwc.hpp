@@ -10,7 +10,7 @@ namespace mwc {
   class mwc_ct {
     public:
     struct configuration_st {
-      static constexpr auto default_configuration() -> const configuration_st;
+      static constexpr auto default_configuration() -> configuration_st;
 
       semantic_version_st m_version;
       window_ct::configuration_st m_window_configuration;
@@ -30,8 +30,8 @@ namespace mwc {
   };
 
   // implementation
-  constexpr auto mwc_ct::configuration_st::default_configuration() -> const configuration_st {
-    return configuration_st {.m_version = semantic_version_st {0, 3, 3},
+  constexpr auto mwc_ct::configuration_st::default_configuration() ->  configuration_st {
+    return configuration_st {.m_version = semantic_version_st {0, 3, 6},
                              .m_window_configuration = window_ct::configuration_st::default_configuration()};
   }
 }

@@ -1,16 +1,18 @@
 #pragma once
 //module;
 
+#include "mwc/ecs/definition.hpp"
 //export module mwc_ecs_component;
 
 import mwc_definition;
 //import mwc_ecs_definition;
-#include "mwc/ecs/definition.hpp"
+import mwc_meta_search;
 import mwc_metaprogramming_utility;
 import mwc_concept;
 import mwc_type_identity;
 import mwc_observer_ptr;
 import mwc_type_identity;
+import mwc_static_array;
 import mwc_hash;
 
 import std;
@@ -18,9 +20,19 @@ import std;
 /*export */ namespace mwc {
   namespace ecs {
     // component type tracking
-    template <typename... tps>
+    template <typename tp, typename tp_underlying_pod = void>
+    struct component_st;
+
     struct component_type_list_st {
-      using component_tuple_t = tuple_t<tps...>;
+      static constexpr auto lambda = [](const std::meta::info a_info) consteval -> bool {
+        return true/*std::meta::is_type(a_info)
+           and std::meta::is_base_of_type(std::meta::substitute(^^component_st,
+                                                                {
+                                                                a_info, ^^void}),
+                                          a_info)*/;
+      };
+      static constexpr auto component_type_info_array = static_array_st {meta::search<decltype(lambda), ^^mwc>(lambda)};
+      using component_tuple_t = decltype(meta::type_info_range_tuple<component_type_info_array>());
 
       template <size_t tp_type_index>
       using component_at_index_t = std::tuple_element_t<tp_type_index, component_tuple_t>;
@@ -28,7 +40,7 @@ import std;
 
     // crtp type to be inherited by ecs component types
     template <typename tp, typename tp_underlying_pod = void>
-    struct component_st : public meta::type_index_st<tp>, meta::type_name_identity_st<tp> {
+    struct component_st : public meta::type_index_st<tp> {
       using underlying_pod_t = tp_underlying_pod;
     };
 
