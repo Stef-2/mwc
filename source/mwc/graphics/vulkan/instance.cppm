@@ -1,10 +1,11 @@
-#pragma once
+module;
 
-#include "mwc/core/utility/semantic_version.hpp"
-#include "mwc/graphics/vulkan/context.hpp"
-#include "mwc/graphics/vulkan/handle.hpp"
+export module mwc_vk_instance;
 
 import mwc_definition;
+import mwc_semantic_version;
+import mwc_vk_handle;
+import mwc_vk_context;
 import mwc_project_name_string;
 import mwc_contract_assertion;
 
@@ -12,7 +13,7 @@ import vulkan;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace graphics {
     namespace vulkan {
       class instance_ct : public handle_ct<vk::raii::Instance> {

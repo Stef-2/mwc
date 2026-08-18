@@ -1,7 +1,8 @@
 #pragma once
 
 #include "mwc/graphics/vulkan/buffer.hpp"
-#include "mwc/core/utility/pointer_cast.hpp"
+
+import mwc_pointer_cast;
 
 import vulkan;
 

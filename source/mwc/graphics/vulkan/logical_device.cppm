@@ -1,16 +1,17 @@
-#pragma once
+module;
 
-#include "mwc/graphics/vulkan/handle.hpp"
-#include "mwc/graphics/vulkan/physical_device.hpp"
-#include "mwc/graphics/vulkan/queue_families.hpp"
+export module mwc_vk_logical_device;
 
 import mwc_definition;
+import mwc_vk_handle;
+import mwc_vk_physical_device;
+import mwc_vk_queue_families;
 
 import vulkan;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace graphics {
     namespace vulkan {
       class logical_device_ct : public handle_ct<vk::raii::Device> {

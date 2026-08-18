@@ -1,11 +1,11 @@
 #pragma once
 
-#include "mwc/graphics/vulkan/handle.hpp"
-#include "mwc/graphics/vulkan/logical_device.hpp"
-#include "mwc/graphics/vulkan/queue_families.hpp"
 #include "mwc/graphics/vulkan/command_pool.hpp"
 
 import mwc_definition;
+import mwc_vk_handle;
+import mwc_vk_logical_device;
+import mwc_vk_queue_families;
 
 import vulkan;
 

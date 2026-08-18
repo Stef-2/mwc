@@ -1,6 +1,8 @@
-#include "mwc/graphics/vulkan/memory_allocator.hpp"
+module;
+
 #include "mwc/core/diagnostic/log/logging.hpp"
-#include "mwc/core/utility/semantic_version.hpp"
+
+module mwc_memory_allocator;
 
 import mwc_observer_ptr;
 import mwc_operating_system;
@@ -22,13 +24,17 @@ namespace {
         // win32 only
       case eKhrExternalMemoryWin32 :
 #ifdef _WIN32
-        return {vk::KHRExternalMemoryWin32ExtensionName};
+        // hardcoded extension name, since vulkan module doesn't export it due to macro guards
+        // and including the headers is not an option until gcc supports mixing modules and headers
+        // note: change this once gcc allows mixing modules and headers
+        return {"VK_KHR_external_memory_win32"};
 #else
+        contract_assert(false);
         return {};
 #endif
       // this flag does not map to any logical device extension
       case eExternallySynchronized : contract_assert(false); return {};
-      default: contract_assert(false); return {};
+      default : contract_assert(false); return {};
     }
   }
 }

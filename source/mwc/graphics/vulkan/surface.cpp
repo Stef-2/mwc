@@ -1,5 +1,8 @@
-#include "mwc/graphics/vulkan/surface.hpp"
+module;
+
 #include "mwc/core/diagnostic/log/logging.hpp"
+
+module mwc_vk_surface;
 
 namespace {
   auto select_surface_present_mode(const mwc::graphics::vulkan::physical_device_ct& a_physical_device,
@@ -37,8 +40,8 @@ namespace mwc {
           surface_information_chain.get<vk::SurfacePresentModeEXT>().presentMode
             = select_surface_present_mode(a_physical_device, *this, a_configuration.m_present_mode);
 
-          return a_physical_device
-            .unique_handle().getSurfaceCapabilities2KHR<decltype(capabilities_pack)...>(
+          return a_physical_device.unique_handle()
+            .getSurfaceCapabilities2KHR<decltype(capabilities_pack)...>(
               surface_information_chain.get<vk::PhysicalDeviceSurfaceInfo2KHR>())
             .value;
         })},

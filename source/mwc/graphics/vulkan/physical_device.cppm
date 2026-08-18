@@ -1,9 +1,11 @@
-#pragma once
+module;
 
-#include "mwc/graphics/vulkan/handle.hpp"
-#include "mwc/graphics/vulkan/instance.hpp"
+export module mwc_vk_physical_device;
 
 import mwc_definition;
+import mwc_semantic_version;
+import mwc_vk_handle;
+import mwc_vk_instance;
 import mwc_static_string;
 import mwc_empty_type;
 import mwc_vulkan_structure_chain;
@@ -12,7 +14,7 @@ import vulkan;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace graphics {
     namespace vulkan {
       class physical_device_ct : public handle_ct<vk::raii::PhysicalDevice> {

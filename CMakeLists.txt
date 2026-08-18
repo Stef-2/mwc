@@ -99,12 +99,6 @@ if (NOT TARGET Vulkan::HppModule)
             VULKAN_HPP_STD_MODULE=std.compat
             VULKAN_HPP_ASSERT=${MWC_ASSERT}
     )
-    if (WIN32)
-        set_target_properties(vulkan_cxx_module PROPERTIES
-                CXX_MODULE_STD FALSE
-        )
-        target_compile_definitions(vulkan_cxx_module PUBLIC VK_USE_PLATFORM_WIN32_KHR)
-    endif()
     target_compile_options(vulkan_cxx_module PRIVATE -w)
     target_include_directories(vulkan_cxx_module PUBLIC ${Vulkan_INCLUDE_DIR})
     target_link_libraries(vulkan_cxx_module PUBLIC Vulkan::Vulkan)

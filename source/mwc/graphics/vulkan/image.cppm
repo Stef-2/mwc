@@ -1,12 +1,11 @@
 module;
 
-#include "mwc/graphics/vulkan/handle.hpp"
-#include "mwc/graphics/vulkan/logical_device.hpp"
-#include "mwc/graphics/vulkan/memory_allocator.hpp"
-
 export module mwc_graphics.vulkan.image;
 
 import mwc_definition;
+import mwc_vk_handle;
+import mwc_vk_logical_device;
+import mwc_memory_allocator;
 
 import vulkan;
 import vk_mem_alloc;

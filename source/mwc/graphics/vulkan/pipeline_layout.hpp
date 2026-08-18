@@ -1,10 +1,9 @@
 #pragma once
 
-#include "mwc/graphics/vulkan/handle.hpp"
-#include "mwc/graphics/vulkan/physical_device.hpp"
-#include "mwc/graphics/vulkan/logical_device.hpp"
-
 import mwc_definition;
+import mwc_vk_handle;
+import mwc_vk_physical_device;
+import mwc_vk_logical_device;
 
 import vulkan;
 

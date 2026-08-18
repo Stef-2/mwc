@@ -1,5 +1,8 @@
-#include "mwc/graphics/vulkan/instance.hpp"
+module;
+
 #include "mwc/core/diagnostic/log/logging.hpp"
+
+module mwc_vk_instance;
 
 import mwc_vk_default_dispatcher;
 

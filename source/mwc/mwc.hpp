@@ -1,10 +1,10 @@
 #pragma once
 
-#include "mwc/core/utility/semantic_version.hpp"
 #include "mwc/graphics/graphics.hpp"
 #include "mwc/window/window.hpp"
 
 import mwc_subsystem;
+import mwc_semantic_version;
 
 namespace mwc {
   class mwc_ct {
@@ -30,7 +30,7 @@ namespace mwc {
   };
 
   // implementation
-  constexpr auto mwc_ct::configuration_st::default_configuration() ->  configuration_st {
+  constexpr auto mwc_ct::configuration_st::default_configuration() -> configuration_st {
     return configuration_st {.m_version = semantic_version_st {0, 3, 6},
                              .m_window_configuration = window_ct::configuration_st::default_configuration()};
   }

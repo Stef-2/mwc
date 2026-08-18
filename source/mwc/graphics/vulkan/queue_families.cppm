@@ -1,16 +1,17 @@
-#pragma once
+module;
 
-#include "mwc/graphics/vulkan/physical_device.hpp"
-#include "mwc/graphics/vulkan/surface.hpp"
+export module mwc_vk_queue_families;
 
 import mwc_definition;
 import mwc_type_mobility;
+import mwc_vk_physical_device;
+import mwc_vk_surface;
 
 import vulkan;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace graphics {
     namespace vulkan {
       class queue_families_ct : public irreproducible_st {

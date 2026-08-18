@@ -1,5 +1,8 @@
-#include "mwc/graphics/vulkan/logical_device.hpp"
+module;
+
 #include "mwc/core/diagnostic/log/logging.hpp"
+
+module mwc_vk_logical_device;
 
 import mwc_vk_default_dispatcher;
 
@@ -15,19 +18,17 @@ namespace {
     auto queue_family_count = 0;
     // graphics queue is mandatory
     using queue_priority_t = mwc::graphics::vulkan::queue_families_ct::family_st::priority_t;
-    const auto queue_priorities = mwc::array_t <const queue_priority_t, 1>{a_queue_families.graphics().m_priority};
-    auto queues = mwc::vector_t<vk::DeviceQueueCreateInfo> {vk::DeviceQueueCreateInfo {
-      vk::DeviceQueueCreateFlags {}, a_queue_families.graphics().m_index, queue_priorities}};
+    const auto queue_priorities = mwc::array_t<const queue_priority_t, 1> {a_queue_families.graphics().m_priority};
+    auto queues = mwc::vector_t<vk::DeviceQueueCreateInfo> {
+      vk::DeviceQueueCreateInfo {vk::DeviceQueueCreateFlags {}, a_queue_families.graphics().m_index, queue_priorities}};
     std::format_to(std::back_inserter(buffer), "[{0}] graphics queue:" SUB "queue index: {1}" SUB "queue count: {2}" SUB "",
                    queue_family_count++, a_queue_families.graphics().m_index, queue_count);
     // in case the device does not support combined graphics and present queue family
     // generate a presentation specific queue
     if (not a_queue_families.supports_combined_graphics_and_present_family()) {
-      const auto queue_priorities = mwc::array_t <const queue_priority_t, 1>{a_queue_families.present().m_priority};
-      queues.emplace_back(vk::DeviceQueueCreateInfo {
-        vk::DeviceQueueCreateFlags {}, a_queue_families.present().m_index,
-        queue_priorities
-      });
+      const auto queue_priorities = mwc::array_t<const queue_priority_t, 1> {a_queue_families.present().m_priority};
+      queues.emplace_back(
+        vk::DeviceQueueCreateInfo {vk::DeviceQueueCreateFlags {}, a_queue_families.present().m_index, queue_priorities});
       std::format_to(std::back_inserter(buffer),
                      "selected device does not support combined graphics and present queues, generating:" SUB "[{0}] present "
                      "queue:" SUB "queue index: {1}" SUB "queue count: {2}" SUB "",
@@ -35,7 +36,7 @@ namespace {
     }
     // dedicated compute queue
     if (a_queue_families.supports_dedicated_compute_family()) {
-      const auto queue_priorities = mwc::array_t <const queue_priority_t, 1>{a_queue_families.compute().m_priority};
+      const auto queue_priorities = mwc::array_t<const queue_priority_t, 1> {a_queue_families.compute().m_priority};
       queues.emplace_back(vk::DeviceQueueCreateFlags {}, a_queue_families.compute().m_index, queue_priorities);
       std::format_to(std::back_inserter(buffer),
                      "selected device supports dedicated compute queue, generating:" SUB "[{0}] compute queues:" SUB
@@ -44,12 +45,9 @@ namespace {
     }
     // dedicated transfer queue
     if (a_queue_families.supports_dedicated_transfer_family()) {
-      const auto queue_priorities = mwc::array_t <const queue_priority_t, 1>{a_queue_families.transfer().m_priority};
-      queues.emplace_back(vk::DeviceQueueCreateInfo {
-        vk::DeviceQueueCreateFlags {},
-a_queue_families.transfer().m_index,
-        queue_priorities
-      });
+      const auto queue_priorities = mwc::array_t<const queue_priority_t, 1> {a_queue_families.transfer().m_priority};
+      queues.emplace_back(
+        vk::DeviceQueueCreateInfo {vk::DeviceQueueCreateFlags {}, a_queue_families.transfer().m_index, queue_priorities});
       std::format_to(std::back_inserter(buffer),
                      "selected device supports dedicated transfer queue, generating:" SUB "[{0}] transfer queues:" SUB
                      "queue index: {1}" SUB "queue count: {2}",

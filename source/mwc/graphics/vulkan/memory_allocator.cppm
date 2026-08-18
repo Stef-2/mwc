@@ -1,16 +1,18 @@
-#pragma once
+module;
 
-#include "mwc/graphics/vulkan/context.hpp"
-#include "mwc/graphics/vulkan/instance.hpp"
-#include "mwc/graphics/vulkan/physical_device.hpp"
-#include "mwc/graphics/vulkan/logical_device.hpp"
+export module mwc_memory_allocator;
 
-import vulkan;
+import mwc_vk_context;
+import mwc_vk_instance;
+import mwc_vk_physical_device;
+import mwc_vk_logical_device;
+
 import vk_mem_alloc;
+import vulkan;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace graphics {
     namespace vulkan {
       class memory_allocator_ct : public vma::Allocator {

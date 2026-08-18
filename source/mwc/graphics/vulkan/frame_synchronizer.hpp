@@ -1,10 +1,10 @@
 #pragma once
 
-#include "mwc/graphics/vulkan/logical_device.hpp"
 #include "mwc/graphics/vulkan/command_pool.hpp"
 #include "mwc/graphics/vulkan/debug.hpp"
 
 import mwc_definition;
+import mwc_vk_logical_device;
 import mwc_debug;
 import mwc_extent;
 
@@ -39,7 +39,8 @@ namespace mwc {
         frame_synchornizer_st(const logical_device_ct& a_logical_device,
                               const command_pool_ct& a_command_pool,
                               const configuration_st& a_configuration)
-          requires(tp_frame_count == std::dynamic_extent) pre(a_configuration.m_frame_count >= minimum_frame_count);
+          requires(tp_frame_count == std::dynamic_extent)
+        pre(a_configuration.m_frame_count >= minimum_frame_count);
 
         auto frame_count() const -> frame_count_t;
         auto generate_data(const logical_device_ct& a_logical_device,

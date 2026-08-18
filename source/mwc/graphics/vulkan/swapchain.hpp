@@ -1,14 +1,13 @@
 #pragma once
 
-#include "mwc/graphics/vulkan/handle.hpp"
-#include "mwc/graphics/vulkan/physical_device.hpp"
-#include "mwc/graphics/vulkan/logical_device.hpp"
-#include "mwc/graphics/vulkan/surface.hpp"
-#include "mwc/graphics/vulkan/queue_families.hpp"
-#include "mwc/graphics/vulkan/memory_allocator.hpp"
-
 import mwc_definition;
+import mwc_vk_handle;
+import mwc_vk_physical_device;
+import mwc_vk_surface;
+import mwc_vk_logical_device;
+import mwc_vk_queue_families;
 import mwc_graphics.vulkan.image;
+import mwc_memory_allocator;
 
 import vulkan;
 

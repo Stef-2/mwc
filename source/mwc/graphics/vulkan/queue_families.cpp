@@ -1,4 +1,6 @@
-#include "mwc/graphics/vulkan/queue_families.hpp"
+module;
+
+module mwc_vk_queue_families;
 
 namespace mwc {
   namespace graphics {

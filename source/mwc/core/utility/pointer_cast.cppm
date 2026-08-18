@@ -1,10 +1,12 @@
-#pragma once
+module;
+
+export module mwc_pointer_cast;
 
 import mwc_definition;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   template <typename tp>
     requires std::is_pointer_v<tp>
   constexpr auto pointer_cast(const tp a_pointer) -> uintptr_t pre(a_pointer != nullptr) {

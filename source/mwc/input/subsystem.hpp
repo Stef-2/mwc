@@ -1,8 +1,6 @@
 #pragma once
 
 #include "mwc/core/container/data_span.hpp"
-#include "mwc/graphics/vulkan/logical_device.hpp"
-#include "mwc/graphics/vulkan/physical_device.hpp"
 #include "mwc/graphics/vulkan/pipeline_layout.hpp"
 #include "mwc/graphics/vulkan/suballocated_memory_mapped_buffer.hpp"
 #include "mwc/input/data/scene/scene.hpp"
@@ -13,6 +11,8 @@
 */
 import mwc_definition;
 import mwc_subsystem;
+import mwc_vk_physical_device;
+import mwc_vk_logical_device;
 import mwc_log_subsystem;
 import mwc_window_subsystem;
 import mwc_chrono_subsystem;

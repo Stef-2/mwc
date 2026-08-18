@@ -1,8 +1,7 @@
 #pragma once
 
-#include "mwc/graphics/vulkan/surface.hpp"
-
 import mwc_definition;
+import mwc_vk_surface;
 
 import vulkan;
 

@@ -1,11 +1,14 @@
-#pragma once
+module;
+
+export module mwc_semantic_version;
 
 import mwc_definition;
 
-import std;
 import vulkan;
 
-namespace mwc {
+import std;
+
+export namespace mwc {
   struct semantic_version_st {
     using version_t = uint32_t;
     using packed_version_t = uint32_t;

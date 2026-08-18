@@ -1,4 +1,6 @@
-#include "mwc/graphics/vulkan/context.hpp"
+module;
+
+module mwc_vk_context;
 
 import mwc_vk_default_dispatcher;
 

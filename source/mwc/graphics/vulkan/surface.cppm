@@ -1,18 +1,20 @@
-#pragma once
+module;
 
-#include "mwc/graphics/vulkan/handle.hpp"
-#include "mwc/graphics/vulkan/instance.hpp"
-#include "mwc/graphics/vulkan/physical_device.hpp"
 #include "mwc/window/window.hpp"
 
+export module mwc_vk_surface;
+
 import mwc_vulkan_structure_chain;
+import mwc_vk_handle;
+import mwc_vk_instance;
+import mwc_vk_physical_device;
 
 import vulkan;
 import vkfw;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace graphics {
     namespace vulkan {
       class surface_ct : public handle_ct<vk::raii::SurfaceKHR> {

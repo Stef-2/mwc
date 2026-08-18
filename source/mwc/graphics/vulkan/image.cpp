@@ -1,10 +1,8 @@
 module;
 
-#include "mwc/graphics/vulkan/handle.hpp"
-#include "mwc/graphics/vulkan/logical_device.hpp"
-#include "mwc/graphics/vulkan/memory_allocator.hpp"
-
 module mwc_graphics.vulkan.image;
+
+import mwc_memory_allocator;
 
 namespace mwc {
   namespace graphics {

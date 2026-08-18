@@ -1,15 +1,16 @@
-#pragma once
+module;
 
-#include "mwc/graphics/vulkan/handle.hpp"
-#include "mwc/core/utility/semantic_version.hpp"
+export module mwc_vk_context;
 
 import mwc_definition;
+import mwc_semantic_version;
+import mwc_vk_handle;
 
 import vulkan;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   namespace graphics {
     namespace vulkan {
       struct context_st : public handle_ct<vk::raii::Context> {

@@ -1,4 +1,6 @@
-#include "mwc/core/utility/semantic_version.hpp"
+module;
+
+module mwc_semantic_version;
 
 namespace mwc {
   auto semantic_version_st::major() const -> version_t {

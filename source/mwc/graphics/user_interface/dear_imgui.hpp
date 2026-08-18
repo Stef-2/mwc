@@ -1,15 +1,15 @@
 #pragma once
 
 #include "mwc/window/window.hpp"
-#include "mwc/graphics/vulkan/context.hpp"
-#include "mwc/graphics/vulkan/instance.hpp"
-#include "mwc/graphics/vulkan/physical_device.hpp"
-#include "mwc/graphics/vulkan/logical_device.hpp"
-#include "mwc/graphics/vulkan/queue_families.hpp"
 #include "mwc/graphics/vulkan/queue.hpp"
 #include "mwc/graphics/vulkan/swapchain.hpp"
 
 import mwc_definition;
+import mwc_vk_context;
+import mwc_vk_instance;
+import mwc_vk_physical_device;
+import mwc_vk_logical_device;
+import mwc_vk_queue_families;
 import mwc_type_mobility;
 
 import vulkan;

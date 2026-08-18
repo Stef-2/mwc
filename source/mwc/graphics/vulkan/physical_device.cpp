@@ -1,6 +1,8 @@
-#include "mwc/graphics/vulkan/physical_device.hpp"
+module;
+
 #include "mwc/core/diagnostic/log/logging.hpp"
-#include "mwc/core/utility/semantic_version.hpp"
+
+module mwc_vk_physical_device;
 
 namespace mwc {
   namespace graphics {
