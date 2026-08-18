@@ -3,6 +3,7 @@
 #undef assert
 
 import mwc_logging_subsystem_switch;
+import mwc_log_subsystem;
 
 import std;
 
@@ -57,7 +58,7 @@ void handle_contract_violation(const std::contracts::contract_violation& a_viola
     std::format_to(std::back_inserter(contract_violation_string),
                    SUB "source location: {0}" SUB "stacktrace: {1}",
                    a_violation.location(),
-                   std::basic_stacktrace::current(/*skip*/ 1));
+                   std::stacktrace::current(/*skip*/ 1));
     std::println("{0}", contract_violation_string);
   }
 }

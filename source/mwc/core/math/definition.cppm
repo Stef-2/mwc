@@ -5,7 +5,7 @@ export module mwc_math_definition;
 import mwc_definition;
 import mwc_concept;
 
-import glm;
+export import glm;
 
 import std;
 

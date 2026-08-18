@@ -94,6 +94,7 @@ namespace mwc {
     template <camera_projection_et tp_camera_projection>
     constexpr auto camera_ct::generate_projection_matrix(const configuration_st<tp_camera_projection>& a_configuration)
       -> projection_t {
+      // perspective
       if constexpr (tp_camera_projection == camera_projection_et::e_perspective) {
         const auto half_fov_tangent
           = scalar_t {std::tan(geometry::radians(a_configuration.m_field_of_view_degrees) / scalar_t {2.0})};
@@ -107,6 +108,7 @@ namespace mwc {
                                            scalar_t {-2.0} * a_configuration.m_far_clip * a_configuration.m_near_clip
                                              / (a_configuration.m_far_clip - a_configuration.m_near_clip)},
                                           {0.0, 0.0, -1.0, 0.0}}};
+      // orthographic
       } else {
         const auto width = a_configuration.m_right_clip - a_configuration.m_left_clip;
         const auto height = a_configuration.m_top_clip - a_configuration.m_bottom_clip;

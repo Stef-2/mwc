@@ -25,6 +25,7 @@ import std;
     template <typename tp, typename tp_underlying_pod = void>
     struct component_st : public meta::type_index_st<tp> {
       using underlying_pod_t = tp_underlying_pod;
+
     };
 
     template <typename>

@@ -68,13 +68,16 @@ export namespace mwc {
         default : contract_assert(false); std::unreachable();
       }
     }
-    constexpr auto identity() -> transformation_t<> {
-      return transformation_t<> {static_cast<default_scalar_t>(1.0)};
+    constexpr auto transformation_identity() -> transformation_t<> {
+      return glm::identity<transformation_t<>>();
     }
-    constexpr auto identity() -> position_t<> {
+    constexpr auto orientation_identity() -> orientation_t<> {
+      return glm::identity<orientation_t<>>();
+    }
+    constexpr auto position_identity() -> position_t<> {
       return position_t<> {0.0, 0.0, 0.0};
     }
-    constexpr auto identity() -> scale_t<> {
+    constexpr auto scale_identity() -> scale_t<> {
       return scale_t<> {1.0, 1.0, 1.0};
     }
 
@@ -103,7 +106,7 @@ export namespace mwc {
 
     struct aabb_st {
       constexpr auto midpoint() const -> position_t<> {
-        return (m_min + m_max) * static_cast<default_scalar_t> {0.5};
+        return (m_min + m_max) * static_cast<default_scalar_t>(0.5);
       }
       position_t<> m_min;
       position_t<> m_max;
