@@ -12,25 +12,28 @@ export namespace mwc {
   namespace meta {
     // recursively search through [tp_scope] and its descendents, counting the number of entities that match [tp_predicate]
     template <typename tp_predicate, std::meta::info tp_scope = mwc_namespace>
+      requires requires {std::meta::is_namespace(tp_scope) and std::is_invocable_r_v<bool, tp_predicate, const std::meta::info>;}
     consteval auto search_count(const tp_predicate a_predicate) -> size_t {
       auto entity_count = size_t {0};
 
-      const auto search_engine = [&entity_count]<tp_predicate, std::meta::info tp_local_scope>(
-                                   this auto&& a_this, const tp_predicate a_predicate) consteval -> void {
+      const auto search_engine = [&entity_count]<typename tp_local_predicate, std::meta::info tp_local_scope>(
+                                   this auto&& a_this, const tp_local_predicate a_predicate) consteval -> void {
         static constexpr auto members
           = std::define_static_array(std::meta::members_of(tp_local_scope, std::meta::access_context::current()));
 
         template for (constexpr auto member : members) {
-          constexpr auto is_complete_type = std::meta::is_complete_type(member);
-          constexpr auto is_not_template = not std::meta::is_template(member);
-          constexpr auto is_namespace = std::meta::is_namespace(member);
-          const bool found = a_predicate(member);
+          constexpr auto dealiased_member = std::meta::dealias(member);
+          constexpr auto is_complete_type = std::meta::is_complete_type(dealiased_member) and std::meta::is_class_type(dealiased_member);
+          constexpr auto is_not_template = not std::meta::is_template(dealiased_member);
+          // constexpr auto is_class_type = ;
+          constexpr auto is_namespace = std::meta::is_namespace(dealiased_member);
+          const bool found = a_predicate(dealiased_member);
 
           if (found) {
             ++entity_count;
           }
           if constexpr (is_namespace or (is_complete_type and is_not_template)) {
-            a_this.template operator()<tp_predicate, member>(a_predicate);
+            a_this.template operator()<tp_predicate, dealiased_member>(a_predicate);
           }
         }
       };
@@ -42,12 +45,13 @@ export namespace mwc {
 
     // recursively search through [tp_scope] and its descendents, returning entities that match [tp_predicate]
     template <typename tp_predicate, std::meta::info tp_scope = mwc_namespace>
+      requires requires {std::meta::is_namespace(tp_scope) and std::is_invocable_r_v<bool, tp_predicate, const std::meta::info>;}
     consteval auto search(const tp_predicate a_predicate) {
 
       auto matched_entities = std::array<std::meta::info, search_count<tp_predicate, tp_scope>(a_predicate)> {};
       size_t i = 0;
-      const auto search_engine = [&matched_entities, &i]<tp_predicate, std::meta::info tp_local_scope>(
-                                   this auto&& a_this, const tp_predicate a_predicate) consteval -> void {
+      const auto search_engine = [&matched_entities, &i]<typename tp_local_predicate, std::meta::info tp_local_scope>(
+                                   this auto&& a_this, const tp_local_predicate a_predicate) consteval -> void {
         static constexpr auto members
           = std::define_static_array(std::meta::members_of(tp_local_scope, std::meta::access_context::current()));
 

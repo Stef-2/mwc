@@ -63,8 +63,8 @@ namespace mwc {
     constexpr auto camera_ct::configuration_st<camera_projection_et::e_perspective>::default_configuration()
       -> configuration_st<camera_projection_et::e_perspective> {
       return configuration_st<camera_projection_et::e_perspective> {
-        .m_position = decltype(ecs::position_st::m_position)::Zero(),
-        .m_orientation = geometry::coordinate_orientation(geometry::coordinate_direction_et::e_forward),
+        .m_position = decltype(ecs::position_st::m_position){0.0},
+        .m_orientation = geometry::coordinate_direction(geometry::coordinate_direction_et::e_forward),
         .m_scale = {1.0, 1.0, 1.0},
         .m_aspect_ratio = 16.0 / 9.0,
         .m_field_of_view_degrees = 45.0,
@@ -74,8 +74,8 @@ namespace mwc {
     constexpr auto camera_ct::configuration_st<camera_projection_et::e_orthographic>::default_configuration()
       -> configuration_st<camera_projection_et::e_orthographic> {
       return configuration_st<camera_projection_et::e_orthographic> {
-        .m_position = decltype(ecs::position_st::m_position)::Zero(),
-        .m_orientation = decltype(ecs::orientation_st::m_orientation)::Identity(),
+        .m_position = decltype(ecs::position_st::m_position) {0.0},
+        .m_orientation = decltype(ecs::orientation_st::m_orientation) {},
         .m_scale = {1.0, 1.0, 1.0},
         .m_left_clip = -512.0,
         .m_right_clip = 512.0,

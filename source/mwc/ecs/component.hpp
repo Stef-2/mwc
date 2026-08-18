@@ -20,28 +20,32 @@ import std;
 /*export */ namespace mwc {
   namespace ecs {
     // component type tracking
-    template <typename tp, typename tp_underlying_pod = void>
-    struct component_st;
-
-    struct component_type_list_st {
-      static constexpr auto lambda = [](const std::meta::info a_info) consteval -> bool {
-        return true/*std::meta::is_type(a_info)
-           and std::meta::is_base_of_type(std::meta::substitute(^^component_st,
-                                                                {
-                                                                a_info, ^^void}),
-                                          a_info)*/;
-      };
-      static constexpr auto component_type_info_array = static_array_st {meta::search<decltype(lambda), ^^mwc>(lambda)};
-      using component_tuple_t = decltype(meta::type_info_range_tuple<component_type_info_array>());
-
-      template <size_t tp_type_index>
-      using component_at_index_t = std::tuple_element_t<tp_type_index, component_tuple_t>;
-    };
 
     // crtp type to be inherited by ecs component types
     template <typename tp, typename tp_underlying_pod = void>
     struct component_st : public meta::type_index_st<tp> {
       using underlying_pod_t = tp_underlying_pod;
+    };
+
+    template <typename>
+    struct component_type_list_st {
+      static constexpr auto component_type_infos() {
+        return static_array_st {
+          meta::search([](std::meta::info a_info) consteval -> bool {
+return std::meta::is_type(a_info)
+and std::meta::is_base_of_type(std::meta::substitute(^^component_st,
+                                          {
+                                          a_info, ^^void}),
+                    a_info);
+})
+        };
+      }
+      //static constexpr auto component_type_info_array = static_array_st {component_type_infos};
+
+      //using component_tuple_t = decltype(meta::type_info_range_tuple<component_type_infos()>());
+
+      /*template <size_t tp_type_index>
+      using component_at_index_t = std::tuple_element_t<tp_type_index, component_tuple_t>;*/
     };
 
     // concept modeling component types
