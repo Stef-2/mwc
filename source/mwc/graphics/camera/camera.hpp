@@ -34,7 +34,7 @@ namespace mwc {
 
     // implementation
     template <>
-      struct camera_ct::configuration_st<camera_projection_et::e_perspective> {
+    struct camera_ct::configuration_st<camera_projection_et::e_perspective> {
       static constexpr auto default_configuration() -> configuration_st<camera_projection_et::e_perspective>;
 
       geometry::position_t<> m_position;
@@ -63,26 +63,26 @@ namespace mwc {
     constexpr auto camera_ct::configuration_st<camera_projection_et::e_perspective>::default_configuration()
       -> configuration_st<camera_projection_et::e_perspective> {
       return configuration_st<camera_projection_et::e_perspective> {
-        .m_position = decltype(ecs::position_st::m_position){0.0},
+        .m_position = decltype(ecs::position_st::m_position) {scalar_t {0}},
         .m_orientation = geometry::coordinate_direction(geometry::coordinate_direction_et::e_forward),
         .m_scale = {1.0, 1.0, 1.0},
-        .m_aspect_ratio = 16.0 / 9.0,
-        .m_field_of_view_degrees = 45.0,
-        .m_near_clip = 0.1,
-        .m_far_clip = 1024.0};
+        .m_aspect_ratio = static_cast<scalar_t>(16.0 / 9.0),
+        .m_field_of_view_degrees = static_cast<scalar_t>(45.0),
+        .m_near_clip = static_cast<scalar_t>(0.1),
+        .m_far_clip = static_cast<scalar_t>(1024.0)};
     }
     constexpr auto camera_ct::configuration_st<camera_projection_et::e_orthographic>::default_configuration()
       -> configuration_st<camera_projection_et::e_orthographic> {
       return configuration_st<camera_projection_et::e_orthographic> {
-        .m_position = decltype(ecs::position_st::m_position) {0.0},
+        .m_position = decltype(ecs::position_st::m_position) {scalar_t {0}},
         .m_orientation = decltype(ecs::orientation_st::m_orientation) {},
         .m_scale = {1.0, 1.0, 1.0},
-        .m_left_clip = -512.0,
-        .m_right_clip = 512.0,
-        .m_bottom_clip = -512.0,
-        .m_top_clip = 512.0,
-        .m_near_clip = -512.0,
-        .m_far_clip = 512.0};
+        .m_left_clip = static_cast<scalar_t>(-512.0),
+        .m_right_clip = static_cast<scalar_t>(512.0),
+        .m_bottom_clip = static_cast<scalar_t>(-512.0),
+        .m_top_clip = static_cast<scalar_t>(512.0),
+        .m_near_clip = static_cast<scalar_t>(-512.0),
+        .m_far_clip = static_cast<scalar_t>(512.0)};
     }
     template <camera_projection_et tp_camera_projection>
     constexpr camera_ct::camera_ct(const configuration_st<tp_camera_projection>& a_configuration)

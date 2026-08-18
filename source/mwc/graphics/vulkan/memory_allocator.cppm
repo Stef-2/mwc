@@ -2,12 +2,13 @@ module;
 
 export module mwc_memory_allocator;
 
+import mwc_definition;
 import mwc_vk_context;
 import mwc_vk_instance;
 import mwc_vk_physical_device;
 import mwc_vk_logical_device;
 
-import vk_mem_alloc;
+export import vk_mem_alloc;
 import vulkan;
 
 import std;
@@ -26,8 +27,8 @@ export namespace mwc {
                             const configuration_st& a_configuration = configuration_st::default_configuration());
         ~memory_allocator_ct();
 
-        [[nodiscard]] auto statistics() const -> const vma::TotalStatistics;
-        [[nodiscard]] auto budget() const -> const vector_t<vma::Budget>;
+        [[nodiscard]] auto statistics() const -> vma::TotalStatistics;
+        [[nodiscard]] auto budget() const -> vector_t<vma::Budget>;
         template <typename tp_this>
         [[nodiscard]] auto configuration(this tp_this&& a_this) -> decltype(auto);
 

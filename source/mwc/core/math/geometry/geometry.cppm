@@ -68,6 +68,16 @@ export namespace mwc {
         default : contract_assert(false); std::unreachable();
       }
     }
+    constexpr auto identity() -> transformation_t<> {
+      return transformation_t<> {static_cast<default_scalar_t>(1.0)};
+    }
+    constexpr auto identity() -> position_t<> {
+      return position_t<> {0.0, 0.0, 0.0};
+    }
+    constexpr auto identity() -> scale_t<> {
+      return scale_t<> {1.0, 1.0, 1.0};
+    }
+
     // left handed
     template <std::floating_point tp = default_scalar_t>
     constexpr auto look_at(const position_t<tp>& a_origin, const position_t<tp>& a_target,
@@ -92,6 +102,9 @@ export namespace mwc {
     }*/
 
     struct aabb_st {
+      constexpr auto midpoint() const -> position_t<> {
+        return (m_min + m_max) * static_cast<default_scalar_t> {0.5};
+      }
       position_t<> m_min;
       position_t<> m_max;
     };

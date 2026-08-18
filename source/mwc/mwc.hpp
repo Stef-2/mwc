@@ -1,9 +1,9 @@
 #pragma once
 
 #include "mwc/graphics/graphics.hpp"
-#include "mwc/window/window.hpp"
 
 import mwc_subsystem;
+import mwc_window;
 import mwc_semantic_version;
 
 namespace mwc {

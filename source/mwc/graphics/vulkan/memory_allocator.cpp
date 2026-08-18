@@ -89,10 +89,10 @@ namespace mwc {
       memory_allocator_ct::~memory_allocator_ct() {
         this->destroy();
       }
-      auto memory_allocator_ct::statistics() const -> const vma::TotalStatistics {
+      auto memory_allocator_ct::statistics() const -> vma::TotalStatistics {
         return this->calculateStatistics();
       }
-      auto memory_allocator_ct::budget() const -> const vector_t<vma::Budget> {
+      auto memory_allocator_ct::budget() const -> vector_t<vma::Budget> {
         return this->getHeapBudgets();
       }
     }

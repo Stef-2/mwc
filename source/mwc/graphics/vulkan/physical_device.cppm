@@ -8,7 +8,7 @@ import mwc_vk_handle;
 import mwc_vk_instance;
 import mwc_static_string;
 import mwc_empty_type;
-import mwc_vulkan_structure_chain;
+import mwc_vk_structure_chain;
 
 import vulkan;
 

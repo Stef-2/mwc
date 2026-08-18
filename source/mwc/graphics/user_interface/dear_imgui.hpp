@@ -1,10 +1,10 @@
 #pragma once
 
-#include "mwc/window/window.hpp"
 #include "mwc/graphics/vulkan/queue.hpp"
 #include "mwc/graphics/vulkan/swapchain.hpp"
 
 import mwc_definition;
+import mwc_window;
 import mwc_vk_context;
 import mwc_vk_instance;
 import mwc_vk_physical_device;

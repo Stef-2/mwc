@@ -25,7 +25,7 @@ import mwc_metaprogramming_utility;
 import mwc_input_shader_source;
 import mwc_color;
 
-//import vkfw;
+import vkfw;
 // import fastgltf;
 
 namespace mwc {

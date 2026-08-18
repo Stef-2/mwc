@@ -1,11 +1,11 @@
 #pragma once
 
+import mwc_definition;
 import mwc_vk_handle;
 import mwc_vk_logical_device;
 import mwc_memory_allocator;
 
 import vulkan;
-import vk_mem_alloc;
 
 import std;
 

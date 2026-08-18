@@ -1,7 +1,6 @@
 #pragma once
 
 #include "mwc/input/subsystem.hpp"
-#include "mwc/window/window.hpp"
 #include "mwc/graphics/vulkan/swapchain.hpp"
 #include "mwc/graphics/vulkan/pipeline_layout.hpp"
 #include "mwc/graphics/vulkan/command_pool.hpp"
@@ -15,6 +14,7 @@
 #include "mwc/graphics/camera/camera.hpp"
 
 import mwc_definition;
+import mwc_window;
 import mwc_vk_context;
 import mwc_vk_instance;
 import mwc_vk_physical_device;

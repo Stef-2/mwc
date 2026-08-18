@@ -1,10 +1,9 @@
 module;
 
-#include "mwc/window/window.hpp"
-
 export module mwc_vk_surface;
 
-import mwc_vulkan_structure_chain;
+import mwc_window;
+import mwc_vk_structure_chain;
 import mwc_vk_handle;
 import mwc_vk_instance;
 import mwc_vk_physical_device;

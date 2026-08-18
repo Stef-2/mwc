@@ -1,5 +1,8 @@
-#include "mwc/window/window.hpp"
+module;
+
 #include "mwc/core/diagnostic/log/logging.hpp"
+
+module mwc_window;
 
 namespace mwc {
   window_ct::window_ct(const configuration_st& a_configuration)

@@ -1,4 +1,6 @@
-#pragma once
+module;
+
+export module mwc_window;
 
 import mwc_definition;
 import mwc_resolution;
@@ -10,7 +12,7 @@ import std;
 import vulkan;
 import vkfw;
 
-namespace mwc {
+export namespace mwc {
   class window_ct : public irreproducible_st {
     public:
     struct configuration_st {

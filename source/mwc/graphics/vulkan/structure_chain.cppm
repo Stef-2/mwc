@@ -1,6 +1,6 @@
 module;
 
-export module mwc_vulkan_structure_chain;
+export module mwc_vk_structure_chain;
 
 import mwc_definition;
 

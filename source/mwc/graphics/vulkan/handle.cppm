@@ -1,13 +1,12 @@
 module;
 
-#include "mwc/graphics/vulkan/debug.hpp"
-
 export module mwc_vk_handle;
 
 import mwc_definition;
 import mwc_pointer_cast;
 import mwc_type_mobility;
 import mwc_vk_null_handle;
+import mwc_vk_debug_name;
 
 import vulkan;
 

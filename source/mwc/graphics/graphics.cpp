@@ -1,5 +1,4 @@
 #include "mwc/graphics/graphics.hpp"
-#include "mwc/graphics/vulkan/debug.hpp"
 #include "mwc/input/subsystem.hpp"
 
 //#include <eigen3/Eigen/src/Geometry/Transform.h>
@@ -14,6 +13,7 @@
 //#include <eigen3/Eigen/src/Geometry/Transform.h>
 
 import mwc_memory_conversion;
+import mwc_vk_debug_name;
 
 namespace mwc {
   namespace graphics {

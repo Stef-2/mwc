@@ -1,12 +1,13 @@
 #pragma once
 
 #include "mwc/graphics/vulkan/command_pool.hpp"
-#include "mwc/graphics/vulkan/debug.hpp"
 
 import mwc_definition;
 import mwc_vk_logical_device;
 import mwc_debug;
+import mwc_vk_debug_name;
 import mwc_extent;
+import mwc_empty_type;
 
 import vulkan;
 

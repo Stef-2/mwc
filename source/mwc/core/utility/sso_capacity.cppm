@@ -6,7 +6,7 @@ import mwc_definition;
 
 export namespace mwc {
   namespace utility {
-    consteval auto sso_capacity() {
+    consteval auto sso_capacity() -> size_t {
       string_t string;
 
       return string.capacity();

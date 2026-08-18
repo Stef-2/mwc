@@ -2,6 +2,7 @@
 #include "mwc/graphics/vulkan/shader_object.hpp"
 #include "mwc/output/output.hpp"
 #include "mwc/graphics/camera/camera.hpp"
+#include "mwc/core/diagnostic/log/logging.hpp"
 
 import mwc_file_subsystem;
 import mwc_breakpoint;
