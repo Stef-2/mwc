@@ -31,14 +31,16 @@ import std;
     template <typename>
     struct component_type_list_st {
       static constexpr auto component_type_infos() {
+        static constexpr auto lambda = [](std::meta::info a_info) consteval -> bool {
+          return std::meta::is_type(a_info)
+          and std::meta::is_base_of_type(std::meta::substitute(^^component_st,
+                                                    {
+                                                    a_info, ^^void}),
+                              a_info);
+        };
+        
         return static_array_st {
-          meta::search([](std::meta::info a_info) consteval -> bool {
-return std::meta::is_type(a_info)
-and std::meta::is_base_of_type(std::meta::substitute(^^component_st,
-                                          {
-                                          a_info, ^^void}),
-                    a_info);
-})
+          meta::search<decltype(lambda), ^^ecs>(lambda)
         };
       }
       //static constexpr auto component_type_info_array = static_array_st {component_type_infos};

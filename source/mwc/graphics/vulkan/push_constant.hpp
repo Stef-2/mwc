@@ -12,8 +12,8 @@ namespace mwc {
     namespace vulkan {
       struct push_constant_st {
         struct view_data_st {
-          math::vector_t<float32_t, 4> m_view_position = {};
-          math::vector_t<float32_t, 4> m_view_direction = {};
+          math::vector_t<float32_t, 4> m_view_position {0};
+          math::vector_t<float32_t, 4> m_view_direction {0};
         };
         struct projection_data_st {
           vk::Extent2D m_window_extent = {};
@@ -32,7 +32,7 @@ namespace mwc {
           descriptor_index_t m_normal_map = {};
         };
 
-        geometry::transformation_t<> m_model = geometry::transformation_t<>::Ones();
+        geometry::transformation_t<> m_model = geometry::transformation_identity();
         view_data_st m_view_data = {};
         projection_data_st m_projection_data = {};
         buffer_device_address_registers_st m_registers = {};

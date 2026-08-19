@@ -58,6 +58,7 @@ export namespace mwc {
     }
     constexpr auto coordinate_direction(const coordinate_direction_et a_coordinate_direction) -> direction_t<> {
       using enum coordinate_direction_et;
+
       switch (a_coordinate_direction) {
         case e_right : return direction_t<> {1.0, 0.0, 0.0};
         case e_left : return direction_t<> {-1.0, 0.0, 0.0};
@@ -69,7 +70,7 @@ export namespace mwc {
       }
     }
     constexpr auto transformation_identity() -> transformation_t<> {
-      return glm::identity<transformation_t<>>();
+      return glm::zero<transformation_t<>>();
     }
     constexpr auto orientation_identity() -> orientation_t<> {
       return glm::identity<orientation_t<>>();
@@ -84,10 +85,17 @@ export namespace mwc {
     // left handed
     template <std::floating_point tp = default_scalar_t>
     constexpr auto look_at(const position_t<tp>& a_origin, const position_t<tp>& a_target,
-                           const coordinate_direction_et a_up_direction = coordinate_direction_et::e_up)
+                           const direction_t<tp>& a_up_direction = coordinate_direction(coordinate_direction_et::e_up))
       -> transformation_t<tp, 3> {
       return glm::lookAt(a_origin, a_target, a_up_direction);
     }
+    template <std::floating_point tp = default_scalar_t>
+    constexpr auto look_at(const direction_t<tp>& a_forward_direction,
+                           const direction_t<tp>& a_up_direction = coordinate_direction(coordinate_direction_et::e_up))
+      -> orientation_t<tp> {
+      return glm::quatLookAt(a_forward_direction, a_up_direction);
+    }
+
     // left handed
     /*template <std::floating_point tp = default_scalar_t>
     constexpr auto

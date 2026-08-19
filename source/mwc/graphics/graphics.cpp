@@ -27,33 +27,33 @@ namespace mwc {
     constexpr auto Rad2Deg = 360 / (std::numbers::pi_v<float> * 2);
     constexpr auto Deg2Rad = std::numbers::pi_v<float> / 180;
 
-    quat clamp_quaternion(quat q, const float3& bounds) {
-      q.x() /= q.w();
-      q.y() /= q.w();
-      q.z() /= q.w();
-      q.w() = 1.0f;
+    /*quat clamp_quaternion(quat q, const float3& bounds) {
+      q.x /= q.w;
+      q.y /= q.w;
+      q.z /= q.w;
+      q.w = 1.0f;
 
-      if (bounds.x() != 0.0) {
-        float angleX = 2.0f * Rad2Deg * std::atan(q.x());
-        angleX = std::clamp(angleX, -bounds.x(), bounds.x());
-        q.x() = std::tan(0.5f * Deg2Rad * angleX);
+      if (bounds.x != 0.0) {
+        float angleX = 2.0f * Rad2Deg * std::atan(q.x);
+        angleX = std::clamp(angleX, -bounds.x, bounds.x);
+        q.x = std::tan(0.5f * Deg2Rad * angleX);
       }
 
-      if (bounds.y() != 0.0) {
-        float angleY = 2.0f * Rad2Deg * std::atan(q.y());
-        angleY = std::clamp(angleY, -bounds.y(), bounds.y());
-        q.y() = std::tan(0.5f * Deg2Rad * angleY);
+      if (bounds.y != 0.0) {
+        float angleY = 2.0f * Rad2Deg * std::atan(q.y);
+        angleY = std::clamp(angleY, -bounds.y, bounds.y);
+        q.y = std::tan(0.5f * Deg2Rad * angleY);
       }
 
-      if (bounds.z() != 0.0) {
-        float angleZ = 2.0f * Rad2Deg * std::atan(q.z());
-        angleZ = std::clamp(angleZ, -bounds.z(), bounds.z());
-        q.z() = std::tan(0.5f * Deg2Rad * angleZ);
+      if (bounds.z != 0.0) {
+        float angleZ = 2.0f * Rad2Deg * std::atan(q.z);
+        angleZ = std::clamp(angleZ, -bounds.z, bounds.z);
+        q.z = std::tan(0.5f * Deg2Rad * angleZ);
       }
 
       return q.normalized();
-    }
-    mat4 view(float3 pos, float yaw, float pitch) {
+    }*/
+    /*mat4 view(float3& pos, float yaw, float pitch) {
       float cosPitch = std::cos(pitch);
       float sinPitch = std::sin(pitch);
       float cosYaw = std::cos(yaw);
@@ -64,14 +64,14 @@ namespace mwc {
       float3 zaxis = {sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw};
 
       mat4 m;
-      m.col(0) = float4 {xaxis.x(), yaxis.x(), zaxis.x(), 0.0f};
-      m.col(1) = float4 {xaxis.y(), yaxis.y(), zaxis.y(), 0.0f};
-      m.col(2) = float4 {xaxis.z(), yaxis.z(), zaxis.z(), 0.0f};
-      m.col(3) = float4 {-(xaxis.dot(pos)), -(yaxis.dot(pos)), -(zaxis.dot(pos)), 1.0f};
+      m[0] = float4 {xaxis.x(), yaxis.x(), zaxis.x(), 0.0f};
+      m[1] = float4 {xaxis.y(), yaxis.y(), zaxis.y(), 0.0f};
+      m[2] = float4 {xaxis.z(), yaxis.z(), zaxis.z(), 0.0f};
+      m[3] = float4 {-(xaxis.dot(pos)), -(yaxis.dot(pos)), -(zaxis.dot(pos)), 1.0f};
 
       return m;
-    }
-    mat4 look_at(float3 eye, float3 target, float3 up = {0.0f, 1.0f, 0.0f}) {
+    }*/
+    /*mat4 look_at(float3 eye, float3 target, float3 up = {0.0f, 1.0f, 0.0f}) {
       float3 z_axis = float3 {eye - target}.normalized();
       float3 x_axis = up.cross(z_axis).normalized();
       float3 y_axis = z_axis.cross(x_axis);
@@ -87,7 +87,7 @@ namespace mwc {
       t.translation() = -eye;
 
       return t.matrix();
-    }
+    }*/
 
     auto transition_image_layout(const vk::raii::CommandBuffer& a_command_buffer, const vk::Image a_image,
                                  const vk::ImageLayout a_previous_layout, const vk::ImageLayout a_layout) -> void {

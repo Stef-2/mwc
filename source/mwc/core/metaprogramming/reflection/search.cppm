@@ -56,10 +56,12 @@ export namespace mwc {
           = std::define_static_array(std::meta::members_of(tp_local_scope, std::meta::access_context::current()));
 
         template for (constexpr auto member : members) {
-          constexpr auto is_complete_type = std::meta::is_complete_type(member);
-          constexpr auto is_not_template = not std::meta::is_template(member);
-          constexpr auto is_namespace = std::meta::is_namespace(member);
-          const bool found = a_predicate(member);
+          constexpr auto dealiased_member = std::meta::dealias(member);
+          constexpr auto is_complete_type = std::meta::is_complete_type(dealiased_member) and std::meta::is_class_type(dealiased_member);
+          constexpr auto is_not_template = not std::meta::is_template(dealiased_member);
+          // constexpr auto is_class_type = ;
+          constexpr auto is_namespace = std::meta::is_namespace(dealiased_member);
+          const bool found = a_predicate(dealiased_member);
 
           if (found) {
             matched_entities[i] = member;

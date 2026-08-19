@@ -24,7 +24,7 @@ namespace mwc {
     constexpr data_span_st(const concepts::contiguous_storage_c auto& a_data) pre(contract::validate_storage(a_data));
 
     template <typename tp_this>
-    [[nodiscard]] constexpr auto data(this tp_this&& a_this) pre(a_this.m_data != nullptr);
+    [[nodiscard]] constexpr auto data(this tp_this&& a_this) post(r: r != nullptr);
     [[nodiscard]] constexpr auto size() const post(r : r != 0);
     [[nodiscard]] constexpr auto size_bytes() const post(r : r != 0);
     [[nodiscard]] constexpr auto empty() const;
@@ -74,7 +74,7 @@ namespace mwc {
   }
   template <typename tp, size_t tp_size>
   constexpr auto data_span_st<tp, tp_size>::empty() const {
-    return m_size == 0;
+    return m_size == 0 or m_data == nullptr;
   }
   template <typename tp, size_t tp_size>
   constexpr auto data_span_st<tp, tp_size>::span(this auto&& a_this) {
