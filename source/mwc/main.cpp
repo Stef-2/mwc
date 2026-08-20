@@ -51,7 +51,7 @@ auto main() -> int {
     std::cout << node.m_data.m_mesh_index << '\n';
   }
 */
-  const auto comp = test0 {};
+  /*const auto comp = test0 {};
   const auto e = entity_ct {test2 {.c = 'b'}, comp, test1 {.f = 6.4f}};
   const auto e2 = mwc::ecs::generate_entity<test2, test0, test1>(test2 {.c = 'a'}, test0 {.i = {222, 442}}, test1 {.f = 1.42f});
   const auto e3 = mwc::ecs::generate_entity<test0, test1>(test0 {.i = {53, -26}}, test1 {.f = 23.57f});
@@ -69,7 +69,7 @@ auto main() -> int {
   e.insert_components(test3 {.b = true});
   e.remove_components<test1>();
   mwc::ecs::remove_components<test3>(5);
-  const auto components = e.components<test2, test0, test3>();
+  const auto components = e.components<test2, test0, test3>();*/
   //auto after_ac = mwc::ecs::entity_components<test2, test0, test3>(e);
   //const auto ac2 = mwc::ecs::ecs_subsystem_st::entity_archetype_map[1].m_archetype->component_data_row(0);
 

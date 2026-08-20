@@ -226,7 +226,7 @@ target_sources(imgui_cxx_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${imgui_mo
     ${imgui_module_SOURCE_DIR}/generated/backends/imgui_impl_vulkan.cppm
 )
 target_link_libraries(imgui_cxx_module PRIVATE
-imgui_static
+    imgui_static
     vulkan_cxx_module
 )
 

@@ -83,7 +83,7 @@ namespace mwc {
           const auto result = static_cast<vk::Result>(
             dispatcher->vkCreateShadersEXT(m_logical_device.native_handle(), a_configuration.m_shader_create_info.size(),
                                            native_create_info_ptr, nullptr, native_storage_ptr));*/
-          const auto result = m_logical_device.unique_handle().createShadersEXT(a_configuration.m_shader_create_info);
+          const auto [result, shaders] = m_logical_device.unique_handle().createShadersEXT(a_configuration.m_shader_create_info);
           contract_assert(result == vk::Result::eSuccess);
 
           for (const auto& shader_object : storage)

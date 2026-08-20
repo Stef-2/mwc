@@ -16,7 +16,7 @@ namespace mwc {
       public:
       using components_tuple_t
         = tuple_t<ecs::position_st, ecs::orientation_st, ecs::scale_st, ecs::camera_projection_st, ecs::camera_type_st>;
-      using scalar_t = ecs::camera_projection_st::underlying_pod_t;
+      using scalar_t = geometry::default_scalar_t;
       using projection_t = decltype(std::declval<ecs::camera_projection_st>().m_projection);
 
       static constexpr auto default_projection_type = camera_projection_et::e_perspective;

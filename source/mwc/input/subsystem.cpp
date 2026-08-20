@@ -5,9 +5,12 @@
 #include "mwc/core/diagnostic/log/logging.hpp"
 
 import mwc_file_subsystem;
+import mwc_directory;
 import mwc_breakpoint;
 import mwc_vertex_model;
 import mwc_stb_image;
+
+import vulkan;
 
 namespace {
   auto process_slang_diagnostics(const Slang::ComPtr<slang::IBlob> a_slang_diagnostics) -> void {
@@ -35,13 +38,13 @@ namespace mwc {
       mouse_st::previous_cursor_position = mouse_st::cursor_positon_st {{0.0}, {0.0}};
       mouse_st::current_cursor_position = mouse_st::cursor_positon_st {{0.0}, {0.0}};
 
-      filesystem_st::gltf_parser = fastgltf::Parser {fastgltf::Extensions::None};
+      // filesystem_st::gltf_parser = fastgltf::Parser {fastgltf::Extensions::None};
 
       // slang configuration
       const auto slang_global_session_generation_result
         = slang::createGlobalSession(filesystem_st::slang_global_session.writeRef());
       contract_assert(slang_succeeded(slang_global_session_generation_result));
-      const auto& shader_data_directory_path = filesystem::directory(filesystem::directory_et::e_shader).c_str();
+      const auto& shader_data_directory_path = filesystem::directory(filesystem::directory_et::e_shader).string().c_str();
       const auto slang_target_description
         = slang::TargetDesc {.format = SLANG_SPIRV, .profile = filesystem_st::slang_global_session->findProfile("spirv_1_6")};
       auto slang_compiler_options = array_t<slang::CompilerOptionEntry, 2> {
@@ -92,7 +95,7 @@ namespace mwc {
       return buffer;
     }
     auto read_scene_file(const file_path_t& a_filepath,
-                         const input_subsystem_st::filesystem_st::scene_processing_configuration_st& a_configuration) -> void {
+                         const input_subsystem_st::filesystem_st::scene_processing_configuration_st& a_configuration) -> void {/*
       // sanity checks
       // scene mesh and image data should either be preserved in host memory or propagated to device memory, or both
       if (not a_configuration.m_mesh_processing.m_preserve_in_host_memory
@@ -403,7 +406,7 @@ namespace mwc {
               : nullptr;
         }
       }
-      input_subsystem_st::filesystem_st::scene_registry.emplace_back(std::move(native_scene));
+      input_subsystem_st::filesystem_st::scene_registry.emplace_back(std::move(native_scene));*/
     }
     auto read_shader_file(const file_path_t& a_filepath,
                           const input_subsystem_st::filesystem_st::shader_processing_configuration_st& a_configuration) -> void {
@@ -413,8 +416,8 @@ namespace mwc {
       auto slang_diagnostics = Slang::ComPtr<slang::IBlob> {};
 
       const auto module
-        = Slang::ComPtr<slang::IModule> {slang_session->loadModuleFromSourceString(a_filepath.filename().c_str(),
-                                                                                   a_filepath.c_str(),
+        = Slang::ComPtr<slang::IModule> {slang_session->loadModuleFromSourceString(a_filepath.filename().string().c_str(),
+                                                                                   a_filepath.string().c_str(),
                                                                                    shader_source.c_str(),
                                                                                    slang_diagnostics.writeRef())};
       process_slang_diagnostics(slang_diagnostics);

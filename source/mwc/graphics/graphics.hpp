@@ -16,6 +16,7 @@
 import mwc_definition;
 import mwc_window;
 import mwc_semantic_version;
+import mwc_directory;
 import mwc_vk_context;
 import mwc_vk_instance;
 import mwc_vk_physical_device;

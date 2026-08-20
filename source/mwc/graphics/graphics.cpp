@@ -309,9 +309,9 @@ namespace mwc {
 
       auto shader_cfg = input::input_subsystem_st::filesystem_st::shader_processing_configuration_st {
         .m_device_context = {{&m_logical_device, &m_physical_device, &m_pipeline_layout}},
-        true,
-        true,
-        true};
+        .m_cache_spir_v_to_filesystem =  true,
+        .m_cache_reflection_data_to_filesystem = true,
+        .m_cache_shader_pipeline_to_filesystem = true};
       mwc::file_path_t shader_path = mwc::filesystem::directory(mwc::filesystem::directory_et::e_shader);
       shader_path /= "default.slang";
       mwc::input::read_shader_file(shader_path, shader_cfg);
@@ -328,7 +328,7 @@ namespace mwc {
       float3& cam_pos = std::get<0>(cam_comps).m_position;
       quat& cam_ori = std::get<1>(cam_comps).m_orientation;
       cam_pos = {0.5f, 0.5f, 0.5f};
-      cam_ori = quat {geometry::look_at(float3 {cam_pos * -1.0f}, float3 {0.1f, 0.1f, 0.1f}).rotation().inverse()};
+      cam_ori = quat {geometry::look_at(float3 {cam_pos * -1.0f32}, float3 {0.1f, 0.1f, 0.1f}).rotation().inverse()};
     }
 
     auto graphics_ct::render() -> void {

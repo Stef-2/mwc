@@ -9,42 +9,42 @@ import mwc_camera_projection_type;
 namespace mwc {
   namespace ecs {
     struct null_component_st : public component_st<null_component_st> {};
-    struct test0 : mwc::ecs::component_st<test0, int> {
+    struct test0 : mwc::ecs::component_st<test0> {
       int i[2] = {23, 44};
     };
-    struct test1 : mwc::ecs::component_st<test1, float> {
+    struct test1 : mwc::ecs::component_st<test1> {
       float f = 2.0f;
     };
-    struct test2 : mwc::ecs::component_st<test2, char> {
+    struct test2 : mwc::ecs::component_st<test2> {
       char c = 'a';
     };
-    struct test3 : mwc::ecs::component_st<test3, bool> {
+    struct test3 : mwc::ecs::component_st<test3> {
       bool b = true;
     };
     struct parent_st : public component_st<parent_st, entity_index_t> {
       entity_index_t m_parent;
     };
     template <size_t tp_count = 8>
-    struct static_children_st : public component_st<static_children_st<tp_count>, entity_index_t> {
+    struct static_children_st : public component_st<static_children_st<tp_count>> {
       array_t<entity_index_t, tp_count> m_children;
     };
-    struct position_st : public component_st<position_st, geometry::position_t<>::value_type> {
+    struct position_st : public component_st<position_st> {
       geometry::position_t<> m_position;
     };
-    struct orientation_st : public component_st<orientation_st, geometry::orientation_t<>::value_type> {
+    struct orientation_st : public component_st<orientation_st> {
       geometry::orientation_t<> m_orientation;
     };
-    struct scale_st : public component_st<scale_st, geometry::scale_t<>::value_type> {
+    struct scale_st : public component_st<scale_st> {
       geometry::scale_t<> m_scale;
     };
-    struct transformation_st : public component_st<transformation_st, geometry::transformation_t<>::value_type> {
+    struct transformation_st : public component_st<transformation_st> {
       geometry::transformation_t<> m_transformation;
     };
-    struct camera_projection_st : public component_st<camera_projection_st, geometry::transformation_t<>::value_type> {
+    struct camera_projection_st : public component_st<camera_projection_st> {
 
       geometry::camera_projection_t m_projection;
     };
-    struct camera_type_st : public component_st<camera_type_st, std::underlying_type_t<graphics::camera_projection_et>> {
+    struct camera_type_st : public component_st<camera_type_st> {
       graphics::camera_projection_et m_projection_type;
     };
   }

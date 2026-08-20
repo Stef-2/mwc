@@ -11,14 +11,40 @@ import std;
 
 export namespace mwc {
   namespace meta {
+    template <typename tp>
+    constexpr auto type_name() -> string_view_t {
+      return std::meta::identifier_of(^^tp);
+    }
+    template <typename tp>
+    constexpr auto fully_qualified_type_name() -> string_view_t {
+      auto fully_qualified_name = string_t {type_name<tp>()};
+
+      const auto lambda = [&fully_qualified_name]<std::meta::info tp_entity>(this auto&& a_this) consteval -> void {
+        if constexpr (std::meta::has_parent(tp_entity)) {
+          constexpr auto parent = std::meta::parent_of(tp_entity);
+
+          if constexpr (std::meta::has_identifier(parent)) {
+            constexpr auto parent_identifier = std::meta::identifier_of(parent);
+
+            std::format_to(std::front_inserter(fully_qualified_name), "::{0}", parent_identifier);
+          }
+          a_this.template operator()<parent>();
+        }
+      };
+      lambda.template operator()<^^tp>();
+
+      return std::define_static_string(fully_qualified_name);
+    }
     // crtp type to be inherited by types requiring constant evaluated name reflection and unique type hash generation
     // built on constant evaluated reflection of implementation defined output of [std::source_location::function_name()]
     template <typename tp>
     struct type_name_identity_st {
-      static constexpr auto type_name(const bool a_include_namespace = true) {
-        constexpr auto type_name = ^^tp;
-
-        return std::meta::identifier_of(type_name);
+      static constexpr auto type_name(const bool a_include_namespace = true) -> string_view_t {
+        if (a_include_namespace) {
+          return fully_qualified_type_name<tp>();
+        } else {
+          return mwc::meta::type_name<tp>();
+        }
       }
       static constexpr auto type_name_hash() -> size_t {
         constexpr auto name = type_name(/*include_namespace*/ true);
@@ -46,10 +72,12 @@ export namespace mwc {
         return std::meta::is_type(a_info)
            and std::meta::is_base_of_type(std::meta::substitute(^^type_index_st,
                                                                 {
-                                                                a_info}),
+                                                                ^^tp}),
                                           a_info);
       });
+      static_assert(descendents.size() != 0);
       static constexpr auto descendent_static_array = static_array_st(descendents);
+
       constexpr auto descendent_index = std::ranges::find(descendent_static_array.m_data, ^^tp);
 
       return std::distance(descendent_static_array.m_data.begin(), descendent_index);

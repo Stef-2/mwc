@@ -23,26 +23,29 @@ import std;
 
     // crtp type to be inherited by ecs component types
     template <typename tp, typename tp_underlying_pod = void>
-    struct component_st : public meta::type_index_st<tp> {
+    struct component_st : public meta::type_index_st<tp>, public meta::type_name_identity_st<tp> {
       using underlying_pod_t = tp_underlying_pod;
 
     };
 
     template <typename>
     struct component_type_list_st {
-      static constexpr auto component_type_infos() {
-        static constexpr auto lambda = [](std::meta::info a_info) consteval -> bool {
+      static constexpr auto lambda = [](std::meta::info a_info) consteval -> bool {
           return std::meta::is_type(a_info)
           and std::meta::is_base_of_type(std::meta::substitute(^^component_st,
                                                     {
                                                     a_info, ^^void}),
                               a_info);
         };
-        
+      static constexpr auto component_type_infos() {
         return static_array_st {
           meta::search<decltype(lambda), ^^ecs>(lambda)
         };
       }
+      static constexpr auto component_count() -> size_t {
+        return meta::search<decltype(lambda), ^^ecs>(lambda).size();
+      }
+      static_assert(component_count() != 0);
       //static constexpr auto component_type_info_array = static_array_st {component_type_infos};
 
       //using component_tuple_t = decltype(meta::type_info_range_tuple<component_type_infos()>());
@@ -118,13 +121,13 @@ import std;
         using sorted_t = decltype(ascending_sort());
         using combined_t = decltype(std::tuple_cat(tp_tuple {}, tuple_t<decltype(sorted_t::first)> {}));
         using rest_t = decltype(std::tuple_cat(tuple_t<decltype(sorted_t::second)> {}, tuple_t<tps...> {}));
-        auto [... rest] = rest_t {};
+        [[maybe_unused]] auto [... rest] = rest_t {};
         return component_type_sort<combined_t, decltype(rest)...>();
       }
       // final iteration
       else {
         using result_t = decltype(std::tuple_cat(tp_tuple {}, ascending_sort()));
-        auto [... unpack_result] = result_t {};
+        [[maybe_unused]] auto [... unpack_result] = result_t {};
         // in case that this pass did not fully sort the elements, repeat
         if constexpr (not determine_order.template operator()<true, decltype(unpack_result)...>())
           return component_type_sort<tuple_t<>, decltype(unpack_result)...>();
@@ -141,7 +144,7 @@ import std;
     }
     template <component_c tp_component, component_c... tp_components>
     consteval auto sorted_component_reference_types() {
-      auto [... unpack_tuple] = sorted_component_types<tp_component, tp_components...>();
+      [[maybe_unused]] auto [... unpack_tuple] = sorted_component_types<tp_component, tp_components...>();
 
       return std::declval<tuple_t<std::add_lvalue_reference_t<decltype(unpack_tuple)>...>>();
     }
