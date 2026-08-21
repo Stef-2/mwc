@@ -49,7 +49,7 @@ set(DATA_SHADER_DIR ${DATA_DIR}/shader)
 set(FETCHCONTENT_BASE_DIR ${EXTERNAL_SOURCE_DIR})
 
 # compile features
-add_compile_options(-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums -fmax-errors=8 --embed-dir=${SOURCE_DIR})
+add_compile_options(-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums -fmax-errors=16 --embed-dir=${SOURCE_DIR})
 if(MINGW)
     # fix OpenUSD dllimport declarations when compiling with mingw
     add_compile_options(-mnop-fun-dllimport)

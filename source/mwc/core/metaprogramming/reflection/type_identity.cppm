@@ -4,6 +4,7 @@ export module mwc_type_identity;
 
 import mwc_definition;
 import mwc_static_array;
+import mwc_meta_search;
 import mwc_sso_capacity;
 import mwc_hash;
 
@@ -39,7 +40,7 @@ export namespace mwc {
     // built on constant evaluated reflection of implementation defined output of [std::source_location::function_name()]
     template <typename tp>
     struct type_name_identity_st {
-      static constexpr auto type_name(const bool a_include_namespace = true) -> string_view_t {
+      static constexpr auto type_name(const bool_t a_include_namespace = true) -> string_view_t {
         if (a_include_namespace) {
           return fully_qualified_type_name<tp>();
         } else {
@@ -68,16 +69,19 @@ export namespace mwc {
     // index generator
     template <typename tp>
     constexpr auto index() -> size_t {
-      static constexpr auto descendents = search([](const std::meta::info a_info) consteval -> bool {
-        return std::meta::is_type(a_info) and std::meta::is_same_type(a_info, ^^tp);/*std::meta::is_type(a_info) and
-           std::meta::is_base_of_type(std::meta::substitute(^^type_index_st,
+      static constexpr auto descendents = meta::search([](const std::meta::info a_info) consteval -> bool_t {
+        //constexpr std::meta::info = std::meta::template_of(^^type_index_st);
+        //constexpr auto sub = std::meta::substitute(^^type_index_st, {a_info});
+        return std::meta::is_type(a_info) and std::meta::is_base_of_type(std::meta::substitute(^^type_index_st, {a_info}), a_info);
+
+        /*std::meta::is_type(a_info)
+           and std::meta::is_base_of_type(std::meta::substitute(^^type_index_st,
                                                                 {
-                                                                a_info}),
-                                          a_info);*/
+                                                                ^^tp}),
+                                                                a_info)*//*std::meta::is_type(a_info) and std::meta::is_same_type(a_info, ^^tp)*/;
       });
       static_assert(descendents.size() != 0);
       static constexpr auto descendent_static_array = static_array_st(descendents);
-      static_assert(std::is_same_v<typename [:descendent_static_array.m_data[0]:], char**>);
       constexpr auto descendent_index = std::ranges::find(descendent_static_array.m_data, ^^tp);
 
       return std::distance(descendent_static_array.m_data.begin(), descendent_index);
@@ -87,5 +91,15 @@ export namespace mwc {
     struct type_index_st {
       static constexpr auto index = size_t {meta::index<tp>()};
     };
+
+    struct test0 : type_index_st<test0> {};
+    struct test1 : type_index_st<test1> {};
+
+    //static_assert(test0::index == 333);
+    //static_assert(test1::index == 333);
   }
+  struct test3 : mwc::meta::type_index_st<test3> {};
+  struct test4 : mwc::meta::type_index_st<test4> {};
+  static_assert(test3::index == 333);
+  static_assert(test4::index == 333);
 }
