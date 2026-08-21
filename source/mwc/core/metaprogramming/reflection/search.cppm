@@ -4,16 +4,17 @@ export module mwc_meta_search;
 
 import mwc_definition;
 import mwc_static_array;
+import mwc_static_string;
 import mwc_namespace;
 
 import std;
 
 namespace mwc {
   namespace meta{
-    template <std::meta::info tp_exception>
+    template <auto tp_exception>
     consteval auto handle(/*const std::meta::exception& a_exception*/) -> void {
-      constexpr auto exception = std::meta::extract<std::meta::exception>(tp_exception);
-      typename [:exception.from():] x = 33;
+      //constexpr auto exception = std::meta::extract<std::meta::exception>(tp_exception);
+      //typename [:exception.from():] x = 33;
       //static_assert(std::is_same_v<typename [:exception.from():], void>);
       //static_assert(false, string_view_t{exception.what()});
       //static_assert(69==420);
@@ -21,29 +22,31 @@ namespace mwc {
       //return exception;
     }
     consteval auto assert_recursible_scope(const std::meta::info a_outer_entity, const std::meta::info a_inner_entity) -> bool_t {
-      try {
-        const auto dealiased_member = a_inner_entity;//std::meta::is_type_alias(a_inner_entity) ? std::meta::dealias(a_inner_entity) : a_inner_entity;
-        const auto is_complete_type = std::meta::is_complete_type(dealiased_member) and std::meta::is_class_type(dealiased_member);
-        const auto is_template = std::meta::is_template(dealiased_member);
-        const auto is_namespace = std::meta::is_namespace(dealiased_member);
-        const auto member_of_self = std::meta::is_same_type(dealiased_member, a_outer_entity);//dealiased_member != a_outer_entity;
+        try {
+          const auto dealiased_member = a_inner_entity;//std::meta::is_type_alias(a_inner_entity) ? std::meta::dealias(a_inner_entity) : a_inner_entity;
+          const auto is_complete_type = std::meta::is_complete_type(dealiased_member) and std::meta::is_class_type(dealiased_member);
+          const auto is_template = std::meta::is_template(dealiased_member);
+          const auto is_namespace = std::meta::is_namespace(dealiased_member);
+          const auto member_of_self = std::meta::is_same_type(dealiased_member, a_outer_entity);//dealiased_member != a_outer_entity;
 
-        if (is_namespace or (is_complete_type and not is_template and not member_of_self)) {
-          return true;
-        } else {
+          if (is_namespace or (is_complete_type and not is_template and not member_of_self)) {
+            return true;
+          } else {
+            return false;
+          }
+        } catch (const std::meta::exception a_exception) {
+          meta::handle<typename [:a_exception.from():]>();
+          //constexpr auto f = a_exception.from();
+          /*
+          __builtin_constexpr_diag(0, "", a_exception.what());
+          static_assert(0 == 2);
+          // constexpr auto exception = std::meta::extract<std::meta::exception>(^^a_exception);
+          //static_assert(false, string_view_t{a_exception.what()});
+          //static_assert(std::meta::is_same_v<a_exception.from()>);
+          constexpr auto e = meta::handle<^^a_exception>();
+          static_assert(false, string_view_t {e.what(), 64});*/
           return false;
         }
-      } catch (const std::meta::exception& a_exception) {
-        meta::handle<std::meta::reflect_object(a_exception)>();
-        __builtin_constexpr_diag(0, "", a_exception.what());
-        static_assert(0 == 2);
-        // constexpr auto exception = std::meta::extract<std::meta::exception>(^^a_exception);
-        //static_assert(false, string_view_t{a_exception.what()});
-        //static_assert(std::meta::is_same_v<a_exception.from()>);
-        constexpr auto e = meta::handle<^^a_exception>();
-        static_assert(false, string_view_t {e.what(), 64});
-        return false;
-      }
     }
   }
 }
