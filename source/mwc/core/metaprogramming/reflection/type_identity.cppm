@@ -69,15 +69,15 @@ export namespace mwc {
     template <typename tp>
     constexpr auto index() -> size_t {
       static constexpr auto descendents = search([](const std::meta::info a_info) consteval -> bool {
-        return std::meta::is_type(a_info)
-           and std::meta::is_base_of_type(std::meta::substitute(^^type_index_st,
+        return std::meta::is_type(a_info) and std::meta::is_same_type(a_info, ^^tp);/*std::meta::is_type(a_info) and
+           std::meta::is_base_of_type(std::meta::substitute(^^type_index_st,
                                                                 {
-                                                                ^^tp}),
-                                          a_info);
+                                                                a_info}),
+                                          a_info);*/
       });
       static_assert(descendents.size() != 0);
       static constexpr auto descendent_static_array = static_array_st(descendents);
-
+      static_assert(std::is_same_v<typename [:descendent_static_array.m_data[0]:], char**>);
       constexpr auto descendent_index = std::ranges::find(descendent_static_array.m_data, ^^tp);
 
       return std::distance(descendent_static_array.m_data.begin(), descendent_index);

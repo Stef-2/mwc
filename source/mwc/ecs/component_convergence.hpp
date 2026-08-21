@@ -21,7 +21,7 @@ namespace mwc {
     struct test3 : mwc::ecs::component_st<test3> {
       bool b = true;
     };
-    struct parent_st : public component_st<parent_st, entity_index_t> {
+    struct parent_st : public component_st<parent_st> {
       entity_index_t m_parent;
     };
     template <size_t tp_count = 8>

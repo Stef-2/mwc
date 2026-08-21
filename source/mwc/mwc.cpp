@@ -55,9 +55,9 @@ namespace mwc {
     while (true) {
       std::ignore = mwc::input::input_subsystem_st::poll_hardware_events();
 
-      auto cursor_position_x = input::input_subsystem_st::mouse_st::cursor_positon_st::scalar_t {};
-      auto cursor_position_y = input::input_subsystem_st::mouse_st::cursor_positon_st::scalar_t {};
-      m_window.vkfw_window()->getCursorPos(&cursor_position_x, &cursor_position_y);
+      auto cursor_position_x = static_cast<double>(input::input_subsystem_st::mouse_st::cursor_positon_st::scalar_t {});
+      auto cursor_position_y = static_cast<double>(input::input_subsystem_st::mouse_st::cursor_positon_st::scalar_t {});
+      std::ignore = m_window.vkfw_window()->getCursorPos(&cursor_position_x, &cursor_position_y);
 
       input::input_subsystem_st::mouse_st::previous_cursor_position
         = input::input_subsystem_st::mouse_st::current_cursor_position;

@@ -11,7 +11,6 @@ import mwc_metaprogramming_utility;
 import mwc_concept;
 import mwc_type_identity;
 import mwc_observer_ptr;
-import mwc_type_identity;
 import mwc_static_array;
 import mwc_hash;
 

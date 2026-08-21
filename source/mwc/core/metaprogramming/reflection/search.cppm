@@ -84,7 +84,7 @@ export namespace mwc {
       };
 
       search_engine.template operator()<tp_predicate, tp_scope>(a_predicate);
-      // static_assert(match_count == 3333);
+      static_assert(match_count != 0);
       return std::define_static_array(matched_entities);
     }
 
