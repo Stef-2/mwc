@@ -70,17 +70,17 @@ export namespace mwc {
     template <typename tp>
     constexpr auto index() -> size_t {
       static constexpr auto descendents = meta::search([](const std::meta::info a_info) consteval -> bool_t {
-        //constexpr std::meta::info = std::meta::template_of(^^type_index_st);
-        //constexpr auto sub = std::meta::substitute(^^type_index_st, {a_info});
-        return std::meta::is_type(a_info) and std::meta::is_base_of_type(std::meta::substitute(^^type_index_st, {a_info}), a_info);
-
-        /*std::meta::is_type(a_info)
-           and std::meta::is_base_of_type(std::meta::substitute(^^type_index_st,
-                                                                {
-                                                                ^^tp}),
-                                                                a_info)*//*std::meta::is_type(a_info) and std::meta::is_same_type(a_info, ^^tp)*/;
+        if (std::meta::is_type(a_info)
+            and std::meta::can_substitute(^^type_index_st, {
+                                                           a_info})) {
+          const auto substitution = std::meta::substitute(^^type_index_st, {
+                                                                           a_info});
+          return std::meta::is_base_of_type(substitution, a_info) and a_info != substitution;
+        } else {
+          return false;
+        }
       });
-      static_assert(descendents.size() != 0);
+      static_assert(descendents.size() != 0, "the indexing search yielded no results");
       static constexpr auto descendent_static_array = static_array_st(descendents);
       constexpr auto descendent_index = std::ranges::find(descendent_static_array.m_data, ^^tp);
 
@@ -95,8 +95,8 @@ export namespace mwc {
     struct test0 : type_index_st<test0> {};
     struct test1 : type_index_st<test1> {};
 
-    //static_assert(test0::index == 333);
-    //static_assert(test1::index == 333);
+    static_assert(test0::index == 333);
+    static_assert(test1::index == 333);
   }
   struct test3 : mwc::meta::type_index_st<test3> {};
   struct test4 : mwc::meta::type_index_st<test4> {};
