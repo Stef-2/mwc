@@ -75,12 +75,12 @@ export namespace mwc {
                                                            a_info})) {
           const auto substitution = std::meta::substitute(^^type_index_st, {
                                                                            a_info});
-          return std::meta::is_base_of_type(substitution, a_info) and a_info != substitution;
+          return std::meta::is_base_of_type(substitution, a_info)/* and a_info != substitution*/;
         } else {
           return false;
         }
       });
-      static_assert(descendents.size() != 0, "the indexing search yielded no results");
+      static_assert(descendents.size() != 0, "the indexing search yielded no results, ensure that there are types crtp-inheriting from [type_index_st]");
       static constexpr auto descendent_static_array = static_array_st(descendents);
       constexpr auto descendent_index = std::ranges::find(descendent_static_array.m_data, ^^tp);
 

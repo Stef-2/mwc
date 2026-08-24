@@ -14,6 +14,10 @@ namespace mwc {
 }
 namespace mwc {
   namespace meta {
+    enum class parse_mode_et : uint8_t {
+      e_count,
+      e_search
+    };
     consteval auto assert_recursible_scope(const std::meta::info a_outer_entity, const std::meta::info a_inner_entity) -> bool_t {
       using namespace std::meta;
 
@@ -29,7 +33,7 @@ namespace mwc {
       const auto member_of_self = is_complete_type(dinner) and is_complete_type(douter) and is_same_type(dinner, douter);
       const auto self = dinner == douter;
 
-      if ((inner_namespace or (inner_complete_type))) {
+      if (inner_namespace or inner_complete_type) {
         //if (is_namespace or is_complete_type) {
         return true;
       } else {
@@ -47,8 +51,8 @@ export namespace mwc {
                  std::meta::is_namespace(tp_scope) and std::is_invocable_r_v<bool, tp_predicate, const std::meta::info>;
                }
     consteval auto search_count(const tp_predicate a_predicate) -> size_t {
-      auto entity_count = size_t {0};
       auto parsed_entities = vector_t<std::meta::info> {};
+      auto entity_count = size_t {0};
 
       const auto search_engine = [&entity_count, &parsed_entities]<typename tp_local_predicate, std::meta::info tp_local_scope>(
                                    this auto&& a_this,
@@ -58,6 +62,9 @@ export namespace mwc {
         parsed_entities.push_back(tp_local_scope);
 
         template for (constexpr auto member : members) {
+          /*if constexpr (member == ^^::mwc::meta) {
+            static_assert(false);
+          }*/
           const auto already_parsed = std::ranges::contains(parsed_entities, tp_local_scope);
           const auto match = a_predicate(member);
           if (match) {
@@ -76,45 +83,85 @@ export namespace mwc {
     }
 
     // recursively search through [tp_scope] and its recursible descendents, returning entities that match [tp_predicate]
+    // template <typename tp_predicate, std::meta::info tp_scope = mwc_namespace>
+    //   requires requires {
+    //              std::meta::is_namespace(tp_scope) and std::is_invocable_r_v<bool, tp_predicate, const std::meta::info>;
+    //            }
+    // consteval auto search(const tp_predicate a_predicate) {
+    //   auto parsed_entities = vector_t<std::meta::info> {};
+    //   constexpr auto match_count = search_count<tp_predicate, tp_scope>(a_predicate);
+    //   auto matched_entities = array_t<std::meta::info, match_count> {};
+    //   size_t i = 0;
+    //   const auto search_engine
+    //     = [&matched_entities, &parsed_entities, &i]<typename tp_local_predicate, std::meta::info tp_local_scope>(
+    //         this auto&& a_this,
+    //         const tp_local_predicate a_predicate) consteval -> void {
+    //     static constexpr auto members
+    //       = std::define_static_array(std::meta::members_of(tp_local_scope, std::meta::access_context::current()));
+    //
+    //     parsed_entities.push_back(tp_local_scope);
+    //     template for (constexpr auto member : members) {
+    //       constexpr auto recursible_scope = assert_recursible_scope(tp_local_scope, member);
+    //       const auto already_parsed = std::ranges::contains(parsed_entities, tp_local_scope);
+    //       const auto match = a_predicate(member);
+    //       if (match) {
+    //         /*
+    //         if (std::ranges::contains(matched_entities, member)) {
+    //           static_assert(std::is_same_v<typename[:member:], char****>);
+    //         }*/
+    //         matched_entities[i] = member;
+    //         ++i;
+    //       }
+    //
+    //       if (recursible_scope and not already_parsed and not match) {
+    //         a_this.template operator()<tp_predicate, member>(a_predicate);
+    //       }
+    //     }
+    //   };
+    //
+    //   search_engine.template operator()<tp_predicate, tp_scope>(a_predicate);
+    //
+    //   return std::define_static_array(matched_entities);
+    // }
+
     template <typename tp_predicate, std::meta::info tp_scope = mwc_namespace>
       requires requires {
-                 std::meta::is_namespace(tp_scope) and std::is_invocable_r_v<bool, tp_predicate, const std::meta::info>;
-               }
-    consteval auto search(const tp_predicate a_predicate) {
-      constexpr auto match_count = search_count<tp_predicate, tp_scope>(a_predicate);
-      auto matched_entities = std::array<std::meta::info, match_count> {};
+      std::meta::is_namespace(tp_scope) and std::is_invocable_r_v<bool, tp_predicate, const std::meta::info>;
+      }
+    consteval auto search(const tp_predicate a_predicate){
       auto parsed_entities = vector_t<std::meta::info> {};
-      size_t i = 0;
-      const auto search_engine
-        = [&matched_entities, &parsed_entities, &i]<typename tp_local_predicate, std::meta::info tp_local_scope>(
-            this auto&& a_this,
-            const tp_local_predicate a_predicate) consteval -> void {
+      auto matched_entities = vector_t<std::meta::info> {};
+      //auto i = size_t {0};
+
+      constexpr auto search_engine = [/*&matched_entities*/]<typename tp_local_predicate, std::meta::info tp_local_scope>(
+                                   this auto&& a_this,
+                                   const tp_local_predicate a_predicate, size_t i, vector_t<std::meta::info>& v) consteval -> size_t {
         static constexpr auto members
           = std::define_static_array(std::meta::members_of(tp_local_scope, std::meta::access_context::current()));
+        //parsed_entities.push_back(tp_local_scope);
 
-        parsed_entities.push_back(tp_local_scope);
         template for (constexpr auto member : members) {
-          constexpr auto recursible_scope = assert_recursible_scope(tp_local_scope, member);
-          const auto already_parsed = std::ranges::contains(parsed_entities, tp_local_scope);
+          /*if constexpr (member == ^^::mwc::meta) {
+            static_assert(false);
+          }*/
+          //const auto already_parsed = std::ranges::contains(parsed_entities, tp_local_scope);
           const auto match = a_predicate(member);
-          if (match) {
-            /*
-            if (std::ranges::contains(matched_entities, member)) {
-              static_assert(std::is_same_v<typename[:member:], char****>);
-            }*/
-            matched_entities[i] = member;
-            ++i;
-          }
+            if (match) {
+              v.push_back(member);
+              ++i;
+            }
 
-          if (recursible_scope and not already_parsed and not match) {
-            a_this.template operator()<tp_predicate, member>(a_predicate);
+
+
+          constexpr auto recursible_scope = assert_recursible_scope(tp_local_scope, member);
+          if (recursible_scope and /*not already_parsed and*/ not match) {
+            return a_this.template operator()<tp_predicate, member>(a_predicate, i, v);
           }
         }
-      };
+        return i;
+                                   };
+      constexpr auto cnt = search_engine.template operator()<tp_predicate, tp_scope>(a_predicate, 0, matched_entities);
 
-      search_engine.template operator()<tp_predicate, tp_scope>(a_predicate);
-
-      return std::define_static_array(matched_entities);
     }
 
     // utility that converts a range of type reflections into a matching tuple_t
