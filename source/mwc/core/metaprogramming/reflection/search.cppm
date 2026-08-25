@@ -129,13 +129,13 @@ export namespace mwc {
                  std::meta::is_namespace(tp_scope) and std::is_invocable_r_v<bool, tp_predicate, const std::meta::info>;
                }
     consteval auto search(const tp_predicate a_predicate) {
-      auto parsed_entities = vector_t<std::meta::info> {};
-      auto matched_entities = vector_t<std::meta::info> {};
-      auto i = size_t {0};
+      //auto parsed_entities = vector_t<std::meta::info> {};
+      //auto matched_entities = vector_t<std::meta::info> {};
+      //auto i = size_t {0};
 
       constexpr auto search_engine = []<typename tp_local_predicate, std::meta::info tp_local_scope, parse_mode_et tp_parse_mode>(
                                        this auto&& a_this, const tp_local_predicate a_predicate,
-                                       vector_t<std::meta::info> a_matched_entities = {}) consteval {
+                                       vector_t<std::meta::info>&& a_matched_entities = {}) consteval -> std::conditional_t<tp_parse_mode == parse_mode_et::e_search, vector_t<std::meta::info>, size_t>{
         static constexpr auto members
           = std::define_static_array(std::meta::members_of(tp_local_scope, std::meta::access_context::current()));
         /*if constexpr (tp_parse_mode == parse_mode_et::e_search) {
@@ -150,7 +150,7 @@ export namespace mwc {
           }
 
           constexpr auto recursible_scope = assert_recursible_scope(tp_local_scope, member);
-          if (recursible_scope /*not already_parsed and*/) {
+          if constexpr (recursible_scope /*not already_parsed and*/) {
             return a_this.template operator()<tp_predicate, member, tp_parse_mode>(a_predicate, std::move(a_matched_entities));
           }
         }
@@ -160,7 +160,10 @@ export namespace mwc {
         else
           return a_matched_entities.size();
       };
-      constexpr auto cnt = search_engine.template operator()<tp_predicate, tp_scope, parse_mode_et::e_search>(a_predicate);
+      constexpr auto cnt = search_engine.template operator()<tp_predicate, tp_scope, parse_mode_et::e_count>(a_predicate);
+
+      //array_t<std::meta::info, cnt> me {};
+      return span_t<const std::meta::info, cnt> {std::define_static_array(search_engine.template operator()<tp_predicate, tp_scope, parse_mode_et::e_search>(a_predicate))};
     }
 
     // utility that converts a range of type reflections into a matching tuple_t
