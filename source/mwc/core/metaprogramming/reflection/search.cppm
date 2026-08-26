@@ -14,10 +14,6 @@ namespace mwc {
 }
 namespace mwc {
   namespace meta {
-    enum class parse_mode_et : uint8_t {
-      e_count,
-      e_search
-    };
     consteval auto assert_recursible_scope(const std::meta::info a_outer_entity, const std::meta::info a_inner_entity) -> bool_t {
       using namespace std::meta;
 
@@ -26,14 +22,14 @@ namespace mwc {
 
       const auto inner_complete_type = is_complete_type(dinner) and is_class_type(dinner);
       const auto outer_complete_type = is_complete_type(douter) and is_class_type(douter);
-      const auto inner_namespace = is_namespace(dinner) and a_inner_entity != ^^std;
-      const auto outer_namespace = is_namespace(douter);
+      const auto inner_namespace = is_namespace(dinner) and dinner != ^^std;
+      const auto outer_namespace = is_namespace(douter) and douter != ^^std;
 
       const auto template_type = is_template(dinner);
       const auto member_of_self = is_complete_type(dinner) and is_complete_type(douter) and is_same_type(dinner, douter);
       const auto self = dinner == douter;
-
-      if (inner_namespace or inner_complete_type) {
+      const auto no_fucking_std = (is_namespace(dinner) and dinner != ^^::std) or (is_namespace(douter) and douter != ^^::std);
+      if ((inner_namespace or inner_complete_type) and not member_of_self and not self and no_fucking_std) {
         //if (is_namespace or is_complete_type) {
         return true;
       } else {
@@ -126,44 +122,39 @@ export namespace mwc {
 
     template <typename tp_predicate, std::meta::info tp_scope = mwc_namespace>
       requires requires {
-                 std::meta::is_namespace(tp_scope) and std::is_invocable_r_v<bool, tp_predicate, const std::meta::info>;
+                 std::meta::is_namespace(tp_scope) /* and std::is_invocable_r_v<bool, tp_predicate, const std::meta::info*/ > ;
                }
-    consteval auto search(const tp_predicate a_predicate) {
-      //auto parsed_entities = vector_t<std::meta::info> {};
-      //auto matched_entities = vector_t<std::meta::info> {};
-      //auto i = size_t {0};
-
-      constexpr auto search_engine = []<typename tp_local_predicate, std::meta::info tp_local_scope, parse_mode_et tp_parse_mode>(
-                                       this auto&& a_this, const tp_local_predicate a_predicate,
-                                       vector_t<std::meta::info>&& a_matched_entities = {}) consteval -> std::conditional_t<tp_parse_mode == parse_mode_et::e_search, vector_t<std::meta::info>, size_t>{
+    consteval auto search(std::indirectly_regular_unary_invocable<> a_predicate) {
+      constexpr auto recursion_depth_limit = size_t {64};
+      constexpr auto search_engine
+        = [recursion_depth_limit]<typename tp_local_predicate, std::meta::info tp_local_scope, size_t tp_recursion_depth = 0>(
+            this auto&& a_this,
+            const tp_local_predicate a_predicate,
+            vector_t<std::meta::info>&& a_matched_entities = {}) consteval
+        -> vector_t<std::meta::info> /*std::conditional_t<tp_parse_mode == parse_mode_et::e_search, vector_t<std::meta::info>, size_t>*/ {
+        constexpr auto within_recursion_depth_limit = tp_recursion_depth <= recursion_depth_limit;
         static constexpr auto members
           = std::define_static_array(std::meta::members_of(tp_local_scope, std::meta::access_context::current()));
-        /*if constexpr (tp_parse_mode == parse_mode_et::e_search) {
-          parsed_entities.push_back(tp_local_scope);
-        }*/
 
         template for (constexpr auto member : members) {
-          //const auto already_parsed = std::ranges::contains(parsed_entities, tp_local_scope);
-          const auto match = a_predicate(member);
-          if (match) {
+          if (const auto match = a_predicate(member)) {
             a_matched_entities.push_back(member);
           }
 
           constexpr auto recursible_scope = assert_recursible_scope(tp_local_scope, member);
-          if constexpr (recursible_scope /*not already_parsed and*/) {
-            return a_this.template operator()<tp_predicate, member, tp_parse_mode>(a_predicate, std::move(a_matched_entities));
+          if constexpr (recursible_scope and within_recursion_depth_limit) {
+            a_matched_entities
+              = a_this.template operator()<tp_predicate, member, tp_recursion_depth + 1>(a_predicate,
+                                                                                         std::move(a_matched_entities));
           }
         }
 
-        if constexpr (tp_parse_mode == parse_mode_et::e_search)
-          return a_matched_entities;
-        else
-          return a_matched_entities.size();
+        return a_matched_entities;
       };
-      constexpr auto cnt = search_engine.template operator()<tp_predicate, tp_scope, parse_mode_et::e_count>(a_predicate);
+      constexpr auto match_count = search_engine.template operator()<tp_predicate, tp_scope>(a_predicate).size();
 
-      //array_t<std::meta::info, cnt> me {};
-      return span_t<const std::meta::info, cnt> {std::define_static_array(search_engine.template operator()<tp_predicate, tp_scope, parse_mode_et::e_search>(a_predicate))};
+      return span_t<const std::meta::info, match_count> {
+        std::define_static_array(search_engine.template operator()<tp_predicate, tp_scope>(a_predicate))};
     }
 
     // utility that converts a range of type reflections into a matching tuple_t
@@ -182,5 +173,11 @@ export namespace mwc {
 
       return type_accumulator(std::make_index_sequence<tp.m_data.size()> {});
     }
+
+    template <auto tp>
+      requires(std::meta::template_of(^^decltype(tp)) == ^^static_array_st)
+    struct type_info_range_tuple_st {
+      using tuple_t = decltype(type_info_range_tuple<tp>());
+    };
   }
 }

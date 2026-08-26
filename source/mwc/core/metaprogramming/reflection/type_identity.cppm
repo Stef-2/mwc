@@ -70,21 +70,17 @@ export namespace mwc {
     template <typename tp>
     constexpr auto index() -> size_t {
       static constexpr auto descendents = meta::search([](const std::meta::info a_info) consteval -> bool_t {
-        /*if (std::meta::is_type(a_info)
-            and std::meta::can_substitute(^^type_index_st, {
-                                                           a_info})) {
-          const auto substitution = std::meta::substitute(^^type_index_st, {
-                                                                           a_info});*/
-          //return a_info == ^^tp;
-          return std::meta::is_type(a_info) and std::meta::is_base_of_type(std::meta::substitute(^^type_index_st, {
-                                                                           a_info}), a_info);
-        /*} else {
-          return false;
-        }*/
+        const auto within_std = std::meta::has_parent(a_info) and (std::meta::parent_of(a_info) == ^^std);
+        return not within_std and std::meta::is_complete_type(a_info)
+           and std::meta::is_base_of_type(std::meta::substitute(^^type_index_st,
+                                                                {
+                                                                a_info}),
+                                          a_info);
       });
-      static_assert(descendents.size() == 1232132);
-      static_assert(descendents.size() != 0, "the indexing search yielded no results, ensure that there are types crtp-inheriting from [type_index_st]");
+      static_assert(descendents.size() != 0,
+                    "the indexing search yielded no results, ensure that there are types crtp-inheriting from [type_index_st]");
       static constexpr auto descendent_static_array = static_array_st(descendents);
+
       constexpr auto descendent_index = std::ranges::find(descendent_static_array.m_data, ^^tp);
 
       return std::distance(descendent_static_array.m_data.begin(), descendent_index);
