@@ -66,29 +66,40 @@ export namespace mwc {
     template <typename tp>
     struct type_index_st;
 
+    constexpr auto f = [](const std::meta::info a_info) consteval -> bool_t { /*
+      if (std::meta::is_complete_type(a_info)) {
+        const auto within_std = std::meta::has_parent(a_info) and (std::meta::parent_of(a_info) == ^^std);
+        const auto substitute = std::meta::substitute(^^type_index_st,
+                                                      {
+                                                      a_info});
+
+        return not within_std and std::meta::is_base_of_type(substitute, a_info);
+      }
+
+      return false;*/
+                                                                              return std::meta::identifier_of(a_info)
+                                                                                  == string_view_t {"mwc::meta::test0"};
+    };
+    //static_assert(std::is_same_v<txtx, void***>);
     // index generator
     template <typename tp>
     constexpr auto index() -> size_t {
-      static constexpr auto descendents = meta::search([](const std::meta::info a_info) consteval -> bool_t {
-        const auto within_std = std::meta::has_parent(a_info) and (std::meta::parent_of(a_info) == ^^std);
-        return not within_std and std::meta::is_complete_type(a_info)
-           and std::meta::is_base_of_type(std::meta::substitute(^^type_index_st,
-                                                                {
-                                                                a_info}),
-                                          a_info);
-      });
-      static_assert(descendents.size() != 0,
+      constexpr auto descendents = meta::search(f);
+      static_assert(descendents.size() > 0,
                     "the indexing search yielded no results, ensure that there are types crtp-inheriting from [type_index_st]");
-      static constexpr auto descendent_static_array = static_array_st(descendents);
+      static constexpr auto descendent_static_array = static_array_st {descendents};
+      constexpr auto descendent_index = std::ranges::find(descendent_static_array.array(), ^^tp);
+      // static_assert(descendent_index != descendent_static_array.array().end(), "[tp] not found in [descendent_static_array]");
 
-      constexpr auto descendent_index = std::ranges::find(descendent_static_array.m_data, ^^tp);
-
-      return std::distance(descendent_static_array.m_data.begin(), descendent_index);
+      return std::distance(descendent_static_array.array().begin(), descendent_index);
     }
     // definition
     template <typename tp>
     struct type_index_st {
       static constexpr auto index = size_t {meta::index<tp>()};
+      static constexpr auto indexed_types_tuple() {
+        //return type_info_range_to_tuple<static_array_st {s}>();
+      }
     };
 
     struct test0 : type_index_st<test0> {};
