@@ -15,7 +15,7 @@ export namespace mwc {
     // returning entities that match [a_predicate]
     template <std::meta::info tp_scope = mwc_namespace>
       requires requires { std::meta::is_namespace(tp_scope); }
-    consteval auto search(const std::predicate<const std::meta::info> auto& a_unary_predicate) {
+    consteval auto search(/*std::predicate<const std::meta::info>*/ auto a_unary_predicate) {
       // limit recursion depth in case of loops
       constexpr auto recursion_depth_limit = size_t {32};
       // determine if [a_inner_entity] can be recursively examined for contents via [std::meta::members_of()]
@@ -50,7 +50,8 @@ export namespace mwc {
           = std::define_static_array(std::meta::members_of(tp_local_scope, std::meta::access_context::current()));
 
         template for (constexpr auto member : members) {
-          if (const auto match = a_predicate(member)) {
+          // static_assert(std::is_same_v<decltype(a_predicate), void*>);
+          if (a_predicate(member)) {
             a_entity_accumulator.push_back(member);
           }
 
