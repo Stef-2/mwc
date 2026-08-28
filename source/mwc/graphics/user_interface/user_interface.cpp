@@ -62,8 +62,8 @@ namespace mwc {
       // ecs
       if (ImGui::BeginChild("ecs", ImVec2 {0.0, 640.0}, ImGuiChildFlags_Borders)) {
         dear_imgui_ct::centered_text("ecs");
-        using component_tuple_t = decltype(meta::type_info_range_tuple<ecs::component_type_list_st<void>::component_type_infos()>());
-        // static_assert(std::is_same_v<component_tuple_t, void***>);
+        using component_tuple_t = decltype(ecs::component_st<void>::indexed_types_tuple());
+        static_assert(std::is_same_v<component_tuple_t, void***>);
         static_assert(std::tuple_element_t<5, component_tuple_t>::index == 333);
         constexpr auto component_count = std::tuple_size_v<component_tuple_t>;
 

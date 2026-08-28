@@ -24,9 +24,8 @@ import std;
     template <typename tp, typename tp_underlying_pod = void>
     struct component_st : public meta::type_index_st<tp>, public meta::type_name_identity_st<tp> {
       using underlying_pod_t = tp_underlying_pod;
-
     };
-
+    /*
     template <typename>
     struct component_type_list_st {
       static constexpr auto lambda = [](std::meta::info a_info) consteval -> bool {
@@ -45,14 +44,8 @@ import std;
         return meta::search<decltype(lambda), ^^ecs>(lambda).size();
       }
       static_assert(component_count() != 0);
-      //static constexpr auto component_type_info_array = static_array_st {component_type_infos};
-
-      //using component_tuple_t = decltype(meta::type_info_range_tuple<component_type_infos()>());
-
-      /*template <size_t tp_type_index>
-      using component_at_index_t = std::tuple_element_t<tp_type_index, component_tuple_t>;*/
     };
-
+*/
     // concept modeling component types
     template <typename tp>
     concept component_c

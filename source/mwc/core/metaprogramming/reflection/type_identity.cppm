@@ -104,21 +104,12 @@ export namespace mwc {
     template <typename tp>
     struct type_index_st {
       static constexpr auto index = size_t {meta::index<tp>()};
+      static constexpr auto indexed_types_range() {
+        return meta::search(indexing_unary_predicate<tp>);
+      }
       static constexpr auto indexed_types_tuple() {
         return type_info_range_to_tuple<static_array_st {meta::search(indexing_unary_predicate<tp>)}>();
       }
     };
-
-    struct test0 : type_index_st<test0> {};
-    struct test1 : type_index_st<test1> {};
-    struct test2 : type_index_st<test2> {};
-
-    static_assert(test0::index == 333);
-    static_assert(test1::index == 333);
-    static_assert(test2::index == 333);
   }
-  struct test3 : ::mwc::meta::type_index_st<test3> {};
-  struct test4 : ::mwc::meta::type_index_st<test4> {};
-  static_assert(test3::index == 333);
-  static_assert(test4::index == 333);
 }
