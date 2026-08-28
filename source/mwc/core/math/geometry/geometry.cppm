@@ -26,7 +26,7 @@ export namespace mwc {
     template <std::floating_point tp = default_scalar_t>
     using scale_t = math::vector_t<tp, 3>;
     template <std::floating_point tp = default_scalar_t, size_t tp_count = 4>
-    using transformation_t = math::transformation_t<tp, tp_count>;
+    using transformation_t = math::matrix_t<tp, tp_count, tp_count>;
     using camera_projection_t = transformation_t<>;
 
     enum class coordinate_axis_et : uint8_t {
@@ -86,7 +86,7 @@ export namespace mwc {
     template <std::floating_point tp = default_scalar_t>
     constexpr auto look_at(const position_t<tp>& a_origin, const position_t<tp>& a_target,
                            const direction_t<tp>& a_up_direction = coordinate_direction(coordinate_direction_et::e_up))
-      -> transformation_t<tp, 3> {
+      -> transformation_t<tp> {
       return glm::lookAt(a_origin, a_target, a_up_direction);
     }
     template <std::floating_point tp = default_scalar_t>
@@ -113,7 +113,7 @@ export namespace mwc {
     }*/
 
     struct aabb_st {
-      constexpr auto midpoint() const -> position_t<> {
+      [[nodiscard]] constexpr auto mid_point() const -> position_t<> {
         return (m_min + m_max) * static_cast<default_scalar_t>(0.5);
       }
       position_t<> m_min;

@@ -63,8 +63,8 @@ namespace mwc {
       if (ImGui::BeginChild("ecs", ImVec2 {0.0, 640.0}, ImGuiChildFlags_Borders)) {
         dear_imgui_ct::centered_text("ecs");
         using component_tuple_t = decltype(ecs::component_st<void>::indexed_types_tuple());
-        static_assert(std::is_same_v<component_tuple_t, void***>);
-        static_assert(std::tuple_element_t<5, component_tuple_t>::index == 333);
+        // static_assert(std::is_same_v<component_tuple_t, void***>);
+        // static_assert(std::tuple_element_t<5, component_tuple_t>::index == 333);
         constexpr auto component_count = std::tuple_size_v<component_tuple_t>;
 
         constexpr auto table_flags = ImGuiTableFlags_Borders bitor ImGuiTableFlags_HighlightHoveredColumn
@@ -74,8 +74,8 @@ namespace mwc {
         if (ImGui::BeginTable("ecs", component_count + 1, table_flags, table_size)) {
           ImGui::TableSetupColumn("entity");
           mwc::static_for_loop<0, component_count>([]<size_t tp_index> {
-            auto header_string = string_t {std::tuple_element_t<tp_index, component_tuple_t>::type_name(false)};
-            ImGui::TableSetupColumn(header_string.c_str());
+            constexpr auto header_string = std::tuple_element_t<tp_index, component_tuple_t>::type_name(false);
+            ImGui::TableSetupColumn(header_string.data());
           });
           ImGui::TableHeadersRow();
 

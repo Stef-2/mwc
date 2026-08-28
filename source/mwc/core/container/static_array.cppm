@@ -41,7 +41,7 @@ export namespace mwc {
     std::copy_n(a_data.data(), tp_count, m_data.data());
   }
   template <typename tp, size_t tp_count>
-    requires requires { tp_count > 0 && tp_count < std::numeric_limits<long unsigned int>::max(); }
+    requires requires { tp_count > 0 && tp_count < std::numeric_limits<size_t>::max(); }
   template <typename tp_this>
   constexpr auto ::mwc::static_array_st<tp, tp_count>::array(this tp_this&& a_this) -> decltype(auto) {
     return std::forward_like<tp_this>(a_this.m_data);

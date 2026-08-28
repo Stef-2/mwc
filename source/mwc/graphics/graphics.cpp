@@ -1,4 +1,6 @@
 #include "mwc/graphics/graphics.hpp"
+
+// #include "glm/gtx/euler_angles.hpp"
 #include "mwc/input/subsystem.hpp"
 
 //#include <eigen3/Eigen/src/Geometry/Transform.h>
@@ -309,7 +311,7 @@ namespace mwc {
 
       auto shader_cfg = input::input_subsystem_st::filesystem_st::shader_processing_configuration_st {
         .m_device_context = {{&m_logical_device, &m_physical_device, &m_pipeline_layout}},
-        .m_cache_spir_v_to_filesystem =  true,
+        .m_cache_spir_v_to_filesystem = true,
         .m_cache_reflection_data_to_filesystem = true,
         .m_cache_shader_pipeline_to_filesystem = true};
       mwc::file_path_t shader_path = mwc::filesystem::directory(mwc::filesystem::directory_et::e_shader);
@@ -328,7 +330,7 @@ namespace mwc {
       float3& cam_pos = std::get<0>(cam_comps).m_position;
       quat& cam_ori = std::get<1>(cam_comps).m_orientation;
       cam_pos = {0.5f, 0.5f, 0.5f};
-      cam_ori = quat {geometry::look_at(float3 {cam_pos * -1.0f32}, float3 {0.1f, 0.1f, 0.1f}).rotation().inverse()};
+      cam_ori = quat {glm::inverse(geometry::look_at(float3 {cam_pos * -1.0f32}, float3 {0.1f, 0.1f, 0.1f}, {0.0f, 1.0f, 0.0f}))};
     }
 
     auto graphics_ct::render() -> void {
@@ -351,19 +353,19 @@ namespace mwc {
       //yaw += (float)cursor_position_delta_x / 20000.0f;
       //pitch += (float)cursor_position_delta_y / 20000.0f;
 
-      math::angle_axis_t<float> x_angle_axis = {cursor_position_delta_y / 200.0f, float3 {1.0f, 0.0f, 0.0f}};
-      quat quat_delta_x = quat {x_angle_axis};
-      quat quat_to_y = quat {math::angle_axis_t<float> {geometry::radians(89.0f), float3 {1.0f, 0.0f, 0.0f}}};
-      math::angle_axis_t<float> y_angle_axis = {cursor_position_delta_x / 200.0f, float3 {0.0f, 1.0f, 0.0f}};
-      quat quat_delta_y = quat {y_angle_axis};
+      //math::angle_axis_t<float> x_angle_axis = {cursor_position_delta_y / 200.0f, float3 {1.0f, 0.0f, 0.0f}};
+      quat quat_delta_x = glm::angleAxis(cursor_position_delta_y / 200.0f, float3 {1.0f, 0.0f, 0.0f});
+      quat quat_to_y = glm::angleAxis(geometry::radians(89.0f), float3 {1.0f, 0.0f, 0.0f});
+      //math::angle_axis_t<float> y_angle_axis = {cursor_position_delta_x / 200.0f, float3 {0.0f, 1.0f, 0.0f}};
+      quat quat_delta_y = glm::angleAxis(cursor_position_delta_x / 200.0f, float3 {0.0f, 1.0f, 0.0f});
       //auto comb_delta = x_angle_axis * y_angle_axis;
       //auto offset = float3 {0.0f, 0.0f, 0.0f};
-      quat new_ori = quat::Identity() * quat_delta_y * cam_ori * quat_delta_x;
+      quat new_ori = geometry::orientation_identity() * quat_delta_y * cam_ori * quat_delta_x;
       mat3 nm = new_ori.toRotationMatrix();
-      auto t = math::euler_angles_t<float> {new_ori.toRotationMatrix()};
-      auto bv = float3 {t.angles()};
+      //auto t = math::euler_angles_t<float> {new_ori.toRotationMatrix()};
+      //auto bv = float3 {t.angles()};
       //new_ori = clamp_quaternion(new_ori, {90.0f, 0.0f, 0.0f});
-      auto new_aa = math::angle_axis_t<float> {new_ori};
+      auto new_aa = /*math::angle_axis_t<float>*/ {new_ori};
       auto new_ea
         = new_ori.toRotationMatrix().canonicalEulerAngles(0, 1, 2); //math::euler_angles_t<float> {new_ori.toRotationMatrix()};
       /*if (std::abs(new_aa.axis().x()) >= 1.0f) {

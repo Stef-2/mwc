@@ -21,8 +21,5 @@ export namespace mwc {
 
     template <std::floating_point tp>
     using quaternion_t = glm::qua<tp>;
-
-    template <std::floating_point tp, size_t tp_count>
-    using transformation_t = matrix_t<tp, tp_count, tp_count>;
   }
 }

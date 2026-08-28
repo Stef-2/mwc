@@ -6,19 +6,19 @@ include(FetchContent)
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-if(NOT CMAKE_EXPERIMENTAL_CXX_IMPORT_STD)
-    if( ${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.4)
+if (NOT CMAKE_EXPERIMENTAL_CXX_IMPORT_STD)
+    if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.4)
         set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD f35a9ac6-8463-4d38-8eec-5d6008153e7d)
-    elseif(${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.3)
+    elseif (${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.3)
         set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD 451f2fe2-a8a2-47c3-bc32-94786d8fc91b)
-    elseif(${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.2)
+    elseif (${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.2)
         set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD d0edc3af-4c50-42ea-a356-e2862fe7a444)
-    elseif(${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.0)
+    elseif (${CMAKE_VERSION} VERSION_GREATER_EQUAL 4.0)
         set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD 1942b4fa-b2c5-4546-9385-83f254070067)
-    elseif(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.30)
+    elseif (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.30)
         set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD 0e5b6991-d74f-4b3d-a41c-cf096e0b2508)
-    endif()
-endif()
+    endif ()
+endif ()
 set(CMAKE_CXX_MODULE_STD TRUE)
 
 message("using cmake version: ${CMAKE_VERSION}")
@@ -50,10 +50,10 @@ set(FETCHCONTENT_BASE_DIR ${EXTERNAL_SOURCE_DIR})
 
 # compile features
 add_compile_options(-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums -fmax-errors=16 --embed-dir=${SOURCE_DIR})
-if(MINGW)
+if (MINGW)
     # fix OpenUSD dllimport declarations when compiling with mingw
     add_compile_options(-mnop-fun-dllimport)
-endif()
+endif ()
 
 # if logging is enabled, attempt to find the logging directory, if not present, generate one
 if (${MWC_LOG})
@@ -162,13 +162,13 @@ find_package(glm CONFIG REQUIRED)
 get_target_property(glm_INCLUDE_DIR glm::glm-header-only INTERFACE_INCLUDE_DIRECTORIES)
 add_library(glm_cxx_module STATIC)
 target_include_directories(glm_cxx_module PRIVATE
-    ${vma_SOURCE_DIR}
+        ${vma_SOURCE_DIR}
 )
-target_compile_definitions(glm_cxx_module PRIVATE
-    GLM_ENABLE_EXPERIMENTAL
-    GLM_GTC_INLINE_NAMESPACE
-    GLM_EXT_INLINE_NAMESPACE
-    GLM_GTX_INLINE_NAMESPACE
+target_compile_definitions(glm_cxx_module PUBLIC
+        GLM_ENABLE_EXPERIMENTAL
+        GLM_GTC_INLINE_NAMESPACE
+        GLM_EXT_INLINE_NAMESPACE
+        GLM_GTX_INLINE_NAMESPACE
 )
 target_compile_options(glm_cxx_module PRIVATE -w)
 target_sources(glm_cxx_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${glm_INCLUDE_DIR} FILES ${glm_INCLUDE_DIR}/glm/glm.cppm)
@@ -191,20 +191,20 @@ target_link_libraries(fast_gltf_module PRIVATE fastgltf)]]
 ]]
 # imgui library
 FetcHContent_Declare(imgui GIT_REPOSITORY
-    https://github.com/ocornut/imgui
+        https://github.com/ocornut/imgui
 )
 FetchContent_MakeAvailable(imgui)
 add_library(imgui_static STATIC)
 target_include_directories(imgui_static PRIVATE
-    ${imgui_SOURCE_DIR}
-    ${imgui_SOURCE_DIR}/backends
+        ${imgui_SOURCE_DIR}
+        ${imgui_SOURCE_DIR}/backends
 )
 target_sources(imgui_static PRIVATE
-    ${imgui_SOURCE_DIR}/imgui.cpp
-    ${imgui_SOURCE_DIR}/imgui_draw.cpp
-    ${imgui_SOURCE_DIR}/imgui_tables.cpp
-    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+        ${imgui_SOURCE_DIR}/imgui.cpp
+        ${imgui_SOURCE_DIR}/imgui_draw.cpp
+        ${imgui_SOURCE_DIR}/imgui_tables.cpp
+        ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+        ${imgui_SOURCE_DIR}/imgui_demo.cpp
 )
 FetchContent_Declare(imgui_module GIT_REPOSITORY
         https://github.com/stripe2933/imgui-module
@@ -216,18 +216,18 @@ FetchContent_Declare(imgui_module GIT_REPOSITORY
 FetchContent_MakeAvailable(imgui_module)
 add_library(imgui_cxx_module STATIC)
 target_include_directories(imgui_cxx_module PRIVATE
-    ${imgui_SOURCE_DIR}
-    ${imgui_SOURCE_DIR}/backends
+        ${imgui_SOURCE_DIR}
+        ${imgui_SOURCE_DIR}/backends
 )
 target_sources(imgui_cxx_module PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${imgui_module_SOURCE_DIR} FILES
-    ${imgui_module_SOURCE_DIR}/generated/imgui.cppm
-    # ${imgui_module_SOURCE_DIR}/generated/imgui_internal.cppm
-    ${imgui_module_SOURCE_DIR}/generated/backends/imgui_impl_glfw.cppm
-    ${imgui_module_SOURCE_DIR}/generated/backends/imgui_impl_vulkan.cppm
+        ${imgui_module_SOURCE_DIR}/generated/imgui.cppm
+        # ${imgui_module_SOURCE_DIR}/generated/imgui_internal.cppm
+        ${imgui_module_SOURCE_DIR}/generated/backends/imgui_impl_glfw.cppm
+        ${imgui_module_SOURCE_DIR}/generated/backends/imgui_impl_vulkan.cppm
 )
 target_link_libraries(imgui_cxx_module PRIVATE
-    imgui_static
-    vulkan_cxx_module
+        imgui_static
+        vulkan_cxx_module
 )
 
 find_package(pxr CONFIG REQUIRED HINTS ${OPEN_USD_INSTALL_DIR})

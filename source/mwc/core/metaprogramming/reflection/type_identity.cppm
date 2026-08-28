@@ -27,7 +27,7 @@ export namespace mwc {
           if constexpr (std::meta::has_identifier(parent)) {
             constexpr auto parent_identifier = std::meta::identifier_of(parent);
 
-            std::format_to(std::front_inserter(fully_qualified_name), "::{0}", parent_identifier);
+            fully_qualified_name.insert(0, std::format("::{0}", parent_identifier));
           }
           a_this.template operator()<parent>();
         }
