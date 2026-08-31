@@ -104,6 +104,8 @@ if (NOT TARGET Vulkan::HppModule)
     target_link_libraries(vulkan_cxx_module PUBLIC Vulkan::Vulkan)
 endif ()
 
+#glfw library
+find_package(glfw3 CONFIG REQUIRED)
 # vkfw library
 FetchContent_Declare(
         vkfw
@@ -255,16 +257,22 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         MWC_ASSERT=${MWC_ASSERT}
 )
 # project libraries
-target_link_libraries(${PROJECT_NAME} PUBLIC
+target_link_libraries(${PROJECT_NAME} PRIVATE
         vulkan_cxx_module
         vkfw_cxx_module
         vma_cxx_module
         glm_cxx_module
         glfw
         usd
-        usd_ms
+        #usd_ms
+        imgui_static
         imgui_cxx_module
         slang::slang
         GPUOpen::VulkanMemoryAllocator
-        VulkanMemoryAllocator::Headers
 )
+# mingw specific
+if (MINGW)
+    target_link_libraries(${PROJECT_NAME} PUBLIC
+            stdc++exp
+    )
+endif ()
