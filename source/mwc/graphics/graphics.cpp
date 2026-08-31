@@ -23,8 +23,8 @@ namespace mwc {
     using float4 = math::vector_t<float32_t, 4>;
     using quat = math::quaternion_t<float32_t>;
     using mat3 = math::matrix_t<float32_t, 3, 3>;
-    using mat4 = math::matrix_t<float, 4, 4>;
-    using trans = geometry::transformation_t<float>;
+    using mat4 = math::matrix_t<float32_t, 4, 4>;
+    using trans = geometry::transformation_t<float32_t>;
 
     constexpr auto Rad2Deg = 360 / (std::numbers::pi_v<float> * 2);
     constexpr auto Deg2Rad = std::numbers::pi_v<float> / 180;
@@ -354,30 +354,30 @@ namespace mwc {
       //pitch += (float)cursor_position_delta_y / 20000.0f;
 
       //math::angle_axis_t<float> x_angle_axis = {cursor_position_delta_y / 200.0f, float3 {1.0f, 0.0f, 0.0f}};
-      quat quat_delta_x = glm::angleAxis(cursor_position_delta_y / 200.0f, float3 {1.0f, 0.0f, 0.0f});
-      quat quat_to_y = glm::angleAxis(geometry::radians(89.0f), float3 {1.0f, 0.0f, 0.0f});
+      quat quat_delta_x = glm::angleAxis(cursor_position_delta_y / 200.f32, float3 {1.0f, 0.0f, 0.0f});
+      quat quat_to_y = glm::angleAxis(geometry::radians(89.0f32), float3 {1.0f, 0.0f, 0.0f});
       //math::angle_axis_t<float> y_angle_axis = {cursor_position_delta_x / 200.0f, float3 {0.0f, 1.0f, 0.0f}};
-      quat quat_delta_y = glm::angleAxis(cursor_position_delta_x / 200.0f, float3 {0.0f, 1.0f, 0.0f});
+      quat quat_delta_y = glm::angleAxis(cursor_position_delta_x / 200.0f32, float3 {0.0f, 1.0f, 0.0f});
       //auto comb_delta = x_angle_axis * y_angle_axis;
       //auto offset = float3 {0.0f, 0.0f, 0.0f};
       quat new_ori = geometry::orientation_identity() * quat_delta_y * cam_ori * quat_delta_x;
-      mat3 nm = new_ori.toRotationMatrix();
+      mat3 nm = glm::mat4_cast(new_ori);
       //auto t = math::euler_angles_t<float> {new_ori.toRotationMatrix()};
       //auto bv = float3 {t.angles()};
       //new_ori = clamp_quaternion(new_ori, {90.0f, 0.0f, 0.0f});
-      auto new_aa = /*math::angle_axis_t<float>*/ {new_ori};
-      auto new_ea
-        = new_ori.toRotationMatrix().canonicalEulerAngles(0, 1, 2); //math::euler_angles_t<float> {new_ori.toRotationMatrix()};
+      quat new_aa = /*math::angle_axis_t<float>*/ {new_ori};
+      /*auto new_ea
+        = new_ori.toRotationMatrix().canonicalEulerAngles(0, 1, 2);*/ //math::euler_angles_t<float> {new_ori.toRotationMatrix()};
       /*if (std::abs(new_aa.axis().x()) >= 1.0f) {
         new_aa.angle() = std::clamp(new_aa.angle(), geometry::radians(-89.0f), geometry::radians(89.0f));
       }*/
       //t.angles().x() = std::clamp(t.angles().x(), geometry::radians(-89.0f), geometry::radians(89.0f));
       //t.angles().z() = 0.0f;
-
+      /*
       float x = geometry::degrees(new_aa.angle()) * new_aa.axis().x();
       float z = geometry::degrees(new_aa.angle()) * new_aa.axis().z();
       float r = (x + z) / 2;
-
+*/
       /*if (std::abs(x) > 90.0f or std::abs(z) > 90.0f)
         new_aa.angle() *= 0.95f;*/
       /*{
@@ -395,20 +395,20 @@ namespace mwc {
 
       //new_aa.axis().normalize();
 
-      m_window->title(std::format("AA: [x:{: 4.2f}]   [y:{: 4.2f}]   [z:{: 4.2f}]   [a_deg:{: 4.2f}]"
+      /*m_window->title(std::format("AA: [x:{: 4.2f}]   [y:{: 4.2f}]   [z:{: 4.2f}]   [a_deg:{: 4.2f}]"
                                   " === AA*MAG: [x:{: 4.2f}] [y:{: 4.2f}]   [z:{: 4.2f}]"
                                   " === DIR: [x:{: 4.2f}]   [y:{: 4.2f}]   [z:{: 4.2f}]",
                                   new_aa.axis().x(), new_aa.axis().y(), new_aa.axis().z(), geometry::degrees(new_aa.angle()), x,
-                                  geometry::degrees(new_aa.angle()) * new_aa.axis().y(), z, nm(0, 2), nm(1, 2), nm(2, 2)));
+                                  geometry::degrees(new_aa.angle()) * new_aa.axis().y(), z, nm(0, 2), nm(1, 2), nm(2, 2)));*/
       //float angle_between = new_ori.angularDistance(quat_to_y);
       //float mix = std::min(1.0f, geometry::radians(89.0f) / std::abs(angle_between));
-      if (not(std::abs(nm(1, 2)) >= 0.98f))
+      if (not(std::abs(nm[1][2] >= 0.98f)))
         cam_ori = new_aa; //cam_ori.slerp(mix, new_ori);
 
       //auto cam_aa = math::angle_axis_t<float> {cam_ori};
 
-      constexpr auto speed = 0.01f;
-      mat3 cam_ori_mat = cam_ori.toRotationMatrix();
+      constexpr auto speed = 0.01f32;
+      mat3 cam_ori_mat = glm::mat4_cast(cam_ori);
       //const auto inv_c = camera_trans.inverse();
       /*
       // mat3 look = geometry::look_at(cam_pos, cam_pos + cam)
@@ -423,13 +423,13 @@ namespace mwc {
                       .toRotationMatrix();
       cam_ori = cam_ori_mat;*/
 
-      auto fwd = float3 {-cam_ori_mat(0, 2), -cam_ori_mat(1, 2), -cam_ori_mat(2, 2)};
+      auto fwd = float3 {-cam_ori_mat[0][2], -cam_ori_mat[1][2], -cam_ori_mat[2][2]};
       //auto old_look = look_at(pos, {0.0f, 0.0f, 0.0f}).inverse();
       //fwd = {old_look(0, 2), old_look(1, 2), old_look(2, 2)};
       //fwd.normalize();
       auto up = float3 {0.0f, 1.0f, 0.0f};
       //auto local_up = float3 {camera_trans(0, 1), camera_trans(1, 1), camera_trans(2, 1)};
-      auto right = float3 {fwd.cross(up)}.normalized();
+      auto right = float3 {glm::normalize(glm::cross(fwd, up))};
       //right.normalize();
 
       if (input::input_subsystem_st::keyboard_st::key_map.contains(vkfw::Key::eW)) {
@@ -480,9 +480,10 @@ namespace mwc {
       auto& model = input::input_subsystem_st::filesystem_st::scene_registry[0].m_nodes[0].m_transformation;
       //model.translate(float3 {0.0f, 0.005f, 0.0f} * std::sin((float)(vkfw::getTime().value)));
       //auto inv = camera_trans.inverse();
-      trans cam_trans;
-      cam_trans.fromPositionOrientationScale(cam_pos, cam_ori, cam_sca);
-      mat4 inv = cam_trans.inverse().matrix();
+      trans cam_trans = geometry::transformation_identity();
+      cam_trans = cam_trans * glm::mat4_cast(cam_ori);
+      cam_trans = glm::translate(cam_trans, cam_pos);
+      mat4 inv = glm::inverse(cam_trans);
       //inv = geometry::look_at(cam_pos, float3 {cam_pos + fwd}).matrix();
 
       auto& frame_data = m_frame_synchronizer.m_synchronization_data[m_frame_synchronizer.m_frame_index];
@@ -503,12 +504,12 @@ namespace mwc {
 
       // push constants
       auto push_constants = vulkan::push_constant_st {};
-      push_constants.m_model = cam_proj.matrix() * inv.matrix() * model.matrix();
+      push_constants.m_model = cam_proj * inv * model;
       /* * math::matrix_t<float32_t, 4, 4>::Ones()*/;
       push_constants.m_registers.m_registers[0] = m_vertex_buffers[0].address() + mesh.m_device_mesh.m_vertex_buffer.m_offset;
       push_constants.m_material_data = {1, 2, 0};
-      push_constants.m_view_data.m_view_direction = math::vector_t<float32_t, 4> {inv(0, 2), inv(1, 2), inv(2, 2), 1.0f};
-      push_constants.m_view_data.m_view_position = math::vector_t<float32_t, 4> {inv(0, 3), inv(1, 3), inv(2, 3), 0.0f};
+      push_constants.m_view_data.m_view_direction = math::vector_t<float32_t, 4> {inv[0][2], inv[1][2], inv[2][2], 1.0f};
+      push_constants.m_view_data.m_view_position = math::vector_t<float32_t, 4> {inv[0][3], inv[1][3], inv[2][3], 0.0f};
       push_constants.m_current_time = vkfw::getTime().value;
       cmd.pushConstants<vulkan::push_constant_st>(m_pipeline_layout.native_handle(), vk::ShaderStageFlagBits::eAll, 0,
                                                   push_constants);

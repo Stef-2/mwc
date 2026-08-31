@@ -141,6 +141,7 @@ FetchContent_Declare(vma GIT_REPOSITORY
         SOURCE_SUBDIR "workaround for CMAKE_EXPERIMENTAL_CXX_IMPORT_STD"
 )
 FetchContent_MakeAvailable(vma)
+add_subdirectory(${vma_SOURCE_DIR}/VulkanMemoryAllocator)
 add_library(vma_cxx_module STATIC)
 target_include_directories(vma_cxx_module PRIVATE
         ${vma_SOURCE_DIR}/include
@@ -264,4 +265,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         usd_ms
         imgui_cxx_module
         slang::slang
+        GPUOpen::VulkanMemoryAllocator
+        VulkanMemoryAllocator::Headers
 )

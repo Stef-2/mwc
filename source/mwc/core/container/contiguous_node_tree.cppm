@@ -1,10 +1,12 @@
-#pragma once
+module;
+
+export module mwc_contiguous_node_tree;
 
 import mwc_definition;
 
 import std;
 
-namespace mwc {
+export namespace mwc {
   template <typename tp, std::unsigned_integral tp_index = uint16_t>
   class contiguous_node_tree_ct {
     public:

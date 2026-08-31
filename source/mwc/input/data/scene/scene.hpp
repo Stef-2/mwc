@@ -1,11 +1,11 @@
 #pragma once
 
-#include "mwc/core/container/contiguous_node_tree.hpp"
 #include "mwc/input/data/scene/mesh.hpp"
 
 import mwc_definition;
 import mwc_geometry;
 import mwc_host_camera;
+import mwc_contiguous_node_tree;
 import mwc_input_image;
 
 import std;
