@@ -145,7 +145,7 @@ FetchContent_Declare(vma GIT_REPOSITORY
 FetchContent_MakeAvailable(vma)
 add_subdirectory(${vma_SOURCE_DIR}/VulkanMemoryAllocator)
 add_library(vma_cxx_module STATIC)
-target_include_directories(vma_cxx_module PRIVATE
+target_include_directories(vma_cxx_module PUBLIC
         ${vma_SOURCE_DIR}/include
         ${vma_SOURCE_DIR}/VulkanMemoryAllocator/include
 )
@@ -208,6 +208,8 @@ target_sources(imgui_static PRIVATE
         ${imgui_SOURCE_DIR}/imgui_tables.cpp
         ${imgui_SOURCE_DIR}/imgui_widgets.cpp
         ${imgui_SOURCE_DIR}/imgui_demo.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp
 )
 FetchContent_Declare(imgui_module GIT_REPOSITORY
         https://github.com/stripe2933/imgui-module
@@ -276,3 +278,11 @@ if (MINGW)
             stdc++exp
     )
 endif ()
+#[[
+add_executable(test ${mwc_SOURCE_DIR}/source/test.cpp
+        #/home/billy/dev/mwc/source/mwc/graphics/vulkan/vma_implementation.cpp
+)
+#target_include_directories(test PUBLIC ${SOURCE_DIR})
+#target_sources(test PRIVATE FILE_SET CXX_MODULES BASE_DIRS ${MODULE_DIR} FILES ${MODULE_SOURCES})
+
+target_link_libraries(test PRIVATE vma_cxx_module)]]

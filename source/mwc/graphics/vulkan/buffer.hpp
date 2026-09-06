@@ -4,6 +4,7 @@ import mwc_definition;
 import mwc_vk_handle;
 import mwc_vk_logical_device;
 import mwc_memory_allocator;
+import mwc_vk_null_handle;
 
 import vulkan;
 
@@ -47,7 +48,7 @@ namespace mwc {
       };
 
       struct buffer_region_st {
-        vk::Buffer m_buffer = {nullptr};
+        vk::Buffer m_buffer = null_handle;
         vk::DeviceSize m_offset = {0};
         vk::DeviceSize m_size = {0};
       };

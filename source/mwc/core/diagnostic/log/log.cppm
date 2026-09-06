@@ -45,7 +45,7 @@ export namespace mwc {
           e_cover_higher_severities = utility::set_bit<6>()
         };
 
-        static constexpr auto default_configuration() -> const configuration_st;
+        static constexpr auto default_configuration() -> configuration_st;
         // note: consider using std::bitset for this bit mask
         bit_mask_t<bit_flags_et> m_bit_mask;
       };
@@ -62,7 +62,7 @@ export namespace mwc {
         constexpr sink_st(const sink_c auto a_sink,
                           optional_t<event_severity_et> a_event_severity = configuration_st::default_severity_level,
                           optional_t<configuration_st> a_cfg = configuration_st::default_configuration()) pre(a_sink != nullptr)
-          pre(a_event_severity != event_severity_et::end);
+          pre(not a_event_severity.has_value() or contract::validate_enumerator(a_event_severity.value()));
         constexpr auto operator==(const sink_st& a_other) const -> bool_t;
         constexpr auto operator==(const sink_c auto a_sink) const -> bool_t pre(a_sink != nullptr);
         auto print(const string_view_t a_string) const -> void;
@@ -110,7 +110,7 @@ export namespace mwc {
       };
 
       // implementation
-      constexpr auto configuration_st::default_configuration() -> const configuration_st {
+      constexpr auto configuration_st::default_configuration() -> configuration_st {
         return {std::numeric_limits<bit_mask_t<bit_flags_et>>::max()};
       }
 
