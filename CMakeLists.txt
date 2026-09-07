@@ -49,7 +49,14 @@ set(DATA_SHADER_DIR ${DATA_DIR}/shader)
 set(FETCHCONTENT_BASE_DIR ${EXTERNAL_SOURCE_DIR})
 
 # compile features
-add_compile_options(-std=c++26 -fcontracts -freflection -fmodules -fstrict-enums -fmax-errors=16 --embed-dir=${SOURCE_DIR})
+add_compile_options(-std=c++26
+        -fcontracts
+        -freflection
+        -fmodules
+        -fstrict-enums
+        -fmax-errors=1
+        --embed-dir=${SOURCE_DIR}
+)
 if (MINGW)
     # fix OpenUSD dllimport declarations when compiling with mingw
     add_compile_options(-mnop-fun-dllimport)
@@ -104,8 +111,9 @@ if (NOT TARGET Vulkan::HppModule)
     target_link_libraries(vulkan_cxx_module PUBLIC Vulkan::Vulkan)
 endif ()
 
-#glfw library
+# glfw library
 find_package(glfw3 CONFIG REQUIRED)
+
 # vkfw library
 FetchContent_Declare(
         vkfw
@@ -211,6 +219,10 @@ target_sources(imgui_static PRIVATE
         ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
         ${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp
 )
+target_link_libraries(imgui_static PUBLIC
+        glfw
+        Vulkan::Vulkan
+)
 FetchContent_Declare(imgui_module GIT_REPOSITORY
         https://github.com/stripe2933/imgui-module
         GIT_TAG main
@@ -235,10 +247,14 @@ target_link_libraries(imgui_cxx_module PRIVATE
         vulkan_cxx_module
 )
 
-find_package(pxr CONFIG REQUIRED HINTS ${OPEN_USD_INSTALL_DIR})
+# tbb library
+#find_package(TBB CONFIG REQUIRED)
+# open usd library
+set(PXR_FIND_TBB_IN_CONFIG OFF)
+find_package(pxr CONFIG REQUIRED)
 find_package(slang CONFIG REQUIRED)
 
-# project executable
+# ========== project executable ==========
 add_executable(${PROJECT_NAME})
 # project include directories
 target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
@@ -249,6 +265,10 @@ target_sources(${PROJECT_NAME} PRIVATE FILE_SET CXX_MODULES BASE_DIRS ${MODULE_D
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${SOURCE_DIR}/*${CXX_SOURCE_FILE_EXTENSION})
 target_sources(${PROJECT_NAME} PRIVATE
         ${SOURCES}
+)
+# project compile options
+target_compile_options(${PROJECT_NAME} PRIVATE
+        -fcontract-evaluation-semantic=ignore
 )
 # project compile definitions
 target_compile_definitions(${PROJECT_NAME} PRIVATE
@@ -265,7 +285,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         vma_cxx_module
         glm_cxx_module
         glfw
-        usd
+        #        TBB::tbb
+        #        usd
         #usd_ms
         imgui_static
         imgui_cxx_module
