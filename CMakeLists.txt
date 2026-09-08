@@ -252,8 +252,11 @@ target_link_libraries(imgui_cxx_module PRIVATE
 # open usd library
 set(PXR_FIND_TBB_IN_CONFIG OFF)
 find_package(pxr CONFIG REQUIRED)
+
+# shader slang library
 find_package(slang CONFIG REQUIRED)
 
+#find_package(LightUSD REQUIRED)
 # ========== project executable ==========
 add_executable(${PROJECT_NAME})
 # project include directories
@@ -285,13 +288,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         vma_cxx_module
         glm_cxx_module
         glfw
-        #        TBB::tbb
-        #        usd
-        #usd_ms
+        C:/Users/stefan.stajcic/dev/usd/lib/tbb.lib
+        usd
+        usd_ms
         imgui_static
         imgui_cxx_module
         slang::slang
         GPUOpen::VulkanMemoryAllocator
+        #        lightusd::lightusd_static
+        #        ${LIGHTUSD_TARGET_STATIC}
 )
 # mingw specific
 if (MINGW)
