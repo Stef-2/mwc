@@ -250,7 +250,7 @@ target_link_libraries(imgui_cxx_module PRIVATE
 # tbb library
 #find_package(TBB CONFIG REQUIRED)
 # open usd library
-set(PXR_FIND_TBB_IN_CONFIG OFF)
+#set(PXR_FIND_TBB_IN_CONFIG OFF)
 find_package(pxr CONFIG REQUIRED)
 
 # shader slang library
@@ -288,7 +288,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         vma_cxx_module
         glm_cxx_module
         glfw
-        C:/Users/stefan.stajcic/dev/usd/lib/tbb.lib
+        #        C:/Users/stefan.stajcic/dev/usd/lib/tbb.lib
         usd
         usd_ms
         imgui_static
