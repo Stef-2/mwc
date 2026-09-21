@@ -98,3 +98,4 @@ PenaltyBreakOpenParenthesis: 10
 PenaltyExcessCharacter: 10
 PenaltyReturnTypeOnItsOwnLine: 10
 RemoveBracesLLVM: false
+SortUsingDeclarations: Never

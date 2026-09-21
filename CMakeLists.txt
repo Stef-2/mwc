@@ -295,6 +295,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         imgui_cxx_module
         slang::slang
         GPUOpen::VulkanMemoryAllocator
+        Vulkan::Vulkan
         #        lightusd::lightusd_static
         #        ${LIGHTUSD_TARGET_STATIC}
 )

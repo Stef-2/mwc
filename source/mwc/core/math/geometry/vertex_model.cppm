@@ -29,56 +29,57 @@ export namespace mwc {
     // vertex components
     struct vertex_position_st {
       using storage_t = position_t<>;
-      using array_t = array_t<storage_t::value_type, storage_t::length()>;
+      using native_array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_position;
     };
     struct vertex_normal_st {
       using storage_t = direction_t<>;
-      using array_t = array_t<storage_t::value_type, storage_t::length()>;
+      using native_array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_normal;
     };
     struct vertex_tangent_st {
       using storage_t = math::vector_t<vertex_normal_st::storage_t::value_type, 4>;
-      using array_t = array_t<storage_t::value_type, storage_t::length()>;
+      using native_array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_tangent;
     };
     struct vertex_uv_st {
       using storage_t = math::vector_t<float32_t, 2>;
-      using array_t = array_t<storage_t::value_type, storage_t::length()>;
+      using native_array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_uv;
     };
     struct vertex_color_st {
       using storage_t = math::vector_t<float32_t, 3>;
-      using array_t = array_t<storage_t::value_type, storage_t::length()>;
+      using native_array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_color;
     };
     struct vertex_joints_st {
       using storage_t = math::vector_t<uint16_t, 4>;
-      using array_t = array_t<storage_t::value_type, storage_t::length()>;
+      using native_array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_joints;
     };
     struct vertex_weights_st {
       using storage_t = math::vector_t<float32_t, 4>;
-      using array_t = array_t<storage_t::value_type, storage_t::length()>;
+      using native_array_t = array_t<storage_t::value_type, storage_t::length()>;
 
       storage_t m_weights;
     };
+
     constexpr auto vertex_component_size(const vertex_component_bit_mask_et a_component) {
       switch (a_component) {
         using enum vertex_component_bit_mask_et;
-        case e_position : return sizeof(geometry::vertex_position_st::array_t);
-        case e_normal : return sizeof(geometry::vertex_normal_st::array_t);
-        case e_tangent : return sizeof(geometry::vertex_tangent_st::array_t);
-        case e_uv : return sizeof(geometry::vertex_uv_st::array_t);
-        case e_color : return sizeof(geometry::vertex_color_st::array_t);
-        case e_joints : return sizeof(geometry::vertex_joints_st::array_t);
-        case e_weights : return sizeof(geometry::vertex_weights_st::array_t);
+        case e_position : return sizeof(geometry::vertex_position_st::native_array_t);
+        case e_normal : return sizeof(geometry::vertex_normal_st::native_array_t);
+        case e_tangent : return sizeof(geometry::vertex_tangent_st::native_array_t);
+        case e_uv : return sizeof(geometry::vertex_uv_st::native_array_t);
+        case e_color : return sizeof(geometry::vertex_color_st::native_array_t);
+        case e_joints : return sizeof(geometry::vertex_joints_st::native_array_t);
+        case e_weights : return sizeof(geometry::vertex_weights_st::native_array_t);
         default : contract_assert(false); std::unreachable();
       }
     }

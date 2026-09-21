@@ -12,7 +12,7 @@ import std;
 
 namespace mwc {
   namespace input {
-    struct scene_st {
+    struct scene_st : resource_st {
       using suballocation_t = data_span_st<byte_t>;
 
       struct node_data_st {
@@ -20,6 +20,7 @@ namespace mwc {
         resource_index_t m_mesh_index;
         resource_index_t m_camera_index;
       };
+
       using mesh_storage_t = vector_t<mesh_st>;
       using image_storage_t = vector_t<image_st>;
       using camera_storage_t = vector_t<camera_st>;

@@ -1,61 +1,61 @@
 {
-    "version": 8,
-    "configurePresets": [
-        {
-            "name": "base",
-            "hidden": true,
-            "binaryDir": "${sourceDir}/build/",
-            "generator": "Ninja",
-            "environment": {
-                "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1"
-            },
-            "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": true
-            }
-        },
-        {
-            "name": "gcc_debug",
-            "inherits": "base",
-            "environment": {
-                "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
-                "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree",
-                "COMPILER_CXX_DEBUG_DEFINITIONS": ""
-            },
-            "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_CXX_COMPILER": "g++",
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
-                "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
-            }
-        },
-        {
-            "name": "clang_debug",
-            "inherits": "base",
-            "environment": {
-                "PROJECT_CXX_FEATURE_FLAGS": "-frtti -stdlib=libc++ -fno-exceptions -fstrict-enums --embed-dir=${sourceDir}",
-                "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Wdeprecated -Winline -Wextra-semi -Wsuggest-override",
-                "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fdiagnostics-show-template-tree -fdiagnostics-color=always",
-                "COMPILER_CXX_DEBUG_DEFINITIONS": ""
-            },
-            "cacheVariables": {
-                "CMAKE_C_COMPILER": "clang",
-                "CMAKE_CXX_COMPILER": "clang++",
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
-                "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS} $env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
-            }
-        }
-    ],
-    "buildPresets": [
-        {
-            "name": "gcc_debug_build",
-            "configurePreset": "gcc_debug",
-            "nativeToolOptions": []
-        },
-        {
-            "name": "clang_debug_build",
-            "configurePreset": "clang_debug"
-        }
-    ]
+  "version": 8,
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/",
+      "generator": "Ninja",
+      "environment": {
+        "PROJECT_CXX_DEBUG_DEFINITIONS": "-DMWC_DEBUG=1 -DMWC_LOG=1 -g"
+      },
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true
+      }
+    },
+    {
+      "name": "gcc_debug",
+      "inherits": "base",
+      "environment": {
+        "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Wdeprecated -Winline -Wdangling-reference -Wextra-semi -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override",
+        "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fconcepts-diagnostics-depth=16 -fdiagnostics-show-template-tree",
+        "COMPILER_CXX_DEBUG_DEFINITIONS": ""
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
+        "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
+      }
+    },
+    {
+      "name": "clang_debug",
+      "inherits": "base",
+      "environment": {
+        "PROJECT_CXX_FEATURE_FLAGS": "-frtti -stdlib=libc++ -fno-exceptions -fstrict-enums --embed-dir=${sourceDir}",
+        "PROJECT_CXX_WARNING_FLAGS": "-Wall -Wextra -Wpedantic -Wdeprecated -Winline -Wextra-semi -Wsuggest-override",
+        "PROJECT_CXX_DIAGNOSTIC_FLAGS": "-fdiagnostics-show-template-tree -fdiagnostics-color=always",
+        "COMPILER_CXX_DEBUG_DEFINITIONS": ""
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS_DEBUG": "$env{PROJECT_CXX_DEBUG_DEFINITIONS} $env{COMPILER_CXX_DEBUG_DEFINITIONS}",
+        "CMAKE_CXX_FLAGS": "$env{PROJECT_CXX_FEATURE_FLAGS} $env{PROJECT_CXX_WARNING_FLAGS} $env{PROJECT_CXX_DIAGNOSTIC_FLAGS}"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "gcc_debug_build",
+      "configurePreset": "gcc_debug",
+      "nativeToolOptions": []
+    },
+    {
+      "name": "clang_debug_build",
+      "configurePreset": "clang_debug"
+    }
+  ]
 }

@@ -10,7 +10,7 @@ export namespace mwc {
   namespace graphics {
     namespace vulkan {
       constexpr auto default_dispatcher() -> decltype(auto) {
-        return VULKAN_HPP_DEFAULT_DISPATCHER;
+        return (VULKAN_HPP_DEFAULT_DISPATCHER);
       }
     }
   }

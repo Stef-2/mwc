@@ -58,8 +58,8 @@ namespace mwc {
                                                                          .Device = a_logical_device.native_handle(),
                                                                          .QueueFamily = a_queue_family.m_index,
                                                                          .Queue = a_queue.native_handle(),
-                                                                         .DescriptorPool = *m_descriptor_pool,
-                                                                         .DescriptorPoolSize = 1,
+                                                                         .DescriptorPool = nullptr,
+                                                                         .DescriptorPoolSize = 16,
                                                                          .MinImageCount = a_swapchain.image_count(),
                                                                          .ImageCount = a_swapchain.image_count(),
                                                                          .PipelineCache = graphics::vulkan::null_handle,
@@ -68,7 +68,8 @@ namespace mwc {
                                                                          .Allocator = nullptr,
                                                                          .CheckVkResultFn = nullptr,
                                                                          .MinAllocationSize = 0,
-      .CustomShaderVertCreateInfo = {}, .CustomShaderFragCreateInfo = {}};
+                                                                         .CustomShaderVertCreateInfo = {},
+                                                                         .CustomShaderFragCreateInfo = {}};
 
       const auto vulkan_initialization = ImGui_ImplVulkan_Init(&imgui_vulkan_initialization_info);
       contract_assert(vulkan_initialization);

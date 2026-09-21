@@ -53,7 +53,7 @@ export namespace mwc {
         m_index {a_index} {}
 
       auto operator<=>(const resource_st& a_other) const {
-        return m_name <=> a_other.m_name;
+        return m_index <=> a_other.m_index;
       }
 
       file_path_t m_source_filepath;
